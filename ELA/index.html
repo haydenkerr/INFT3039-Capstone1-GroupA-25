@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELA Pro - Essay Evaluation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #output, #feedback {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Upload a Document (PDF or DOCX)</h2>
+    <input type="file" id="fileInput" accept=".pdf, .docx">
+    <button onclick="processFile()">Process File</button>
+
+    <h3>Extracted Text:</h3>
+    <div id="output"></div>
+
+    <h3>Feedback and Score:</h3>
+    <div id="feedback">Awaiting AI processing...</div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
