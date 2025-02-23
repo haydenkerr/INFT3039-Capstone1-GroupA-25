@@ -1,7 +1,7 @@
 import modal
 
 
-app = modal.App("example-get-started")|
+app = modal.App("example-get-started")
 
 
 @app.function()
@@ -13,3 +13,5 @@ def square(x):
 def main():
     with app.run():
         print("the square is", square.remote(42))
+        
+main()
