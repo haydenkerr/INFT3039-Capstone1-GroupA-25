@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
-
+    // Password protection for testing purposes
+    // const password = "test123";
+    // let enteredPassword = prompt("Enter password to access the site:");
+    // if (enteredPassword !== password) {
+    //     alert("Incorrect password. Access denied.");
+    //     document.body.innerHTML = "<h2>Access Denied</h2>";
+    //     return;
+    // }
     //----------------------------------------
     // 1) WORD COUNT HELPER
     //----------------------------------------
