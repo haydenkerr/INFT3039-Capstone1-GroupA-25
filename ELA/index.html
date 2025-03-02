@@ -1,37 +1,182 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>  
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELA Pro - Essay Evaluation</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #output, #feedback {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-top: 10px;
-            min-height: 100px;
-        }
-    </style>
+<html lang="english">
+<head>
+  <title>ELA - English Language Assistant Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta property="twitter:card" content="summary_large_image" />
+
+  <!-- Force typed text in textareas/inputs to appear black -->
+  <style>
+    textarea,
+    .desktop1-input3 {
+      color: black !important;
+    }
+    textarea::placeholder,
+    .desktop1-input3::placeholder {
+      color: #999; /* placeholders are gray */
+    }
+  </style>
+
+  <!-- Your main CSS, if desired -->
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- pdf.js for PDFs -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"
+  ></script>
+
+  <!-- mammoth for DOCX -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"
+  ></script>
 </head>
 <body>
+  <link href="./index.css" rel="stylesheet" />
 
-    <h2>Upload a Document (PDF or DOCX)</h2>
-    <input type="file" id="fileInput" accept=".pdf, .docx">
-    <button onclick="processFile()">Process File</button>
+  <div class="desktop1-container">
+    <div class="desktop1-desktop1">
+      <div class="desktop1-body">
 
-    <h3>Extracted Text:</h3>
-    <div id="output"></div>
+        <div class="desktop1-reportlink">
+          <div class="desktop1-textarea1">
+            <span class="desktop1-text10 BodyBase">
+              ELA is processing file ..... when complete, a report link will be presented
+            </span>
+            <img
+              src="public/external/dragi210-vuup.svg"
+              alt="DragI210"
+              class="desktop1-drag1"
+            />
+          </div>
+        </div>
 
-    <h3>Feedback and Score:</h3>
-    <div id="feedback">Awaiting AI processing...</div>
+        <span class="desktop1-text11">
+          Link to score, feedback and suggested improvements
+        </span>
 
-    <script src="script.js"></script>
+        <!-- Process Submission button -->
+        <button class="desktop1-processbutton">
+          <img
+            src="public/external/playi149-a39l.svg"
+            alt="PlayI149"
+            class="desktop1-play"
+          />
+          <span class="desktop1-text12 SingleLineBodyBase">
+            Process Submission
+          </span>
+        </button>
 
+        <!-- Word count -->
+        <div class="desktop1-wordcount">
+          <span class="desktop1-text13 BodyBase">Word Count</span>
+          <input type="text" class="desktop1-input1"  />
+        </div>
+
+        <!-- Essay box -->
+        <div class="desktop1-essaybox">
+          <span class="desktop1-text14 BodyBase">Essay</span>
+          <textarea
+            class="desktop1-textarea2"
+            rows="6"
+            placeholder="Paste your essay here, or if loading from a file, the essay text will appear here."
+          ></textarea>
+        </div>
+
+        <!-- Question box -->
+        <div class="desktop1-questionbox">
+          <span class="desktop1-text16 BodyBase">Question</span>
+          <textarea
+            class="desktop1-textarea3"
+            rows="4"
+            placeholder="If Generate question is yes, a question will appear here; else type or paste yours."
+          ></textarea>
+        </div>
+
+        <!-- Upload file controls -->
+        <div class="desktop1-uploadfilegroup">
+          <input
+            type="text"
+            placeholder="No file chosen"
+            class="desktop1-input2"
+            readonly
+          />
+          <button class="desktop1-uploadfilebutton">
+            <img
+              src="public/external/uploadi153-jmr8.svg"
+              alt="UploadI153"
+              class="desktop1-upload"
+            />
+            <span class="desktop1-text18 SingleLineBodyBase">
+              Choose File
+            </span>
+          </button>
+        </div>
+
+        <span class="desktop1-text19">
+          Upload a Question &amp; Essay (TXT, PDF, or DOCX)
+        </span>
+
+        <!-- Additional dropdowns -->
+        <div class="desktop1-generatequestion">
+          <span class="desktop1-text21 BodyBase">Generate question</span>
+          <select>
+            <option value="" disabled selected hidden>Select an option</option>
+            <option value="Yes">Yes - I require a question</option>
+            <option value="No">No - I will enter or upload a question</option>
+          </select>
+        </div>
+        <div class="desktop1-tasktype">
+          <span class="desktop1-text22 BodyBase">Task Type</span>
+          <select>
+            <option value="" disabled selected hidden>Select an option</option>
+            <option value="Academic Task 1">Academic Task 1</option>
+            <option value="Academic Task 2">Academic Task 2</option>
+            <option value="General Task 1">General Task 1</option>
+            <option value="General Task 2">General Task 2</option>
+          </select>
+        </div>
+        <div class="desktop1-submissiongroup">
+          <span class="desktop1-text23 BodyBase">Submission Group</span>
+          <select class="desktop1-select3">
+            <option value="" disabled selected hidden>Select an option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+        <div class="desktop1-email">
+          <span class="desktop1-text24 BodyBase">Enter email</span>
+          <input
+            type="text"
+            placeholder="firstName.lastName@email.com"
+            class="desktop1-input3"
+          />
+        </div>
+        <span class="desktop1-text25">
+          ELA - English Language Assistant Pro
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden file input that we click programmatically -->
+  <input
+    id="fileInput"
+    type="file"
+    style="display: none;"
+    accept=".txt,.pdf,.docx"
+  />
+
+  <!-- (Optional) Debug output areas if you want them:
+  <div id="output" style="white-space: pre-wrap; margin: 2rem 0;"></div>
+  <div id="feedback" style="margin-bottom: 2rem;"></div>
+  -->
+
+  <!-- Main script -->
+  <script src="script.js"></script>
 </body>
 </html>
