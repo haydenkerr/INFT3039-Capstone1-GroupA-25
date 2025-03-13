@@ -704,3 +704,11 @@
   min-width: 160px !important;
   position: revert !important;
 }
+.desktop1-downloadlink {
+  display: flex !important;
+  margin: 22rem 0 !important; /* This is the vertical spacing */
+  margin-left: 10% !important;
+  margin-right: 10% !important;
+  position: static !important;
+  
+}
