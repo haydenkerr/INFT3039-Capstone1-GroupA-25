@@ -1,15 +1,10 @@
-import os
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
-#  enter this in windows powershell to set the environment variable
-# Winodws + x a -> Windows Powershell (Admin)
+load_dotenv()  # Load API Key from `.env` file
 
-# [System.Environment]::SetEnvironmentVariable('GEMINI_API_KEY', 'google_api_key_from_au-studio', [System.EnvironmentVariableTarget]::Machine)
-# use https://thecategorizer.com/windows/how-to-refresh-environment-variables-in-windows/ to refresh the environment variables
-
-#  refreshenv
-
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Create the model
 generation_config = {
@@ -26,25 +21,22 @@ model = genai.GenerativeModel(
   generation_config=generation_config,
   
 )
-
-
-
-chat_session = model.start_chat(
-  history=[
-  ]
-)
 # Function to handle streamed responses
 def handle_streamed_response(response):
     for chunk in response:
         print(chunk.text, end='', flush=True)
 
-# Example function to load context from a relevant source
 def load_context():
     # Here you can load context from a file, database, API, etc.
     # For demonstration, we'll use a simple string as context
     context = open(r"C:\Users\hayde\OneDrive - Logical Aspect\Education\UniSA\INFT3039 - Capstone 1\pattern\improve_ielts_essay\system.md", "r").read()
     
     return context
+
+chat_session = model.start_chat(
+  history=[
+  ]
+)
 
 # Load context
 context = load_context()
@@ -60,6 +52,11 @@ In conclusion, I support the idea of encouraging both, university and vocational
 # Construct the prompt with context
 prompt = f"{context}\n\n{question}\n\n{essay}\n\n"
 
+
+
+def query_gemini(prompt: str) -> str:
+    
 # Send a message and handle the streamed response
-response = chat_session.send_message(prompt)
-handle_streamed_response(response)
+    response = chat_session.send_message(prompt)
+       
+    return handle_streamed_response(response) if response else "No response from Gemini."
