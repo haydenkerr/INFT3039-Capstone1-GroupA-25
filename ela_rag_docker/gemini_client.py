@@ -29,7 +29,7 @@ def handle_streamed_response(response):
 def load_context():
     # Here you can load context from a file, database, API, etc.
     # For demonstration, we'll use a simple string as context
-    context = open(r"C:\Users\hayde\OneDrive - Logical Aspect\Education\UniSA\INFT3039 - Capstone 1\pattern\improve_ielts_essay\system.md", "r").read()
+    context = open(r"https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ela_rag_docker/system.md", "r").read()
     
     return context
 
