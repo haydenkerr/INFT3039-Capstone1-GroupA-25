@@ -29,7 +29,7 @@ def load_document_hashes():
             hashes[doc_hash] = idx
     return hashes
 
-def ingest_csv_documents(max_rows=5000, csv_url=None):
+def ingest_csv_documents(max_rows=10000, csv_url=None):
     """Batch processes and stores CSV data into FAISS with duplicate checking."""
     if csv_url is None:
         csv_url = CSV_URL
