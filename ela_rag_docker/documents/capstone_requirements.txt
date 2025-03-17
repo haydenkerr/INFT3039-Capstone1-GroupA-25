@@ -1,0 +1,983 @@
+ 
+1.	BUSINESS REQUIREMENTS	3
+1.1	EXECUTIVE SUMMARY	3
+1.2	PROJECT PURPOSE/JUSTIFICATION	3
+1.2.1	Business Need/Case	3
+1.2.2	Business Objectives	5
+1.3	PROJECT DESCRIPTION	6
+1.3.1	Project Objectives and Success Criteria	6
+1.3.2	Requirements	7
+1.3.3	Constraints	8
+1.3.4	Assumptions	9
+1.3.5	Preliminary Scope Statement	10
+1.4	RISKS	11
+1.4.1	Technical and Operational Risks	11
+1.4.2	Data and Ethical Risks	12
+1.4.3	Project and Deployment Risks	13
+1.5	PROJECT DELIVERABLES	13
+1.5.1	Expected Outputs	13
+1.5.2	Interim Deliverables	14
+1.5.3	Prioritisation of Deliverables	14
+1.5.4	Approval Process	14
+1.6	SUMMARY MILESTONE SCHEDULE	15
+1.7	SUMMARY BUDGET 	17
+1.7.1	General Estimated Costs	17
+1.8	PROJECT APPROVAL REQUIREMENTS	17
+1.9	PROJECT MANAGEMENT	18
+1.9.1	Project Manager Responsibilities	18
+1.9.2	Project Management Plan	18
+1.10	AUTHORISATION	19
+2.	SYSTEM REQUIREMENTS	20
+3.1	MODEL CONSIDERATIONS	20
+3.2	USE CASE ANALYSIS	21
+3.2.1	Use Case 1: Create an account	22
+3.2.2	Use Case 2: Login	24
+3.2.3	Use Case 3: Reset password	25
+3.2.4	Use Case 4: Submit an essay	28
+3.2.5	Use Case 5: View Results	29
+3.2.6	Use Case 6: Validate Results	32
+3.2.7	Use Case 7: Submit Feedback	33
+3.2.8	Use Case 8: Model Training – Student Feedback	35
+3.2.9	Use Case 9: View Previous Results	37
+3.3	FUNCTIONAL REQUIREMENTS	39
+3.3.1	Create an account	39
+3.3.2	Login	39
+3.3.3	Submit an essay	39
+3.3.4	Grade a submission	40
+3.3.5	Display results	41
+3.3.6	Validate results	41
+3.3.7	Feedback submission	41
+3.3.8	Model Training – Student Feedback	42
+3.3.9	View previous submissions and results	42
+3.4	NON-FUNCTIONAL REQUIREMENTS	42
+3.4.1	Usability	42
+3.4.2	Reliability	43
+3.4.3	Performance	43
+3.4.4	Supportability	44
+3.4.5	Design Constraints	44
+3.4.6	Security	44
+3.5	FUTURE DIRECTIONS	45
+3.5.1	AI Model	45
+3.5.2	User Interface	45
+3.5.3	Other	46
+3.	References	46
+4.	Appendices	48
+APPENDIX A: GLOSSARY	48
+APPENDIX B: REQUIREMENTS CHANGE RECORD	50
+
+
+ 
+
+1.	BUSINESS REQUIREMENTS
+1.1	EXECUTIVE SUMMARY
+The International English Language Testing System (IELTS), first introduced in 1989, is the standard by which prospective students demonstrate their proficiency in the English language before undertaking studies in Australia (Read, 2022). 
+IELTS currently consists of reading, writing, listening, and speaking components, and are marked by human assessors. Students are placed in bands based on established marking criteria.
+The need for each student to be assessed by a person is resource intensive, both from a cost and time perspective. Students needing to bear this cost are less likely to engage with the system regularly and improve their English proficiency. Furthermore, the current system struggles with both flexibility and scalability, with varied time zones and unexpected influxes of students causing delays to both teaching and marking services.
+To address the above issues, our aim is to produce a machine learning model that can interpret written essay submissions from students and provide accurate grading alongside meaningful feedback to facilitate student progression. The model will be trained on existing datasets, but also utilise student submissions to learn, adapt and improve accuracy. Additionally, it will be designed to be called upon via API, allowing schools and universities to integrate the model into existing systems as required.
+
+1.2	PROJECT PURPOSE/JUSTIFICATION
+1.2.1	Business Need/Case
+There are several factors considered when proposing our new system for assessing IELTS submissions. The existing system of human assessors whilst functional, has several shortcomings that could be addressed with an AI-based model. Each of these considerations and their expected business impacts is expanded upon below.
+
+1.2.1.1	Efficiency
+As touched upon briefly in the above summary, human assessors represent both a significant cost, as well as limited flexibility. Depending on the number of submissions from students, their complexity or locale, assessments may take days or weeks to be returned with actionable feedback. A machine learning model could not only deliver near-instant feedback but would be readily available as and when required by students.
+
+1.2.1.2	Availability
+Increasing demand for IELTS testing from within Asia and Middle East has presented unique challenges for the existing system of marking and feedback. Specifically, students from time zones outside of Australia can find engaging with IELTS to be both time-consuming and cost prohibitive. This is particularly detrimental to students of limited resources, leaving them at a disadvantage compared to wealthier students. The lower costs and flexible nature an AI-model will serve to provide more equitable opportunity for all students and facilitate more frequent engagement with IELTS.
+
+1.2.1.3	Impartiality
+Under the current system, if a student were to raise a concern about the impartiality of the marker of their assessment, an additional assessment would need to be conducted. This can be costly to the business and can undermine student confidence in IELTS. The very nature of AI-models is to be impartial, and to mark all submissions without preference or bias. Whilst cases of bias are already exceedingly rare, the removal of the possibility of it through an AI-based tool can contribute greatly to student perception test integrity.
+
+1.2.1.4	Cost-effectiveness
+Whilst human assessors would still be required in cases of escalation, the deployment of an AI-based model would significantly lower the overhead of the business of conducting IELTS testing. These resources could then potentially be redirected into areas of the business better suited to human interaction (e.g. teaching), to ensure more students succeed. 
+
+1.2.1.5	Scalability
+Requiring personnel to mark and provide feedback on every assessment makes scalability difficult. In cases where there is an unexpected surge of submissions, it is unlikely the business will have the capacity to recruit and train the necessary staff to maintain the expected quality of guidance and turnaround time. Furthermore, the inherent labour and financial drawbacks e.g. training, insurance, recruitment etc. make this level of flexibility impractical. The proposed AI-model will address this issue by having the capacity to accept and mark an effectively unlimited number of submissions at a time, with only the available computing resources as the upper limit. This too can be addressed with a cloud-based computing solution for the model, able to be scaled up and down as the needs of the business require.
+
+1.2.1.6	User Experience
+At the heart of this project is improving the IELTS experience for both students and teachers alike. Students will experience the benefit of readily available, reliable and affordable IELTS testing, and will be able to leverage faster feedback to improve their language skills more rapidly. Teachers can focus their efforts on engaging with students to drive better learning outcomes, alongside a marking workload that is limited only to necessary escalations.
+Both outcomes are beneficial to the business at large, but the option of API functionality enhances this further. The model will be designed to be called upon by other apps and platforms, making seamless integration into existing university tools possible. This synergistic approach to IELTS testing is a compelling addition to the existing business infrastructure in a competitive education market.
+
+1.2.2	Business Objectives
+The primary business objectives for this project can be categorised as follows:
+
+1.2.2.1	Deliver better student experiences for IELTS testing
+In terms of student experience, the new tool will provide more accessible testing at potentially lower cost to the student. Feedback will be timely and consistent, allowing students to understand their grades and keeping them more frequently engaged with the program.
+
+1.2.2.2	Significant improvements in the utilisation of teaching resources
+An AI-based tool capable of marking written essays alleviates the needs for teachers to manually mark each test. This allows teachers to serve only as escalation points for special cases and allows the redirection of efforts towards engagement with students. Additionally, a non-human marker nullifies potential student claims of bias in the marking process.
+
+1.2.2.3	Improve student academic outcomes
+Beyond quality-of-life improvements for students, one key objective is improving their education and performance. Access to fast, accurate marking and feedback facilitates more regular iterative learning for students. This enhancement in access to quality testing would be expected to improve student performance on IELTS testing.
+
+1.2.2.4	Preparing for growth
+The transition to an AI model for marking IELTS essays present and opportunity for the business to engage with new markets or expand into existing ones.  A system of this type can be scaled up far more quickly than a traditional human-marker model and can be available at any time for students to utilise.
+
+1.2.2.5	Leveraging the strengths of AI and Machine Learning
+Whilst this model will focus upon written essay submissions, establishing the infrastructure to leverage this model will position the business well for future advancements in the tool e.g. speech recognition or indeed any advancements in AI technology more broadly.
+The first three objectives are expected to be met in the short to medium term. Simply implementing the new system should see positive returns. The second two look toward the long term, with strategic advantages being made available to the business should they choose to pursue them in future.
+
+1.3	PROJECT DESCRIPTION 
+This project encompasses the planning, development, testing and delivery of an AI-model capable of independent evaluation of IELTS essays. The model will be designed to self-learn from existing and wide-ranged resources e.g. sample or exemplar essays, dictionaries and grammar rules. In addition, the model will leverage user feedback to further advance its knowledge base. 
+The model will include API capability to facilitate scalability and seamless integration into existing systems. 
+Students engaging with the system can expect prompt marking and actionable feedback from which they can improve their language skills and future performance in IELTS testing. Teachers will benefit from reliable, efficient IELTS testing without their direct intervention. The business as a whole will stand to gain both from improvements in student and teacher experiences, but also in the opportunity and agility that leveraging AI-based technology will bring.
+
+1.3.1	Project Objectives and Success Criteria
+For this project to be considered a success and fit for purpose, the following objectives must be achieved:
+
+1.3.1.1	Accurate grading
+IELTs written essays are marked with an IELTs prescribed criteria and given a band marking. Band scale is 0-9. Grades given by the model will need to match the equivalent human-marked test within 0.5 bands, and identical essays marked by a model more than once should not give more than 0.5 band variance.  
+
+1.3.1.2	Provide detailed and actionable feedback on ways to improve marks
+Alongside a numerical grade, the model must identify areas of the essay that need improvement and actionable feedback that students can apply for future attempts. Quality of the feedback will be measured against examples essays from the dataset, as well as being signed off by the project stakeholder.
+
+1.3.1.3	Prompt return of results directly to students
+Current system of manual marking and feedback takes between 3-5 days for online testing. Initial objective in this area is to reduce the wait time to 60 seconds, with option for further reduction in wait time depending on development progress, computing resources and the absence of any significant trade-offs e.g. accuracy.
+
+1.3.1.4	Significantly reduced reliance on teaching resources for testing purposes
+Leveraging the model to provide teachers with more capacity to educate students and measurably improve grades both for individual students and as an overall average. Due to the short timeline for this project, success measurement for this goal will depend on stakeholder feedback during testing. Their experience with current teaching and testing systems will allow them to contrast against the new system to assess potential impact on both teaching resources and results.
+
+1.3.1.5	Allow for full-API integration to existing systems or custom UI.
+Key to the successful deployment of this project will be the capability to integrate via API. The stakeholder has expressed interest in a potential long-term goal of app integration, and as such the design of this system will deliver this functionality. Success can be demonstrated via project team and stakeholder testing, alongside verification from a stakeholder-nominated subject matter expert (SME) of their choice.
+
+1.3.2	Requirements
+The below requirements are integral to the success of the final product and must be delivered for project completion:
+
+1.3.2.1	Input
+-	The system shall be able to create an account and password.
+-	The system shall require username and password to gain access to the tool.
+-	The system shall be able to receive files in supported formats within maximum file size.
+-	The system will provide user feedback if upload conditions are not met e.g. format unsupported.
+-	The system shall preprocess the submitted data to prepare for the model e.g. tokenisation.
+
+1.3.2.2	Model
+-	The model shall interpret the pre-processed data and assess based on established on IELTS criteria.
+-	The model shall comprise of a custom-made model alongside existing frameworks e.g. GPT or BERT.
+-	The model shall assign band scores based on this assessment.
+-	The model shall identify text blocks that require improvement.
+-	The model shall construct actionable feedback on how to improve identified text blocks and overall mark.
+-	The model shall leverage submissions data to improve future assessments.
+
+1.3.2.3	Output
+-	The system shall provide feedback to the user that submission has been received.
+-	The system shall return submissions to the student with both grade and feedback within 60 seconds.
+-	The system shall record historical submissions for later review by students and teachers.
+
+1.3.2.4	Deployment
+-	The system must be API-integrated to allow client to deploy within existing or new systems.
+-	The system must be able to leverage cloud-based services to scale up as required for large user bases.
+
+1.3.3	Constraints
+1.3.3.1	Time
+The timeline for this project is 20 weeks from planning and consultation through to delivery of the finished product. Making consistent progress in line with the project plan will be required to ensure success.
+
+1.3.3.2	Computing resources
+
+We must ensure that our model can run on available computing resources within the client business (or that can be reasonably acquired for deployment). Additionally, our team must secure sufficient resources for extensive testing during development.
+
+1.3.3.3	Availability
+
+Consistent coordination within the development team and the stakeholder is a necessary requirement, but also sporadic access to SMEs where questions may fall outside of the stakeholder’s remit. Delays in the flow of necessary information can stall the project.
+
+1.3.3.4	Integration
+
+Our final product must have the capability to be called upon via API. This allows the client to leverage the model within existing systems or create their own UI in future.
+
+1.3.3.5	Financial
+
+The development of this model will be largely utilising free tools and development resources. Beyond development, if funding is required, we will need to consider the need or desire of the client to invest in resources to adequately deploy the model.
+
+1.3.3.6	Integrity
+
+IELTS testing has a strict set of measures and criteria for each marking band or score. For this tool to succeed in its purpose, it must demonstrate consistent adherence to these parameters.
+
+1.3.3.7	Data Access
+
+A key to the success of this model will be the availability of quality data from which the model can learn and adapt. We will be constrained by the volume of this type of data we can reasonably obtain within the project timeframe.
+
+1.3.4	Assumptions
+
+1.3.4.1	File formats
+
+Students will be required to limit their submissions to accepted common-use formats such as .txt, PDF, .docx.
+
+1.3.4.2	Consistency in IELTS marking standards
+
+Current IELTS marking standards and criteria are expected to remain static over the course of development. Any major changes in these standards could cause delays in the delivery timeline.
+
+1.3.4.3	Client-side integration expertise
+
+A basic UI will be constructed to properly test the model, but integration and deployment into the client’s systems will need to be executed by personnel within the business with the necessary skills to complete this task. In addition, direct links to training materials e.g. sample essays will need ongoing maintenance by client to ensure relevance and accuracy.
+
+1.3.4.4	Client-side escalations
+
+Escalations for information outside of the area of expertise of the stakeholder will need to be raised internally by the stakeholder and relayed back to the team as required. In the event information is unable to be obtained or there are significant delays, some assumptions may need to be made to ensure delivery of final product within specified time frame.
+
+1.3.4.5	Client testing and feedback
+
+User Acceptance Testing (UAT) of the completed model will need to be undertaken either by the stakeholder or testers nominated by the stakeholder. Testers will need to communicate necessary changes or observations (if any) back to the team. Testers will also need sufficient hardware with which they can test. Insufficient testing resources could result in delays in project delivery or the omission of certain functionality.
+
+1.3.5	Preliminary Scope Statement
+
+1.3.5.1	Project Scope
+
+This project will focus on delivering a user-friendly and scalable AI-model capable of completing the marking and feedback of IELTs submissions that assess the writing capability of students, currently being executed by human markers. These include:
+-	Coherence and Cohesion
+-	Lexical Resource
+-	Grammatical Range and Accuracy
+The model will focus exclusively on sections of the test where graphs or images are not required, due to the added complexity of image classification and interpretation being outside of scope for this project i.e. General section for Task 1, and both sections of Task 2.
+The model will accept the specified file types and return accurate (within 0.5 marking bands) marks and actionable feedback at a significantly faster rate (60 seconds) than is possible whilst being done manually by markers (currently 3-5 days).
+The solution will be able to be deployed by the client independently, and be able to be scaled up for additional volume as required. It will also have the capacity to be integrated into existing systems via API should the client wish to deploy in this fashion.
+The project will be deemed complete if the above requirements are met.
+Given the limited time frame, there are several aspects of IELTs testing and tool deployment that will be out of scope for this project. These are outlined below.
+
+1.3.5.2	Exclusions
+
+The limited time available for the completion of this model requires us to be selective with where we focus our resources. Our chief aim is to produce a MVP that meets all requirements as outlined in this report, alongside an intentionally basic UI with which the client is able to test the model outside of a development environment. The focus on the model in favour of the UI is due to two main factors.
+
+1.	A polished UI without a functioning model will not meet basic expectations of the client nor address the core objectives this project is attempting to achieve.
+2.	Delivering functioning API integration may make a custom UI for this model redundant depending on how the client wishes to deploy.
+
+This means that the scope of the project outlined above will only represent a portion of a potential solution for automating IELTS testing. With this in mind, below are some potential future enhancements to this project.
+
+-	Dedicated student-facing UI in line with the business’ design language with more advanced user interactions available e.g. direct teacher communication channels or tutor booking services.
+-	Expansion of model capability beyond analysis of the content exclusively contained within the written submissions e.g. Spoken assessments or graph interpretation. Until this functionality is added, the Academic tasks within IELTS will be unable to be graded.
+-	Integration into existing student infrastructure or services e.g. Preply.
+-	Aggregated scores or progress visualisations for tracking student progression.
+-	Teacher-focused interface with functionality to review all student submissions on demand.
+
+
+1.4	RISKS
+The success of this project depends on the identification and management of potential risks that could impact its development, deployment, and long-term functionality. This section outlines key risks that could affect various aspects of the project, categorised by type, as well as proposed mitigation strategies for each. Proactively managing these risks will help to minimise disruptions and ensure the delivery of a high-quality, reliable system.
+1.4.1	Technical and Operational Risks
+Risk	Description	Mitigation
+Algorithm Accuracy	The AI model may not evaluate essays accurately, resulting in incorrect grading of feedback.	Use transfer learning, conduct extensive testing, implement thorough evaluation techniques, and refine the model based on user feedback.
+
+Scalability	The system may struggle with increased load as the user-base grows.	Implement scalable Cloud infrastructure (with features such as load-balancing and auto-scaling), optimise the model and database queries for effective processing, and conduct stress testing to prepare for peak loads.
+Integration Challenges	Integrating the AI model with backend systems or the UI may introduce technical issues or performance bottlenecks.
+Additionally, the development team has limited prior experience in designing and integrating APIs and user interfaces.
+Use modular design, standardised protocols, and regular end-to-end integration testing to identify and resolve issues early. Leverage well-documented frameworks to address experience gaps. 
+Dependence on External APIs	Reliance on third-party APIs may introduce risks if these services become unreliable or discontinued.	Establish fallback mechanisms, regularly evaluate API providers for reliability, and design the system to accommodate future API replacements with minimal impact.
+Compute Resource Limitations	Limited availability of compute resources (e.g., GPU access on Google Colab or Cloud-based training environments) may disrupt model training or delay development timelines.	Where possible, plan training sessions during off-peak hours to increase the likelihood of accessing free GPU resources. Use checkpointing to save model progress and optimise the model/dataset to reduce compute demands.
+Maintenance and Support	Ongoing maintenance costs may exceed expectations, or the system may become too difficult to maintain.	Ensure clear documentation, automated monitoring and logging tools, plan for regular updates, and include maintenance costs in the budget.
+1.4.2	Data and Ethical Risks
+Risk	Description	Mitigation
+Data Quality	Insufficient, inconsistent, or biased training datasets may lead to suboptimal AI performance.	Source diverse and representative datasets for model training, employ data augmentation techniques, and monitor for bias during testing.
+Data Loss	Data loss due to system failure or cybersecurity breaches could affect project integrity.	Regular backups, encryption of sensitive data, and robust cybersecurity measures.
+Bias in Grading	The model may unintentionally favour certain writing styles or overlook others, resulting in unfair or inaccurate grading.	Ensure inclusive high-quality training datasets, audit for fairness, and implement bias mitigation strategies.
+Data Privacy	Data privacy standards must be followed if storing sensitive or personal user data, such as essays or personal information.	Ensure compliance with relevant regulations (APPs, etc.), implement robust policies, and secure user consent.
+
+Over-Reliance /Misuse of AI	Users may misuse the feedback system or become overly reliant on AI-generated feedback.	Communicate the system’s limitations and encourage human validation/clarification of AI feedback.
+
+
+
+1.4.3	Project and Deployment Risks
+Risk	Description	Mitigation
+Delays	Delays in project milestones or unexpected technical hurdles may affect the timeline.	Develop a realistic project timeline with buffer periods for contingencies.
+Budgetary Challenges	Unexpected hosting, maintenance, or licencing costs may exceed initial estimates.	Create a detailed cost forecast that includes operational expenses (e.g., hosting, maintenance, scaling). Review and update forecasts periodically with stakeholder input.
+Cloud Platform Limitations & Cost Controls	The selected Cloud Platform may have usage limits (e.g., API limits, storage caps) that could impact system performance or introduce unexpected costs.	Clearly define expected usage requirements and select a platform with appropriate limits and scaling options. Monitor usage patterns and implement cost controls,
+Misaligned expectations	Misaligned expectations or lack of stakeholder involvement could lead to dissatisfaction with deliverables.	Maintain regular communication, clarify requirements early, and provide regular updates.
+Availability of Customer Resources	If Customer resources are unavailable to answer key questions and help resolve roadblocks, schedule will be impacted.	Regular check-ins to be organised with the project team and the client to ensure all parties are clear on tasks to be performed and address any issues that need to be resolved.
+User Adoption & Market Acceptance	If the platform is difficult, fails to meet user needs, or does not align with market expectations, adoption rates could be lower than anticipated.	Conduct thorough market research to understand user needs and preferences, and any barriers to adoption, as well as usability testing. Iteratively improve the system based on feedback and identified pain points.
+1.5	PROJECT DELIVERABLES
+The following deliverables represent the key outputs required upon the successful completion of this project. These ensure that the stakeholders receive a well-documented, functional, and maintainable system. To avoid scope creep, the project sponsor must approve any modifications or additions to this list.
+1.5.1	Expected Outputs
+•	Working Software (ELA Pro System) – a functional, user-friendly platform where users can submit essays, receive AI-generated feedback based on IELTS scoring bands, and track their progress.
+•	Deployment & Hosting Setup – a Cloud-hosted deployment of the system with scalability configurations, security and compliance measures, and backup & recovery plans.
+•	Technical & System Documentation – technical documentation outlining the system architecture and design, API usage/documentation, model training and evaluation reports, and instructions for deployment and maintenance.
+•	User Documentation – guides or user manuals to help users (teachers and students) to navigate and use the system, and training materials such as tutorial videos.
+•	Testing & Validation Reports – results from system validation and performance testing, usability feedback summary, and AI model evaluation (metrics, bias audits, etc.)
+•	Final Project Reports & Presentations
+o	A detailed report covering project scope, objectives, design decisions, technical methodologies, challenges, limitations, and solutions implemented.
+o	Visual presentations containing summaries and demonstrations of the functionality and features of the software for client review and academic evaluation.
+1.5.2	Interim Deliverables
+•	Data pipeline set up and preprocessing steps
+•	Working AI model for essay scoring/feedback
+•	Prototype/MVP – a working prototype of the system to demonstrate basic functionality (essay submission, grading, and feedback) 
+•	User Feedback & Model Refinements – early user testing reports and iterative model improvements
+•	Progress reports – regular updates on development, testing, and validation
+1.5.3	Prioritisation of Deliverables
+High Priority (Essential Deliverables): 
+Working software, AI model, deployment setup, technical & system documentations.
+Medium Priority: 
+User documentation, testing & validation reports.
+Lower Priority: 
+Final project reports & visual presentations – essential for stakeholder review and academic evaluation but not directly impacting system functionality.
+1.5.4	Approval Process
+Deliverables will be reviewed by the project sponsor and stakeholders through:
+•	Regular review meetings during which interim progress at key milestones is assessed.
+•	Defined acceptance criteria – each deliverable must meet specific criteria for approval, for example functional requirements for software and accuracy benchmarks for grades given, as set out in the Requirements section of this proposal. 
+1.6	SUMMARY MILESTONE SCHEDULE
+The following is an estimated schedule for the high-level milestones that make up this project. However, it is important to note that this is an estimate only, and as such is likely to change as the project progresses and the tasks, milestones, and requirements become more clearly defined.
+ 
+  
+1.7	SUMMARY BUDGET 
+The summary budget below contains the general cost elements and their estimated costs, with estimates for Cloud costs provided for each of the three main Cloud platforms (Amazon Web Services (AWS), Google Cloud Platform (GCP), and Microsoft Azure). All costs are based on an early assumption of 500 users and all prices are in AUD. It is important to note that at this early stage, these figures are rough estimates only; cost estimates will be refined as details regarding tasks, requirements, hosting, storage, and usage requirements become clearer.
+1.7.1	General Estimated Costs
+
+Component	Estimated Cost
+Cloud Services, Tools & Maintenance Costs
+(costs for overall system infrastructure using Cloud providers – AWS, GCP, Azure)	AWS	GCP	Azure
+Cloud Hosting: all system infrastructure using Cloud providers, including virtual machines (VMs), networking services, model hosting, monitoring, etc.	$105 - $210 /month	$100 - $200 /month	$150 - $250 /month
+Compute Resources: processing power needed for running AI model inference, API requests, and load balancing; includes the use of GPUs (or CPUs) for handling computations.	$1800 - $2100 /month	$1500 - $1900 /month	$1500 - $1900 /month
+Data Storage: cost for storing user data, including essays, user accounts, and logs, as well as SQL database and data transfer.
+$220 - $350 /month	$200 - $350 /month	$290 - $370 /month
+Security & Compliance: ensuring compliance with data protection laws such as the APPs. This includes Identity & Access Management, data encryption, security monitoring, etc.	$50 - $120 /month	$65 - $150 /month	$110 - $250 /month
+Software, Tools & Development Costs
+Model Training: one-time cost for training and testing the model (Cloud-based GPU usage, compute time).
+[NOTE: the aim is to utilise free compute resources such as Google Colab, however if this time is exceeded, a small cost may be incurred]	$0 - $100
+Third-Party APIs: if integrating with third-party APIs (e.g., grammar checkers, synonym generators), there may be usage fees based on the volume of API calls (may involve subscriptions or usage-based costs).	$100 – 700/month
+Licensing Fees: typically, no costs are incurred for using open-source frameworks such as PyTorch, TensorFlow, or Hugging Face, however, costs may arise if using enterprise-level Cloud versions or paid support services.	$0 - $100/month
+Miscellaneous
+Testing: costs associated with user testing and quality assurance.	$200 - $500
+Contingency Fund	10 – 20% of estimated total cost
+
+1.8	PROJECT APPROVAL REQUIREMENTS
+The project is deemed successful when all agreed-upon requirements are met and accepted by the authorized individual responsible for signing off the project closeout.
+These criteria include adherence to functional and non-functional requirements, delivery of outputs such as working software, documentation, and any interim deliverables.
+1.9	PROJECT MANAGEMENT
+1.9.1	Project Manager Responsibilities
+1.9.1.1	Rotating responsibilities per sprint
+Due to the requirement of group work for this project, we have a scheduled rotation of sprint leads / co-leads throughout, where these responsibilities are assigned. If this project was in a non-group approach, we would have a singular accountable person assigned. 
+1.9.1.2	Personnel Management
+Oversee team responsibilities and ensure team remain on task.
+1.9.1.3	Scheduling
+Manage timelines to ensure tasks and milestones are achieved on time.
+1.9.1.4	Project Expenditures
+Oversee budget allocations and expenditures
+1.9.1.5	Progress Tracking
+Monitor progress against project milestones and adjust plans as needed.
+1.9.1.6	Communication
+Facilitate regular updates with stakeholders, provide feedback, and escalate issues when necessary.
+1.9.1.7	Risk Management
+Identify and mitigate risks related to API, model, data security, performance, and operational delivery
+1.9.2	Project Management Plan
+1.9.2.1	Updates
+Regular updates on progress through fortnightly reports to the course OCF. Regular updates on progress through fortnightly reports to the course Business stakeholder.
+1.9.2.2	Project Tracking
+Detailed tracking of sprint-based deliverables and integration of stakeholder feedback into iterations.
+1.9.2.3	Agile Project Delivery
+Employing agile project management principles to ensure flexibility and responsiveness to changing needs.
+
+
+
+
+
+1.10	AUTHORISATION
+The project will proceed only after receiving authorization from the designated project sponsor, confirming that all objectives, deliverables, and constraints are formally agreed upon.
+
+Approved by the Project Sponsor: ________________________        Date:	     /      /      
+
+Project Sponsor Name: _________________________________
+Project Sponsor Title:    _________________________________
+ 
+ 
+2.	SYSTEM REQUIREMENTS
+The requirements documented in this section were generated by the project team based on information provided by the key project stakeholder and the project description. Requirements that are outside the scope of the initial project are documented under “2.5 Future Directions”; however, the project team may incorporate some of these requirements into the initial implementation if resourcing permits.
+3.1	MODEL CONSIDERATIONS
+The IELTS grading uses specific criteria to effectively mark the essays.
+1.	Task Achievement/Task Response: Ability to respond to the essay prompt fully.
+2.	Coherence and Cohesion: Organization of ideas, logical flow, and use of linking devices.
+3.	Lexical Resource: Vocabulary diversity, context-appropriate word usage.
+4.	Grammatical Range and Accuracy: Syntax variety and error frequency.
+
+In review of the marking criteria, the project team have considered current AI models that are available so that we may present an informed option to our stakeholders. For more information on each of the currently available AI models, please see Appendix A.
+Traditional NLP Models
+Examples: N-grams, TF-IDF, Word2Vec
+Pros	Cons	Fit
+•	Easier to implement and computationally inexpensive
+•	Good at simple tasks like keyword detection	•	Struggles with complex, high-level features like context understanding
+•	Limited adaptability to nuanced linguistic patterns	•	Unsuitable for essay grading across all criteria
+
+Fine-tuned Transformers
+Examples: BERT (Bidirectional Encoder Representations from Transformers), RoBERTa, T5
+Pros	Cons	Fit
+•	Strong at context-aware tasks due to bidirectional language representation
+•	Performs well in identifying coherence and lexical diversity	•	Requires significant labelled data and training time
+•	May need multiple iterations to accurately score grammar and cohesion	•	Effective for details analysis but resource-intensive
+
+Large Language Models (LLM)
+Examples: GPT (Generative Pre-trained Transformer), GPT-4, Claude
+Pros	Cons	Fit
+•	Capable of handling complex natural language understanding tasks
+•	Can dynamically evaluate all grading criteria, including task achievement and grammar	•	Expensive to deploy and maintain
+•	Requires ongoing optimization for specific tasks to avoid generating generic feedback	•	Excellent for detailed, nuanced evaluation with scalable feedback
+
+Recommendation: 
+Given the ELA project goal to create a scalable and self-learning AI model capable of accurately grading essays on all IELTS criteria, our recommendation is to use a hybrid approach of combining fine-tuned transformers and LLM’s. 
+To enable this, it would involve fine tuning transformers like BERT for specific criteria such as grammar and lexical analysis. To support the overall task coherence and holistic feedback generation, we would recommend using LLM’s like GPT-4. This may be finetuned based on API settings with the relevant LLM model. 
+
+3.2	USE CASE ANALYSIS
+The use cases outlined below describe how users will interact with the system and their end-to-end journey. As use cases focus on the user’s perspective, back-end processes such as how the model will score submissions are not represented here but are detailed in functional requirements. 
+Use Case Name	Actor	Related Functional Requirements
+Create an account	Student	1-5
+Login	Student	6-11
+Reset password	Student	12-15
+Submit an essay	Student	16-36
+View results	Student	52-58
+Validate results	Teacher	59-60
+Submit feedback	Student	61-65
+Model Training	System Admin	66-73
+View previous results	Student	74-76
+
+
+ 
+
+3.2.1	Use Case 1: Create an account
+User Story: As a student I want to create an account so I can use the system.
+User Journey: A student navigates to the registration page where they are asked to input account information such as their name, email, and password. After submitting, the system validates the data and if successful displays a message that the account has been created. 
+Use case title:	Create an account
+Primary actor:	Student
+Level:	Sea
+Stakeholders:	Student – Wants to create an account and access the platform
+Precondition:	The user must have a valid email address
+The system must be online and available
+Minimal guarantee:	If the process fails, the system provides an error message and logs the issue.
+User data is not lost if an error occurs during the process.
+Success guarantee:	An account is successfully created for the new user.
+The user receives a confirmation email.
+The user can log in using their credentials.
+Trigger:	A student chooses to sign up on the registration page
+Main success scenario: 
+1.	The student clicks on “Create an Account” on the registration page
+2.	The system prompts the student to enter personal details (name, email, password)
+3.	The system validates the email format and password strength
+4.	The student agrees to the terms and conditions.
+5.	The system stores the user information securely in the database.
+6.	A confirmation email is sent with an activation link.
+7.	The student clicks the link to verify the email
+8.	The system activates the account and confirms successful registration
+9.	The student is redirected to the login page.
+Extensions:
+3a. The email address is invalid, the system prompts the user to enter a valid email
+3b. The password is too weak, the system suggests another using a stronger password
+4a. The user does not agree to the terms, the system prevents account creation
+6a. The email fails to send, the system allows resending of the confirmation email
+7a. The activation link expires, the system allows resending a new activation link.
+8a. The user already has an account, the system prevents duplicate accounts
+
+ 
+3.2.2	Use Case 2: Login
+User Story: As a student, I want to login to the system so I can submit my essays and receive feedback.
+User Journey: A student navigates to the login page and enters their username and password, the system validates the credentials and if valid, grants access to the student’s homepage.
+Use case title:	Login
+Primary actor:	Student
+Level:	Sea
+Stakeholders:	Student – wants to log in and access the system
+System Admin – ensures login functionality is secure and operational
+Security Admin – ensures that authentication mechanisms prevent unauthorised access
+Precondition:	The student must have an existing account
+The system must be online and available.
+Minimal guarantee:	If the login fails, the system provides appropriate error messages
+The system does not expose sensitive user information (e.g. incorrect password shouldn’t indicate whether a user exists).
+Success guarantee:	The student is successfully authenticated and can access their account
+The session is secure for the duration of the user’s activity
+Trigger:	The user navigates to the login page and attempts to log in
+Main success scenario: 
+1.	The student navigates to the login page.
+2.	The system prompts the student to enter their email/username and password.
+3.	The student enters valid credentials and submits the login request.
+4.	The login attempt is logged for security monitoring
+5.	The system validates the credentials against the stored user database.
+6.	If the authentication is successful, the system creates a secure session for the user.
+7.	The system redirects the student to their home page
+Extensions:
+3a. The email or password is incorrect, the system displays a generic message, which prevents excessive login attempts and does not indicate whether the email exists.
+3b. If the student has forgotten their password, they can click the “forgot password” link and the system sends a password reset email
+5a. If the student enters incorrect credentials multiple times (e.g. 5) the system temporarily locks the account, sends an email about suspicious activity, and requires the student to wait of verify identity via email
+5a1. If the student’s account is inactive (e.g. not verified) the system displays and account status message and provides a reactivation option
+5a2. If the login occurs from an unrecognised device or location, the system sends a security alert email to the user and requires additional verification (e.g. CAPTCHA or 2FA).
+
+ 
+
+3.2.3	Use Case 3: Reset password
+User Story: As a student, I want to be able to reset my password if I have the incorrect password or I suspect that my account has become compromised.
+User Journey: A student who has forgotten their password or needs to change it initiates the reset process via the web user interface. The process includes re-verifying their identity through their registered email, setting a new password, and regaining access to their account.
+Use case title:	Reset password
+Primary actor:	Student (account holder) – wants to reset their password
+Level:	Sea
+Stakeholders:	User
+Precondition:	The student has a registered account with a verified email address.
+Minimal guarantee:	The system informs the user that an email with a password reset link has been sent, if there is a matching verified account in system.
+Success guarantee:	The user's password is successfully reset, they receive an email confirmation, and they can log in with their new password.
+Trigger:	The student initiates a password reset request, by clicking a “Forgot password” link in the login page
+Main success scenario: 
+1.	 The student clicks the “Forgot password” link in the login page.
+2.	The system prompts the user to enter their registered email address
+3.	The student submits their email address
+4.	The systems display a message on screen stating that an email has been sent to the email address if there is a matching verified account
+5.	The system checks if the email address is registered in the system
+6.	The system sends an email message with a unique, timeboxed password reset link to the student if the account exists in the system
+7.	The student opens the email and clicks on the reset link
+8.	The student is directed to a webpage and prompts the user to enter a strong password
+9.	The student presses the “Save new password” button
+10.	The system saves the new password and confirms the reset on screen
+11.	The system sends an email to the registered address confirming the change of password
+12.	The student logs in with the new password
+Extensions:
+
+7a. If the student clicks the link after the timeboxed period, then the system informs the user on the webpage that the reset link has expired, and presents a “Request forgotten password” link, where the process goes back to step 2.
+
+8a. The system presents a scoring metric of the strength of the password, and if below “Strong” then the “Save new password” button is not enabled or allowed to be pressed, with graphical output below the password entry boxing stating that the parameters that define a strong password
+
+ 
+3.2.4	Use Case 4: Submit an essay
+User Story: As a student, I want to submit my written essays for task 1 and 2 so I can have them scored and receive feedback.
+User Journey: After logging in, the student navigates to the submit essay section of the system and selects whether they want to upload their essay from a document or enter the text directly into the interface. They provide their essay responses for both task 1 and task 2 and once both responses are provided, they submit them for scoring. The system stores the submitted data, the API sends it to the AI model for evaluation, and the user receives a success message on the screen letting them know scoring is underway. 
+Use case title:	Submit an essay
+Primary actor:	Student
+Level:	Sea
+Stakeholders:	Student
+Precondition:	User is logged in to the system.
+Minimal guarantee:	System successfully uploads the file and stores it.
+Success guarantee:	System sends submitted essay to the AI model.
+Trigger:	Student initiates the action by selecting a file to upload or clicking a submit essay button.
+Main success scenario: 
+1.	Student accesses the submit essay page of the UI.
+2.	Student browses for and selects the relevant essay file or enters the essay into the text box.
+3.	Student submits the uploaded essay or inputted text.
+4.	Essay is uploaded and stored, then passed to the AI model for scoring. 
+Extensions:
+1a. The UI page does not load. 
+1a1. The student tries again. 
+2a. The student selects an invalid file type/size. 
+2a1. The system displays the relevant error message, and the student selects another file.
+3a. Essay uploading is interrupted or errors. 
+3a1. The student is notified of the error and tries again. 
+4a. The AI model fails to score the submission. 
+4a1. The essay is stored, and error is logged for an administrator to review and resolve.
+
+
+
+ 
+
+3.2.5	Use Case 5: View Results
+User Story: As a student, I have submitted my essays for task 1 and 2 and want to view my scores and feedback as soon as possible.
+User Journey: After the submission button is clicked, the UI informs the student that the essay is being marked. Once complete, scores will be shown on screen alongside actionable feedback. The scores and feedback and clearly formatted and easy to read. The student checks their email to verify the system has sent a copy of the result.
+Use case title:	View Results
+Primary actor:	Student
+Level:	Sea
+Stakeholders:	Student
+Precondition:	Student is logged in with an account and made a submission.
+Minimal guarantee:	Student is returned results from the model in the UI and via email.
+Success guarantee:	Student can successfully view the results of their submission
+Trigger:	Student initiates action by successfully uploading a submission for marking
+Main success scenario: 
+1.	Student logs in to UI
+2.	Student uploads supported file type or submits text in text box.
+3.	UI display messages indicating submission has been sent to model for marking.
+4.	Model returns results to UI within maximum wait time (60 sec).
+5.	Student reviews result on screen, result has no errors, feedback and grade are comprehensible by student.
+6.	Student receives copy of result via email.
+Extensions:
+1a. Students results are not displayed in UI.
+1a1. Student refreshes page or resubmits essay.
+2a. Student receives results on screen but incorrectly formatted.
+2a1. Student refreshes page.
+2a2. Student checks email to view results.
+3a. Student does not see email in inbox.
+3a1. Student checks junk/spam folders for results.
+
+
+
+ 
+ 
+3.2.6	Use Case 6: Validate Results
+User story: As a teacher I want to view all submissions along with their AI generated scores and feedback to ensure the model scoring is accurate and can be trusted.
+User journey: The teacher accesses the submissions report in the relevant data visualisation platform (e.g., Power BI), and views the available data. The teacher can filter the complete list of submissions by key fields such as student name/email, submission date, or overall score, and can select a submission to drill through and view the detailed information. The teacher can use this detailed information to perform validation of the scores and feedback or perform their own grading.
+Use case title:	Validate Results
+Primary actor:	Teacher
+Level:	Sea
+Stakeholders:	Teacher
+Precondition:	Teacher has been granted permission to access the report and is logged in to the system.
+Minimal guarantee:	Teacher can access the report.
+Success guarantee:	Teacher successfully views and validates a submission.
+Trigger:	Teacher initiates the action by accessing the submissions report and viewing submission details. 
+Main success scenario: 
+1.	 Teacher accesses the submissions report. 
+2.	Teacher filters the submissions and selects one to validate. 
+3.	Teacher reviews the essay responses, AI model scoring and feedback, and validates the outputs are correct.
+Extensions:
+1a. The report is unable to be accessed as the teacher does not have permission. 
+1a1. The teacher requests access to the report. 
+1b. The system does not load. 
+1b1. The teacher tries again. 
+2a. The teacher is unable to locate the desired submission. 
+2a1. The teacher waits until the next scheduled refresh of the report and tries again. 
+2a2. The teacher raises an exception with an administrator. 
+3a. The teacher disagrees with the AI model scoring or feedback. 
+3a1. The teacher raises an exception with an administrator. 
+
+
+ 
+
+3.2.7	Use Case 7: Submit Feedback
+User Story: As a student, I want to be able to submit my feedback on how the tool could be improved.
+User Journey: After Submit Feedback button is clicked, UI present a feedback form alongside a Submit button. User completes feedback within text box and clicks Submit. UI presents message that feedback has been submitted and will be reviewed.
+Use case title:	Submit Feedback
+Primary actor:	Student
+Level:	Sea
+Stakeholders:	Student, System Admin
+Precondition:	Student is logged in with an account
+Minimal guarantee:	System will accept student feedback and provide confirmation of acceptance
+Success guarantee:	Feedback will be stored and made available to System Admin for review
+Trigger:	Student initiates action by completing feedback form and submitting
+Main success scenario: 
+1.	Student logs in to UI
+2.	Student clicks Submit Feedback button
+3.	UI displays feedback form and Submit button
+4.	Student fills out form and clicks Submit
+5.	UI produces message indicating feedback has been received and will be reviewed
+6.	System stores feedback in database for review
+7.	System Admin reviews and actions feedback
+Extensions:
+1a. Form does not appear when Submit Feedback is clicked.
+1a1. Student refreshes page and reattempts.
+1a2. Student reattempts from an alternate browser.
+2a. Form appears but Submit Feedback does not trigger submission.
+2a1. Student copies text, refreshes page and attempts resubmission.
+3a. Student clicks Submit, form disappears but no confirmation is shown.
+3a1. Student attempts resubmission.
+3a2. Student escalates directly to System Admin via teaching staff.
+
+
+
+ 
+3.2.8	Use Case 8: Model Training – Student Feedback
+User Story: As a student, I want to provide feedback on the suggested improvements and feedback provided by the system to that any errors or feedback improvements can be considered
+User Journey: A student is provided a feedback summary by the system, which they review and choose to provide their feedback on, a “submit feedback” button presents a form in which they put their feedback, when submitted a message appears confirming submission. When the feedback is submitted the feedback is reviewed by a system admin to check validity and put forward for model tuning.
+Use case title:	Model Training – Student Feedback 
+Primary actor:	Student
+Level:	Sea
+Stakeholders:	Student – provides feedback on the system generated feedback
+System Admin – reviews student feedback and determines whether model tuning is required
+Precondition:	The student has submitted an assignment
+The system has generated feedback on the assignment
+The student has access to review and respond to the feedback
+Minimal guarantee:	The student’s feedback is recorded
+The system admin can review all feedback provided by the student
+Success guarantee:	The student successfully provides feedback on the evaluation feedback
+The system admin reviews and approves or rejects the feedback
+Approved feedback is applied to fine tune the AI model
+Trigger:	The system provides feedback on the student’s assignment
+The student decides to provide feedback on the feedback received
+Main success scenario: 
+1.	The system generates feedback on the student’s assignment
+2.	The student reviews the provided feedback
+3.	The student provides their feedback on the evaluation feedback, including concerns, disagreements, and suggestions for improvement
+4.	The system records the student’s feedback
+5.	The system admin reviews the feedback provided by the student
+6.	The system admin approves or rejects the feedback and classifies it
+7.	If approved and classified the feedback is then applied to the model training and the system updated
+8.	The process is logged for auditing and tracking 
+Extensions:
+3a. The student does not provide feedback
+5a1. The student submits unclear or incomplete feedback
+6a. The feedback is not approved by the system admin, no model update occurs
+7a. The feedback is stored for future model training
+7a1. Technical failure during model training means the update is not applied, error logged.
+
+
+ 
+ 
+3.2.9	Use Case 9: View Previous Results
+User Story: As a student, I want to view my previous submissions and corresponding scores and feedback, so I can track my progress over time. 
+User Journey: After logging in, the student navigates to the previous submissions page where a table displays all their previous submissions. The table includes the submission date, the submission text and the corresponding band scores and written feedback. 
+Use case title:	View Previous Results
+Primary actor:	Student
+Level:	Sea
+Stakeholders:	Student
+Precondition:	Student is logged in to the system & has submitted at least one essay.
+Minimal guarantee:	Student accesses the previous submissions page.
+Success guarantee:	Student sees all previous submissions and their corresponding results.
+Trigger:	Student navigates to the previous submissions page.
+Main success scenario: 
+1.	Student logs in and navigates to the previous submissions page.
+2.	System displays a list of previous submissions belonging to the student.
+3.	Student views their previous submissions, scores and feedback.
+Extensions:
+1a. The page is unable to load. 
+1a1. The student tries again. 
+2a. The student has no previous submissions. 
+2a1. The system displays a “No previous submissions” message. 
+
+ 
+
+ 
+3.3	FUNCTIONAL REQUIREMENTS
+The functional requirements outline what the system should do. The requirements grouped by feature are:
+3.3.1	Create an account
+The system shall:
+FR1:	display a button to create an account.
+FR2:	display a form for the user to input their name, email address and password when the create an account button is clicked. 
+FR3:	check the email address against the existing database to determine if it already exists.
+FR4:	display an error message if the email address already exists.
+FR5:	validate the password entered against the password minimum requirements.
+3.3.2	Login
+The system shall:
+FR6:	display a login form with the following fields:
+•	Email address (input type: text/email)
+•	Password (input type: password)
+FR7:	include a “Login” button for form submission. 
+FR8:	validate the login details against the database.
+FR9:	display a clear error message if:
+•	The email does not exist in the database.
+•	The password does not match the email provided.
+FR10:	not specify if the error is with the email or password to enhance security.
+FR11:	log all login attempts (both successful and failed) for auditing and monitoring purposes.
+FR12:	provide a “Forgot Password?” link to allow users to reset their password. 
+FR13:	send a password reset email to the user’s recorded email address when requested. 
+FR14:	allow users to select a new password that meets password requirements. 
+FR15:	update the stored password to the new password.
+3.3.3	Submit an essay
+The system shall:
+FR16:	display a submit essay button on the home page.
+FR17:	create a new record whenever an essay is submitted.
+FR18:	store the user information and timestamp of the submission.
+FR19:	assign a unique submission ID to a record once created. 
+FR20:	display a choice for the user to select whether to upload a file with their essay or enter the text directly.
+FR21:	display task instructions for task 1 and task 2 including required word count.
+FR22:	display a text box to enter the response for task 1 if the user selects a direct text entry. 
+FR23:	display a text box to enter the response for task 2 if the user selects a direct text entry.
+FR24:	display a real-time word counter below the task 1 and task 2 text boxes.
+FR25:	allow text to be pasted into the direct text boxes from outside the system.
+FR26:	display a file upload field for task 1 where users can select and upload only a .txt, .docx or pdf document.
+FR27:	display a file upload field for task 2 where users can select and upload a .txt, .docx or pdf document.
+FR28:	reject unsupported file types.
+FR29:	display an error message if an unsupported file type is selected for upload.
+FR30:	reject files larger than [20MB] and display an error message to the user. 
+FR31:	display a confirmation message once each file has been successfully uploaded. 
+FR32:	allow users to remove an uploaded document and select a new one.
+FR33:	require a file to be uploaded or text to be entered for both task 1 and task 2 before a user can submit.
+FR34:	display a submit button.
+FR35:	submit the input files or text to the API when the submit button is clicked.
+FR36:	initiate a request to the AI model for grading.
+3.3.4	Grade a submission
+The AI model shall:
+FR37:	extract the text content from the uploaded file for processing.
+FR38:	remove unnecessary whitespace and images.
+FR39:	count the number of words in the essay.
+FR40:	stop the scoring process and return an error message if the submitted text is 20 words or less.
+FR41:	identify errors in spelling according to both the US and UK spelling conventions. 
+FR42:	identify errors in capitalisation. 
+FR43:	identify errors in grammar.
+FR44:	calculate a score between 0-9 for the following components for task 1:
+•	Task Achievement
+•	Coherence and Cohesion
+•	Lexical Resource
+•	Grammatical Range & Accuracy
+FR45:	calculate a score between 0-9 for the following components for task 2:
+•	Task Response
+•	Coherence and Cohesion
+•	Lexical Resource
+•	Grammatical Range & Accuracy
+FR46:	calculate an overall score for task 1 as an average of the component scores.
+FR47:	calculate an overall score for task 2 as an average of the component scores.
+FR48:	calculate an overall written assessment score as a weighted average of the task 1 and task 2 overall scores, where task 1 is worth 1/3 and task 2 is 2/3.
+FR49:	generate written comments outlining weakness(es) of the essay.
+FR50:	generate written comments outlining steps the user can take to improve their score.
+FR51:	return the generated scores and comments to the API.
+3.3.5	Display results
+The system shall:
+FR52:	return the AI model outputs to the system (UI). 
+FR53:	display a message that the essay is being graded after the submit button is clicked.
+FR54:	display all band scores generated by the model.
+FR55:	display all feedback comments generated by the model.
+FR56:	format the results to clearly separate the different scores and comments for clarity.
+FR57:	store the user’s scores and feedback in the database.
+FR58:	email the results to the user’s email on file.
+3.3.6	Validate results
+The system shall: 
+FR59:	allow teachers to access submission data for review and validation. 
+FR60:	support integration with external data visualisation tools for reviewing submissions.
+3.3.7	Feedback submission
+The system shall:
+FR61:	provide a “Submit Feedback” button on the main user interface.
+FR62:	display a form to capture text comments from the user when submit feedback is clicked.
+FR63:	display a submit button to submit the feedback once entered. 
+FR64:	display a confirmation that the feedback has been submitted and will be reviewed.
+FR65:	store the feedback in the database for administrator to review. 
+3.3.8	Model Training – Student Feedback
+The system shall:
+FR66:	provide a button for the student to submit feedback on their evaluation feedback.
+FR67:	display a feedback form when the submit feedback button is clicked.
+FR68:	validate that the feedback field is not blank before allowing submission.
+FR69:	display a confirmation message when feedback is successfully submitted.
+FR70:	store the submitted feedback in the database for review by a system admin.
+FR71:	allow the system admin to download all feedback for approval and classification.
+FR72:	process all approved and classified feedback and apply it to model training.
+FR73:	log all feedback submissions and model updates for tracking and auditing.
+3.3.9	View previous submissions and results
+The system shall:
+FR74:	display a button to view previous submissions.
+FR75:	ensure that students can only view their own submissions associated with their user account.
+FR76:	display a table listing all previous submissions and their corresponding scores and feedback on the previous submissions page. 
+
+3.4	NON-FUNCTIONAL REQUIREMENTS
+Non-functional requirements describe specifications for the system outside of what the system must do. These requirements are outlined below.  
+3.4.1	Usability
+The system must:
+NFR1:	provide clear and actionable feedback messages to users for every interaction.
+NFR2:	provide real-time system feedback, with users receiving responses within 0.1 seconds for UI interactions.
+NFR3: 	display a loading indicator for any operation taking longer than 2 seconds.
+NFR4:	display all dates in the format DD.MM.YYYY across all interfaces
+NFR5:	support English as the default language, with the option for additional language support in future releases.
+NFR6:  	support keyboard navigation and be compatible with assistive technologies for accessibility compliance.
+NFR7:	provide tooltips, user guides or online guidance for users to assist in essay submission, grading interpretation, and system navigation
+3.4.2	Reliability
+The system must:
+NFR8:	maintain high availability with minimal disruption, achieving an uptime of at least 99%.
+NFR9:	support automated data backups at least once every 24 hours with a recovery process ensuring restoration within 2 hours.
+NFR10:	be able to recover from failures with no more than 15 minutes of data loss.
+NFR11:	ensure that any scheduled maintenance or downtime should not exceed 4 hours per month and is announced at least 24 hours in advance by email notifications or in-application alerts.
+NFR12:	include automatic failover systems to switch to backup services in the case of a primary server failure.
+NFR13:	implement load balancing to distribute requests efficiently preventing system crashes.
+3.4.3	Performance
+The system must:
+NFR14:	provide results within 60 seconds for 99% of submissions under normal load conditions.
+NFR15:	be able to process >10,000 essay submissions per month with a load error rate of less than 5% for essay submissions.
+NFR16:	support at least 500 concurrent users without performance degradation.
+NFR17:	be designed to scale dynamically to accommodate a 100% increase in traffic within 10 minutes of peak usage detection.
+NFR18:	provide grading accuracy within ±0.5 bands of human evaluators in 95% of cases.
+NFR19:	provide feedback classified as useful by >50% of users.
+NFR20:	be capable of handling up to 1,000 users during peak load without degrading response times by more than 10%.
+NFR21:	support multi-thread processing to improve AI model efficiency.
+NFR22:	be optimised for low bandwidth connections ensuring accessibility for users with limited internet access.
+NFR23:	support real time autosaving to prevent loss of work in the case of accidental tab closure or system failure.
+3.4.4	Supportability
+The system must:
+NFR24:	provide detailed logging and monitoring tools with logs retained for at least 30 days.
+NFR25:	have documentation (technical and user guides) which are updated within 48 hours of any major system change.
+NFR26:	allow integration of additional modules for future enhancements (e.g. spoken IELTS grading) with minimal modifications.
+NFR27:	have version control to track changes in AI model behaviour and ensure rollback functionality in case of degraded performance.
+NFR28:	be modular, allowing independent updates to different components without affecting the entire system.
+3.4.5	Design Constraints
+The system must:
+NFR29:	be developed using:
+o	Python (backend and AI models)
+o	JavaScript (UI/frontend)
+o	PostgreSQL or MongoDB as the database.
+NFR30:	use industry-standard NLP frameworks such as PyTorch, TensorFlow, or Hugging Face. 
+NFR31:	be deployable on cloud platforms, supporting AWS, Azure, or Google Cloud.
+NFR32:	support API-based integration with existing learning management systems (LMS).
+NFR33:	be cross-browser compatible, supporting full functionality on Chrome, Firefox, Edge, and Safari.
+NFR34:	allow the AI model to be configurable for different IELTS scoring rules, enabling adaption to future changes in IELTS evaluation criteria.
+NFR35:	support at least 100Gb of data storage annually, with the ability to scale by at least 20% per year.
+NFR36:	use only third-party libraries and frameworks with permissive open-source licenses (e.g., MIT, Apache 2.0, BSD), avoiding restrictive licenses like GPL to prevent legal and financial implications.
+3.4.6	Security
+To ensure data integrity, authentication, and access control the system must:
+NFR37:	encrypt all sensitive user data using ASE-256 encryption and ensure proper key management practices.
+NFR38: secure all authentication requests via OAuth 2.0 or JWT tokens.
+NFR39:	implement role-based access control (RBAC) with separate permissions for students, teachers, and administrators. 
+NFR40: support multi factor authentication for administrators.
+NFR41:	undergo security audits every 6 months to check for vulnerabilities.
+NFR42:	log and monitor all authentication attempts with an automatic logout after 5 failed attempts.
+NFR43:	delete data permanently from the system within 30 days of a user’s request.
+NFR44:	log all user interactions and system events for auditing and compliance purposes.
+NFR45:	have a secure timeout mechanism to log out inactive users after 15 minutes to prevent unauthorised access.
+NFR46:	comply with GDPR and Australian Privacy Principles (APPs) for data protection and user privacy.
+NFR47:	ensure all login communications occur over HTTPS to protect user credentials.
+NFR48:	ensure passwords are stored using a secure hashing algorithm.
+
+3.5	FUTURE DIRECTIONS
+Due to resourcing and time constraints, not all desired functionalities can be developed in the initial project implementation. This section lists requirements that are outside the scope of this project. 
+3.5.1	AI Model
+The AI model could:
+•	accept, process and learn data contained in images. This is required to assess task achievement in the academic test task 1, so upon completion the system could be expanded to grade both the academic and general tests.
+•	accept audio data and grade the spoken part of the IELTS assessment.
+3.5.2	User Interface
+The user interface could be further developed to enhance the user experience and introduce additional functionality. Suggested additions are listed below. 
+•	Add accessibility features such as font settings, language settings and screen reader compatibility. 
+•	Facilitate live “mock-tests” where students are presented with the tasks in real time and have 60 minutes to write and submit their response.
+•	Allow teachers to submit essays on behalf of students.
+•	Enhance the previous submissions section to a comprehensive dashboard for students tracking their achievements, progress over time and repeated mistakes or trends with submissions. 
+•	Allow students to request reviews of their submissions and assign these review requests to teachers.
+•	Allow teachers to review submissions directly within the UI and where appropriate make changes to a student’s score or feedback.
+•	Trigger feedback to the AI model when a submission score or feedback is edited, to enable continuous improvement of the model.
+•	Allow administrators to view and search for all submissions within the UI.
+•	Develop a dedicated help center with FAQs and troubleshooting guides. 
+•	Develop a repository of sample essays and model answers with explanations for their scores. 
+•	Develop non-technical guides and lessons that cover the IELTS process e.g., writing strategies, scoring band descriptions.  
+•	Add gamified elements such as achievements, streaks and leaderboards. 
+•	Enhance the results page to include links to relevant lessons/guides based on identified improvement areas. 
+•	Dedicated mobile/tablet device compatible design.
+3.5.3	Other
+•	Develop an app that students can use to interact with the model, as well as connect with tutors. 
+•	Develop a chatbot for technical support and general queries. 
+•	Develop two product offerings: Premium vs Free and offer free trials of premium functionality. 
+
+3.	References
+
+Adam, A 2024, ‘IT Project Cost Estimation – an Overview of How to Do It Right’, Blurify, 21 	June, viewed 1 February 2025, <https://blurify.com/blog/it-project-cost-estimation/>
+AWS, AWS Pricing Estimator, AWS, viewed 1 February 2025, <https://calculator.aws/>.
+Campino, J 2024, ‘Unleashing the transformers: NLP models detect AI writing in education’, Journal of Computers in Education (the Official Journal of the Global Chinese Society for Computers in Education).
+
+DeepLearning.AI. 2023, Natural Language Processing (NLP) - A Complete Guide. www.deeplearning.ai, 11 January, viewed 2 February 2025,   <https://www.deeplearning.ai/resources/natural-language-processing/>
+
+Google Cloud Platform, Google Cloud Pricing Calculator, Google Cloud Platform, viewed 1 February 2025, <https://cloud.google.com/products/calculator?hl=en>.
+Girdler, A 2023, How to Create a Project Budget, video, YouTube, 28 June, viewed 1 	February 2025, <https://www.youtube.com/watch?v=ecs9oUe2dZk>.
+IDP IELTS Australia 2024, IELTS Writing, IDP IELTS Australia, viewed 29 January 2025, <https://ielts.com.au/australia/prepare/writing>.
+
+Khurana, D, Koli, A, Khatter, K & Singh, S 2023, ‘Natural language processing: state of the art, current trends and challenges’, Multimedia Tools and Applications, vol. 82, no. 3, pp. 3713–3744.
+
+Moran, K 2020, ‘Remote Usability-Testing Costs: Moderated vs. Unmoderated’, NN Group, 26 July, viewed 1 February 2025, < https://www.nngroup.com/articles/remote-usability-testing-costs/>
+Naveed, H, Ullah Khan, A, Qiu, S, Saqib, M, Anwar, S, Usman, M, Akhtar, N, Barnes, N & Mian, A 2024, ‘A Comprehensive Overview of Large Language Models’, arXiv.Org. 
+Microsoft, Pricing Calculator, Microsoft Azure, viewed 1 February 2025, 
+https://azure.microsoft.com/en-au/pricing/calculator/
+
+Nielson, J 1998, ‘Cost of User Testing a Website’, NN Group, 2 May, viewed 1 February 2025, < https://www.nngroup.com/articles/cost-of-user-testing-a-website/#:~:text=With%20experience%20it%20is%20possible,know%20what%20you%20are%20doing>.
+
+Read, J 2022, ‘Test Review: The International English Language Testing System (IELTS)’, Language Testing, vol. 39, no. 4, pp. 679–694.
+
+TakeIELTS Official 2024, What is IELTS | Learn everything about the IELTS Test, video, YouTube, 1 August, viewed 19 January 2025, <https://www.youtube.com/watch?v=r5eiUU3EpHE&t=20s>
+
+
+  
+4.	Appendices
+APPENDIX A: GLOSSARY
+Fine-tuned Transformers: 
+These are advanced AI models designed to "understand" language better by learning from large amounts of text (José Campino, 2024). Fine-tuning means we take a pre-built model and teach it to specialize in a specific task, like grading essays.
+
+Think of transformers like a smart intern who knows a lot about language but needs on-the-job training to become an expert essay grader.
+
+While these models excel at understanding complex language features, such as whether ideas connect logically or if vocabulary is used appropriately, they need time and a large amount of data to grade essays accurately. 
+IELTS: 
+International English Language Testing System.  It is a globally recognised/standardised English language proficiency test, designed to assess the language ability of non-native English speakers who wish to study in and/or immigrate to English-speaking countries, or to work in an international environment.
+Large Language Models (LLMs): 
+LLMs are ultra-powerful versions of AI models, capable of not only understanding text but also generating it. They can grasp the overall meaning, tone, and intent behind an essay, providing in-depth analysis and feedback (Naveed et al., 2024).
+
+As a teacher reviews a high volume of essays, an LLM would be able to quickly read and assess an essay, offering detailed feedback on structure, vocabulary and grammar all at once. 
+
+As LLM’s can handle a wide range of tasks, from potential essay scoring to generating detailed feedback for students. They are valuable for ensuring the potential use cases output provides high-quality, detailed support, but can require significant resources to maintain. 
+Lexical analysis:
+Lexical analysis is like the process of reading a sentence and identifying the important pieces, such as words, punctuation, and symbols. For example, in a recipe, you might recognize "mix," "flour," and "2 cups" as key parts.
+In programming, lexical analysis breaks down the code into small parts called tokens, such as keywords (special words with meaning), numbers, or variable names. This helps the computer understand what the program is saying, similar to how you would understand a recipe or instructions. This step also clears out anything unnecessary, like extra spaces or comments, before passing the cleaned-up instructions to the next phase.	
+MVP:
+Minimum Viable Product. Functioning product available for testing and feedback.
+
+NLP Model: 
+Natural Language Processing (NLP) is a machine learning technology designed to interpret, understand, and manipulate human language, whether in speech or text. Traditional NLP models use basic statistical techniques (DeepLearning.AI, 2023) and predefined rules to analyse text. These models are like pattern-recognition tools—they can identify how often certain words appear but lack the ability to truly comprehend the meaning or context (Khurana et al., 2022).
+Imagine you're grading essays by simply checking for the number of times a student uses specific key terms—without reading the entire content. It works to some extent but doesn't understand context or creativity. Application examples of this could include:
+•	Models that rank documents by how many times they use important words (TF-IDF).
+•	Systems that detect sentence structure based on word patterns (e.g., subject-verb-object).
+NLP can be useful in the project as the models can quickly find specific phrases, count word usage or spot repeated errors. But they are not effective at judging essay quality or flow. They are like basic spell checkers – helpful, but not enough for this project on their own
+Strong password: 
+A strong password is a long, complex, and unique password that's difficult for others to guess. It should contain a mix of letters, numbers, and symbols. Characteristics of a strong password are:
+o	Length: At least 12 characters long, but 14 or more is better. 
+o	Complexity: Contains a mix of uppercase and lowercase letters, numbers, and symbols. 
+o	Uniqueness: Different from previous passwords and not shared with anyone. 
+o	Memorability: Easy for you to remember, but difficult for others to guess.
+Student: 
+The key user of the system who will upload their written essays and view results. 
+Teacher: 
+The user who will monitor results to ensure accuracy of the scoring and feedback and perform reviews of student results when requested. 
+Use Case: 
+a situation in which the user could use the system. 
+ 
+APPENDIX B: REQUIREMENTS CHANGE RECORD
+Change ID	Date	Description	Reason	Impact	Changed by
+001	3/2/25	Initial version of the requirements report completed and submitted for stakeholder review.	First iteration of the report for review.	No impact as this is the initial version. 	Project team
+
+
+
+

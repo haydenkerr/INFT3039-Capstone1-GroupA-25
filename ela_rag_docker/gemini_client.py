@@ -1,6 +1,7 @@
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()  # Load API Key from `.env` file
 
@@ -13,50 +14,82 @@ generation_config = {
   "top_k": 40,
   "max_output_tokens": 8192,
   "response_mime_type": "text/plain",
-  
 }
 
 model = genai.GenerativeModel(
   model_name="gemini-2.0-flash",
   generation_config=generation_config,
-  
-)
-# Function to handle streamed responses
-def handle_streamed_response(response):
-    for chunk in response:
-        print(chunk.text, end='', flush=True)
-
-def load_context():
-    # Here you can load context from a file, database, API, etc.
-    # For demonstration, we'll use a simple string as context
-    context = open(r"https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ela_rag_docker/system.md", "r").read()
-    
-    return context
-
-chat_session = model.start_chat(
-  history=[
-  ]
 )
 
-# Load context
-context = load_context()
-question = """
-The diagram below shows how rain water is collected and then treated to be used as drinking water in an Australian town. Summarise the information by selecting and reporting the main features and make comparisons where relevant.You should write at least 150 words.
-"""
-essay = """
-Whether people should be encouraged more to study vocational courses due to the lack of workforce in that area or be encouraged to study at the university remains a big discussion. I believe both of these areas of study should be promoted equally, countries need academics as well as qualified workers.
-One of the reasons that supports the encouragement to study either area, academic or vocational, is the worldwide need for the two types of professionals. For example, Australian government is currently offering work visas and permanent residencies to overseas qualified workers such as, carpenters, cooks, bar managers as well as doctors, nurses and psychologists. Essentially, this demonstrates that the two areas are equally needed and this happens in Canada and England too.
-Another point to be considered is the increase in the people's needs due to the population growth, which, therefore, affects the need for more experts in all sectors. This includes professional from different fields, such as science, construction and even thinkers. If people is encouraged to study more in one field than others, this might be detrimental to societies, leaving one sector significantly more affected. Eventually, countries need a balance in the areas choosen for people to growth a career.
-In conclusion, I support the idea of encouraging both, university and vocational studies. Many countries worldwide have expressed their need for the two types of workers. Besides, as the population is rapidly increasing, the need for experts in multiples areas is increasing too, so promoting both is the only way to maintain a balance."""
+chat_session = model.start_chat(history=[])
 
-# Construct the prompt with context
-prompt = f"{context}\n\n{question}\n\n{essay}\n\n"
+def load_system_prompt():
+    """Load the system prompt from GitHub"""
+    url = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ela_rag_docker/system.md"
+    try:
+        response = requests.get(url)
+        return response.text
+    except Exception as e:
+        print(f"Error loading system prompt: {str(e)}")
+        # Fallback to local file if available
+        try:
+            with open("system.md", "r", encoding="utf-8") as f:
+                return f.read()
+        except:
+            return "You are an IELTS essay evaluator. Evaluate essays based on the IELTS criteria."
 
+# Load system prompt once at module initialization
+SYSTEM_PROMPT = load_system_prompt()
 
-
-def query_gemini(prompt: str) -> str:
+def query_gemini(user_prompt: str, examples_context: str = "", question: str = "", essay: str = "") -> str:
+    """
+    Sends a prompt to Google Gemini and returns the response as a string.
     
-# Send a message and handle the streamed response
-    response = chat_session.send_message(prompt)
-       
-    return handle_streamed_response(response) if response else "No response from Gemini."
+    Args:
+        user_prompt: The main prompt to send
+        examples_context: Optional RAG examples for context
+        question: Optional essay question if available
+        essay: Optional essay text if available
+    """
+    try:
+        # If question and essay are provided, use them in the prompt
+        full_prompt = SYSTEM_PROMPT
+        
+        if examples_context:
+            full_prompt += f"\n\nHere are some example graded essays:\n{examples_context}"
+        
+        if question and essay:
+            full_prompt += f"\n\nNow, evaluate this new essay:\nNew question: {question}\nNew Essay: {essay}"
+        
+        # Add any additional user prompt
+        if user_prompt:
+            full_prompt += f"\n\n{user_prompt}"
+            
+        print("📡 Sending request to Gemini...")
+        print(f"📝 Prompt start: {full_prompt[:300]}...")  # Print only first 300 chars
+
+        response = chat_session.send_message(full_prompt)
+
+        if response:
+            print("✅ Gemini API Response Received")
+            
+            # Capture streamed response
+            full_response = []
+            for chunk in response:
+                if hasattr(chunk, "text"):
+                    full_response.append(chunk.text)
+
+            response_text = " ".join(full_response).strip()
+
+            if response_text:
+                return response_text
+            else:
+                print("⚠️ No valid text in response")
+                return "⚠️ No valid response from Gemini."
+        else:
+            print("⚠️ Gemini API returned None")
+            return "⚠️ Gemini API Error: No response received."
+
+    except Exception as e:
+        print(f"❌ Gemini API Error: {str(e)}")
+        return f"⚠️ Gemini API Error: {str(e)}"
