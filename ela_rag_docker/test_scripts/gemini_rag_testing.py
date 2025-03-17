@@ -23,7 +23,7 @@ def compute_similarity(reference, candidate):
 
 def query_rag_model(question, essay):
     """Send a request to the RAG model API and return the graded response."""
-    API_KEY = "1234abcd"  # Adjust to match FastAPI API key
+    API_KEY = "1234abcd"
     url = "http://192.168.1.15:8001/grade"  # Adjust to match FastAPI endpoint
     payload = {"question": question, "essay": essay}
     headers = {"x-api-key": API_KEY, "Content-Type": "application/json"}
@@ -33,6 +33,31 @@ def query_rag_model(question, essay):
         return response.json()
     else:
         return {"error": "Failed to get response", "status_code": response.status_code}
+
+def get_band_score_feedback(cleaned_evaluation):
+    start = "Overall Band Score:"
+    end = "Feedback and Additional Comments:"
+    return cleaned_evaluation[cleaned_evaluation.find(start)+len(start):cleaned_evaluation.rfind(end)]
+
+def get_task_achievement_feedback(cleaned_evaluation):
+    start = "Task Achievement:"
+    end = "Coherence and Cohesion:"
+    return cleaned_evaluation[cleaned_evaluation.find(start)+len(start):cleaned_evaluation.rfind(end)]
+
+def get_coherence_feedback(cleaned_evaluation):
+    start = "Coherence and Cohesion:"
+    end = "Lexical Resource"
+    return cleaned_evaluation[cleaned_evaluation.find(start)+len(start):cleaned_evaluation.rfind(end)]
+
+def get_lexical_feedback(cleaned_evaluation):
+    start = "Lexical Resource"
+    end = "Grammatical Range "
+    return cleaned_evaluation[cleaned_evaluation.find(start)+len(start):cleaned_evaluation.rfind(end)]
+
+def get_grammar_feedback(cleaned_evaluation):
+    start = "Grammatical Range "
+    end = "Overall Band Score:"
+    return cleaned_evaluation[cleaned_evaluation.find(start)+len(start):cleaned_evaluation.rfind(end)]
 
 # Store test results
 rag_results = []
@@ -47,12 +72,20 @@ for _, row in df_test.iterrows():
     if 'error' in result:
         continue  # Skip failed API responses
     
+    # Extract detailed feedback
+    original_overall_feedback = get_band_score_feedback(row['cleaned_evaluation'])
+    original_task_feedback = get_task_achievement_feedback(row['cleaned_evaluation'])
+    original_coherence_feedback = get_coherence_feedback(row['cleaned_evaluation'])
+    original_lexical_feedback = get_lexical_feedback(row['cleaned_evaluation'])
+    original_grammar_feedback = get_grammar_feedback(row['cleaned_evaluation'])
+    
     # Compute feedback similarity
-    overall_feedback_similarity = compute_similarity(row['cleaned_evaluation'], result['feedback']['task_response'])
+    overall_feedback_similarity = compute_similarity(original_overall_feedback, result['feedback']['task_response'])
     
     # Store test results
     new_row = (
         row['question'], row['essay'], row['cleaned_evaluation'],
+        original_overall_feedback, original_task_feedback, original_coherence_feedback, original_lexical_feedback, original_grammar_feedback,
         row['Overall Band Score'], result['bands']['overall'], overall_feedback_similarity,
         row['Task Achievement'], result['bands']['task_response'],
         row['Coherence'], result['bands']['coherence_cohesion'],
@@ -63,7 +96,8 @@ for _, row in df_test.iterrows():
     processed_rows += 1
 
 # Convert results to DataFrame
-columns = ['question', 'essay', 'original_feedback', 'original_score', 'predicted_score', 'feedback_similarity',
+columns = ['question', 'essay', 'original_feedback', 'original_overall_feedback', 'original_task_feedback', 'original_coherence_feedback', 'original_lexical_feedback', 'original_grammar_feedback',
+           'original_score', 'predicted_score', 'feedback_similarity',
            'original_task_achievement', 'predicted_task_achievement',
            'original_coherence', 'predicted_coherence',
            'original_grammar', 'predicted_grammar',
@@ -71,6 +105,6 @@ columns = ['question', 'essay', 'original_feedback', 'original_score', 'predicte
 rag_results_df = pd.DataFrame(rag_results, columns=columns)
 
 # Save results to Excel
-output_file = "./ela_rag_docker/Scripts/gemini_rag_test_results.xlsx"
+output_file = "./ela_rag_docker/test_scripts/gemini_rag_test_results.xlsx"
 rag_results_df.to_excel(output_file, index=False)
 print(f"✅ Test results saved to {output_file}")
