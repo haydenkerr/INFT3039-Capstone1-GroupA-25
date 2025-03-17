@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import hashlib
 from sentence_transformers import SentenceTransformer
 from vector_db import VectorDatabase
 
@@ -13,13 +14,35 @@ vector_db = VectorDatabase(embedding_dim=384)
 # GitHub CSV URL
 CSV_URL = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_train_data.csv"
 
-def ingest_csv_documents(max_rows=5000):
-    """Batch processes and stores CSV data into FAISS."""
-    print(f"📊 Loading CSV data from {CSV_URL}...")
+def compute_content_hash(content):
+    """Generate a hash for document content to check for duplicates"""
+    return hashlib.md5(content.encode('utf-8')).hexdigest()
+
+def load_document_hashes():
+    """Load existing document hashes from metadata"""
+    hashes = {}
+    for idx, metadata in vector_db.metadata.items():
+        if isinstance(metadata, str) and "hash:" in metadata:
+            hash_start = metadata.find("hash:") + 5
+            hash_end = metadata.find(" ", hash_start) if " " in metadata[hash_start:] else len(metadata)
+            doc_hash = metadata[hash_start:hash_end].strip()
+            hashes[doc_hash] = idx
+    return hashes
+
+def ingest_csv_documents(max_rows=5000, csv_url=None):
+    """Batch processes and stores CSV data into FAISS with duplicate checking."""
+    if csv_url is None:
+        csv_url = CSV_URL
+        
+    print(f"📊 Loading CSV data from {csv_url}...")
     
     try:
+        # Load existing document hashes
+        existing_hashes = load_document_hashes()
+        print(f"🔍 Found {len(existing_hashes)} existing documents")
+        
         # Load the CSV data
-        df = pd.read_csv(CSV_URL)
+        df = pd.read_csv(csv_url)
         
         # Select and rename columns
         df = df[['prompt', 'essay', 'band', 'cleaned_evaluation', 
@@ -31,10 +54,13 @@ def ingest_csv_documents(max_rows=5000):
         
         # Process rows up to max_rows limit
         processed_rows = 0
+        new_docs = 0
+        skipped_docs = 0
+        
         for idx, row in df.iterrows():
             if processed_rows >= max_rows:
                 break
-            
+                
             # Create document content from row data
             content = (
                 f"question: {row['question']}\n"
@@ -48,24 +74,35 @@ def ingest_csv_documents(max_rows=5000):
                 f"Overall Band Score: {row['Overall Band Score']}"
             )
             
+            # Check for duplicates
+            content_hash = compute_content_hash(content)
+            
+            if content_hash in existing_hashes:
+                skipped_docs += 1
+                processed_rows += 1
+                continue
+                
             # Generate embedding
             embedding = embedding_model.encode(content, normalize_embeddings=True)
             
             # Use row index as document ID
             doc_id = f"row_{idx}"
             
-            # Store first 200 chars as metadata preview
-            metadata_preview = content[:200].replace('\n', ' ')
+            # Include hash in metadata for future duplicate checks
+            metadata_preview = f"{content[:150].replace('\n', ' ')} hash:{content_hash}"
             
-            print(f"📂 Adding document: {doc_id}")
+            # Add document to vector database
             vector_db.add_document(np.array(embedding), doc_id, metadata_preview)
+            existing_hashes[content_hash] = str(vector_db.index.ntotal - 1)
             
+            new_docs += 1
             processed_rows += 1
+            
+            if processed_rows % 100 == 0:
+                print(f"📊 Processed {processed_rows} rows, added {new_docs}, skipped {skipped_docs}")
         
-        print(f"✅ Ingested {processed_rows} documents into FAISS.")
-        
-        # Debug: Verify stored documents
-        print(f"📖 Stored documents: {vector_db.list_stored_documents()}")
+        print(f"✅ Processing complete: added {new_docs} new documents, skipped {skipped_docs} duplicates")
+        print(f"📊 Vector DB now contains {vector_db.index.ntotal} total documents")
         
     except Exception as e:
         print(f"❌ Error ingesting CSV data: {str(e)}")

@@ -6,8 +6,14 @@ from vector_db import VectorDatabase
 from hf_embeddings import get_embedding
 from gemini_client import query_gemini
 import os
+import regex as re
 
-app = FastAPI()
+app = FastAPI(    title="ELA Finetuned RAG API",
+    description="This API allows quesiton/essay pairing to query a finetune model with RAG system with Gemini.",
+    version="1.0.0",
+    # docs_url= "/mydocs",  # Change the Swagger docs URL
+    # redoc_url= "/myredoc"  # Change the Redoc docs URL
+)
 vector_db = VectorDatabase(embedding_dim=384)
 
 # API Key for authentication
@@ -39,35 +45,31 @@ def grade_essay(request: EssayRequest):
     # Format examples into context
     examples_context = "\n\n".join([content for content, score in results])
     
-    # Pass to updated gemini_client with question and essay
+    # Pass to gemini_client with question and essay
     llm_response = query_gemini(
-        user_prompt="",  # No additional prompt needed
+        user_prompt="",
         examples_context=examples_context,
         question=request.question,
         essay=request.essay
     )
     
+    # First try direct JSON parsing
     try:
-        # Parse JSON response
         grading_result = json.loads(llm_response)
         return grading_result
     except json.JSONDecodeError:
-        # Handle non-JSON response
-        cleaned_response = llm_response.strip()
-        if cleaned_response.find('{') >= 0 and cleaned_response.rfind('}') > 0:
-            json_start = cleaned_response.find('{')
-            json_end = cleaned_response.rfind('}') + 1
-            cleaned_json = cleaned_response[json_start:json_end]
-            try:
-                grading_result = json.loads(cleaned_json)
-                return grading_result
-            except:
-                pass
-        
-        return {
-            "error": "Could not parse LLM response as JSON",
-            "raw_response": llm_response
-        }
+        # Use the parsing function when JSON extraction fails
+        import re
+        try:
+            formatted_json = parse_grading_response(llm_response)
+            return formatted_json
+        except Exception as e:
+            # Return formatted error if parsing fails
+            return {
+                "error": "Could not parse LLM response",
+                "message": str(e),
+                "raw_response": llm_response
+            }
 
 @app.get("/debug/documents")
 def list_documents():
@@ -97,3 +99,37 @@ def search_vector_db(request: QueryRequest):
 @app.get("/debug/test")
 def test_response():
     return {"This is a test": "response"}
+
+def parse_grading_response(raw_response):
+    # Extract band scores from the response
+    task_response_score = re.search(r"Task Response\s*\|\s*(\d+)", raw_response)
+    coherence_score = re.search(r"Coherence and Cohesion\s*\|\s*(\d+)", raw_response)
+    lexical_score = re.search(r"Lexical Resource\s*\|\s*(\d+)", raw_response)
+    grammar_score = re.search(r"Grammatical Range & Accuracy\s*\|\s*(\d+)", raw_response)
+    overall_score = re.search(r"\*\*Overall Band Score\*\*\s*\|\s*\*\*(\d+)\*\*", raw_response)
+    
+    # Extract feedback sections
+    task_response_feedback = re.search(r"\*\*Task Response:\*\*\s*(.*?)(?=\*\*Coherence and Cohesion:|$)", raw_response, re.DOTALL)
+    coherence_feedback = re.search(r"\*\*Coherence and Cohesion:\*\*\s*(.*?)(?=\*\*Lexical Resource:|$)", raw_response, re.DOTALL)
+    lexical_feedback = re.search(r"\*\*Lexical Resource:\*\*\s*(.*?)(?=\*\*Grammatical Range and Accuracy:|$)", raw_response, re.DOTALL)
+    grammar_feedback = re.search(r"\*\*Grammatical Range and Accuracy:\*\*\s*(.*?)$", raw_response, re.DOTALL)
+    
+    # Format the JSON response
+    formatted_json = {
+        "bands": {
+            "task_response": int(task_response_score.group(1)) if task_response_score else None,
+            "coherence_cohesion": int(coherence_score.group(1)) if coherence_score else None,
+            "lexical_resource": int(lexical_score.group(1)) if lexical_score else None,
+            "grammatical_range": int(grammar_score.group(1)) if grammar_score else None,
+            "overall": int(overall_score.group(1)) if overall_score else None
+        },
+        "feedback": {
+            "task_response": task_response_feedback.group(1).strip() if task_response_feedback else "",
+            "coherence_cohesion": coherence_feedback.group(1).strip() if coherence_feedback else "",
+            "lexical_resource": lexical_feedback.group(1).strip() if lexical_feedback else "",
+            "grammatical_range": grammar_feedback.group(1).strip() if grammar_feedback else ""
+        }
+    }
+    
+    return formatted_json
+
