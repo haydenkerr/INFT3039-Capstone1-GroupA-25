@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import numpy as np
 import json
@@ -6,7 +7,13 @@ from vector_db import VectorDatabase
 from hf_embeddings import get_embedding
 from gemini_client import query_gemini
 import os
+
 import regex as re
+
+from fastapi import Query
+import requests
+import tempfile
+import shutil
 
 app = FastAPI(    title="ELA Finetuned RAG API",
     description="This API allows quesiton/essay pairing to query a finetune model with RAG system with Gemini.",
@@ -14,6 +21,17 @@ app = FastAPI(    title="ELA Finetuned RAG API",
     # docs_url= "/mydocs",  # Change the Swagger docs URL
     # redoc_url= "/myredoc"  # Change the Redoc docs URL
 )
+
+
+# Allow CORS (Adjust origins as per your security requirements)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Change to your frontend URL for security
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 vector_db = VectorDatabase(embedding_dim=384)
 
 # API Key for authentication
@@ -133,3 +151,24 @@ def parse_grading_response(raw_response):
     
     return formatted_json
 
+
+@app.post("/ingest-from-url", dependencies=[Depends(verify_api_key)])
+def ingest_file_from_url(url: str = Query(..., description="Public GitHub or raw file URL")):
+    try:
+        # Download file to temp
+        response = requests.get(url, stream=True)
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to download file")
+
+        suffix = os.path.splitext(url)[-1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            shutil.copyfileobj(response.raw, tmp)
+            file_path = tmp.name
+
+        content = extract_text(file_path)
+        embedding = get_embedding(content)
+        vector_db.add_document(np.array(embedding), doc_id=os.path.basename(url), metadata=content[:200])
+        
+        return {"message": f"Successfully ingested: {url}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ingestion error: {str(e)}")

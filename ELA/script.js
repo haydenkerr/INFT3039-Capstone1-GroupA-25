@@ -168,12 +168,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Build a JSON payload
         const payload = {
-          email,
+          // email,
           question,
-          essay,
-          wordCount,
-          submissionGroup,
-          taskType
+          essay
+          // wordCount,
+          // submissionGroup,
+          // taskType
         };
 
         console.log("[Process Submission] Payload:", payload);
@@ -181,10 +181,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // -------------------------------------
         //  OPTIONAL: API call commented out
         // -------------------------------------
-        /*
-        fetch("https://your-api-endpoint.com/analyze", {
+        
+        fetch("http://192.168.1.17:8001/grade", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {"x-api-key": "1234abcd","Content-Type": "application/json" },
           body: JSON.stringify(payload)
         })
         .then(response => response.json())
@@ -198,11 +198,11 @@ document.addEventListener("DOMContentLoaded", function () {
           document.querySelector(".desktop1-text10").textContent =
             "Failed to process submission.";
         });
-        */
+        
 
         // For now, just indicate done
-        document.querySelector(".desktop1-text10").textContent =
-          "Submission processed (no live API call).";
+        // document.querySelector(".desktop1-text10").textContent =
+        //   "Submission processed (no live API call).";
     });
 
     //----------------------------------------

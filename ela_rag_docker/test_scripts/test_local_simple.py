@@ -2,7 +2,9 @@ import requests
 import pandas as pd
 
 # load test data set
-
+# host_port = "192.168.1.17:8001"
+# Docker
+host_port = "192.168.1.17:8002"
 # Define the GitHub raw CSV URL
 csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
@@ -14,7 +16,7 @@ df_test = df_test[['prompt', 'essay', 'band', 'cleaned_evaluation','Task Achieve
 df_test.rename(columns={'prompt':'question'}, inplace=True)
 
 # Example test case
-question_id = 13
+question_id = 98
 # word wrap the text output below  
 
 
@@ -26,15 +28,15 @@ essayGrade = {
     }
 
 response = requests.post(
-    "http://192.168.1.15:8001/grade",
+    "http://"+host_port+"/grade",
     headers={"x-api-key": API_KEY},
     json=essayGrade,
 )
 print(response.json())
 
-query = {""}
+query = {"query_text": "What is the main idea of the text?"}
 response = requests.post(
-    "http://192.168.1.15:8001/query",
+    "http://"+host_port+"/query",
     headers={"x-api-key": API_KEY},
     json=query,
 )
@@ -44,7 +46,7 @@ print(response.json())
 
 
 responseGet = requests.get(
-    "http://192.168.1.15:8001/debug/documents",
+    "http://"+host_port+"/debug/documents",
     headers={"x-api-key": API_KEY}
     
 )
@@ -54,7 +56,7 @@ print(responseGet.json())
 
 
 responseGet = requests.get(
-    "http://192.168.1.15:8001/debug/test",
+    "http://"+host_port+"/debug/test",
     headers={"x-api-key": API_KEY}
     
 )
