@@ -24,6 +24,7 @@ app = FastAPI(    title="ELA Finetuned RAG API",
 
 
 # Allow CORS (Adjust origins as per your security requirements)
+#  need to check this , as
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Change to your frontend URL for security
