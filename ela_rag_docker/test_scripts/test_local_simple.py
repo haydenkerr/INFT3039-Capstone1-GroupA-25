@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 
 # load test data set
-host_port = "3.27.131.74:8000"
+host_port = "3.26.39.72:8000"
 # Docker
 # host_port = "192.168.1.17:8002"
 # Define the GitHub raw CSV URL
