@@ -27,6 +27,7 @@ def ingest_documents():
     """Batch processes and stores documents into FAISS."""
     documents = load_documents(DOCS_DIR)
 
+
     if not documents:
         print("⚠️ No documents found for ingestion!")
         return
