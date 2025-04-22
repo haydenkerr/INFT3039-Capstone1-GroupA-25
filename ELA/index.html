@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="english">
+
 <head>
-  <title>ELA - English Language Assistant Pro</title>
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="utf-8" />
   <meta property="twitter:card" content="summary_large_image" />
@@ -31,17 +32,23 @@
     src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"
   ></script>
 </head>
-<body>
-  <link href="./index.css" rel="stylesheet" />
 
-  <div class="desktop1-container">
+<body>
+
+    <div class="page-header">
+        <h1>ELA - English Language Assistant Pro</h1>
+    </div>
+
+    <link href="./index.css" rel="stylesheet" />
+
+    <div class="desktop1-container">
     <div class="desktop1-desktop1">
       <div class="desktop1-body">
 
         <div class="desktop1-reportlink">
           <div class="desktop1-textarea1">
             <span class="desktop1-text10 BodyBase">
-              ELA is processing file ..... when complete, a report link will be presented
+              Submit an essay to view your results report
             </span>
             <img
               src="public/external/dragi210-vuup.svg"
@@ -52,7 +59,7 @@
         </div>
 
         <span class="desktop1-text11">
-          Link to score, feedback and suggested improvements
+          View your Results
         </span>
 
         <!-- Process Submission button -->
@@ -69,8 +76,8 @@
 
         <!-- Word count -->
         <div class="desktop1-wordcount">
-          <span class="desktop1-text13 BodyBase">Word Count</span>
-          <input type="text" class="desktop1-input1"  />
+            <span class="desktop1-text21 BodyBase">Word count</span>
+            <input type="text" class="desktop1-input1" />
         </div>
 
         <!-- Essay box -->
@@ -120,7 +127,7 @@
         <!-- Additional dropdowns -->
         <div class="desktop1-generatequestion">
           <span class="desktop1-text21 BodyBase">Generate question</span>
-          <select>
+          <select class = "dropdown-select">
             <option value="" disabled selected hidden>Select an option</option>
             <option value="Yes">Yes - I require a question</option>
             <option value="No">No - I will enter or upload a question</option>
@@ -128,13 +135,22 @@
         </div>
         <!-- download link for template -->
         <div class="desktop1-downloadlink">
-          <a href="https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ELA/template.docx" download="ELA-Template.docx">
-            <span class="desktop1-text20">Download Template</span>
-          </a>
-          </div>
+            <a 
+              href="https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ELA/template.docx" 
+              download="ELA-Template.docx"
+              class="desktop1-downloadtemplatebutton"
+              >
+            <img
+                src="public/external/download-icon.svg"
+                alt="Download Icon"
+                class="desktop1-download"
+            />
+              <span class="desktop1-text20">Download Template</span>
+            </a>
+        </div>
         <div class="desktop1-tasktype">
           <span class="desktop1-text22 BodyBase">Task Type</span>
-          <select>
+          <select class = "dropdown-select">
             <option value="" disabled selected hidden>Select an option</option>
             <option value="Academic Task 1">Academic Task 1</option>
             <option value="Academic Task 2">Academic Task 2</option>
@@ -144,7 +160,7 @@
         </div>
         <div class="desktop1-submissiongroup">
           <span class="desktop1-text23 BodyBase">Submission Group</span>
-          <select class="desktop1-select3">
+          <select class="dropdown-select">
             <option value="" disabled selected hidden>Select an option</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -162,9 +178,7 @@
             class="desktop1-input3"
           />
         </div>
-        <span class="desktop1-text25">
-          ELA - English Language Assistant Pro
-        </span>
+        <span class="desktop1-text25">Submit an Essay</span>
       </div>
     </div>
   </div>
