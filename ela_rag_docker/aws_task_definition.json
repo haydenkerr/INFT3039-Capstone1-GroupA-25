@@ -1,0 +1,21 @@
+{
+    "family": "my-task-def",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "1",
+    "memory": "3024",
+    "containerDefinitions": [
+      {
+        "name": "ela_rag_docker",
+        "image": "437639049876.dkr.ecr.ap-southeast-2.amazonaws.com/ela_rag_docker:latest",
+        "portMappings": [
+          {
+            "containerPort": 8000,
+            "protocol": "tcp"
+          }
+        ],
+        "essential": true
+      }
+    ]
+  }
+  
