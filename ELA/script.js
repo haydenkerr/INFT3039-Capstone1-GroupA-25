@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
         //  OPTIONAL: API call commented out
         // -------------------------------------
         
-        fetch("http://192.168.1.17:8002/grade", {
+        fetch("http://192.168.1.17:8001/grade", {
           method: "POST",
           headers: {"x-api-key": "1234abcd","Content-Type": "application/json" },
           body: JSON.stringify(payload)

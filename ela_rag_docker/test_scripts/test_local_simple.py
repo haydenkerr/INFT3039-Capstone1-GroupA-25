@@ -2,9 +2,9 @@ import requests
 import pandas as pd
 
 # load test data set
-host_port = "3.26.39.72:8000"
+# host_port = "3.26.39.72:8000"
 # Docker
-# host_port = "192.168.1.17:8002"
+host_port = "192.168.1.17:8001"
 # Define the GitHub raw CSV URL
 csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
