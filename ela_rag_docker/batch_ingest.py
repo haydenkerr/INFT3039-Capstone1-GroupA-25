@@ -14,6 +14,7 @@ vector_db = VectorDatabase(embedding_dim=384)
 DOCS_DIR = r"C:\Users\hayde\OneDrive - Logical Aspect\Education\UniSA\INFT3039 - Capstone 1\ela_rag_docker\documents"  # Change this to where your docs are stored
 
 
+
 def load_documents(directory):
     """Loads all text documents from a directory."""
     documents = []

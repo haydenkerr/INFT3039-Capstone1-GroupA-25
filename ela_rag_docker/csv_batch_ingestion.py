@@ -5,6 +5,7 @@ import hashlib
 from sentence_transformers import SentenceTransformer
 from vector_db import VectorDatabase
 
+
 # Initialize embedding model
 embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
