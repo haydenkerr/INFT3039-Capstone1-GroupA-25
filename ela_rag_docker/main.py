@@ -20,6 +20,11 @@ from database import *
 from typing import Optional
 import uuid
 
+from fastapi.responses import HTMLResponse
+from fastapi import Request
+from fastapi.templating import Jinja2Templates
+from jinja2 import Environment, FileSystemLoader
+
 app = FastAPI(    title="ELA Finetuned RAG API",
     description="This API allows quesiton/essay pairing to query a finetune model with RAG system with Gemini.",
     version="1.0.0",
@@ -221,6 +226,77 @@ def grade_essay(request: EssayRequest):
                 "message": str(e),
                 "raw_response": llm_response
             }
+
+# Locate the directory for the results template
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+template_dir = os.path.join(project_root, 'ELA_UI')
+template_env = Environment(loader=FileSystemLoader(template_dir))
+
+@app.get("/results/{tracking_id}", response_class=HTMLResponse)
+def show_results(tracking_id: str):
+
+    session = SessionLocal()
+
+    try:
+        submission = session.execute(
+            select(submissions)
+            .join(submissions_log, submissions.c.submission_id == submissions_log.c.submission_id)
+            .where(submissions_log.c.tracking_id == tracking_id)
+        ).fetchone()
+
+        if not submission:
+            return HTMLResponse(content="No results found", status_code=404)
+        
+        submission_id = submission.submission_id
+        question_id = submission.question_id 
+
+        # Fetch related question, essay, and results
+        question = session.execute(
+            select(questions.c.question_text)
+            .where(questions.c.question_id == question_id)
+        ).scalar()
+
+        essay = submission.essay_response
+
+        results_data = session.execute(
+            select(results)
+            .where(results.c.submission_id == submission_id)
+        ).fetchall()
+
+        # Format and return results
+        response_data = {
+            "question": question,
+            "essay": essay,
+            "results": [{
+                "competency_name": result.competency_name,
+                "score": result.score,
+                "feedback_summary": result.feedback_summary,
+            } for result in results_data]
+        }
+
+        template = template_env.get_template('result_template.html')
+        html_content = template.render(response_data)
+
+        create_log(
+            tracking_id=tracking_id, 
+            log_type="Results Accessed", 
+            log_message="Results returned to the API for the user", 
+            submission_id=submission_id
+        )
+
+        return HTMLResponse(content=html_content, status_code=200)
+    
+    except Exception as e:
+
+        create_log(
+            tracking_id=tracking_id, 
+            log_type="Error", 
+            log_message=f"Error occurred while returning results to the API: {str(e)}", 
+            submission_id=submission_id
+        )
+
+        return HTMLResponse(content=f"An error occurred: {str(e)}", status_code=500)
+
 
 @app.get("/debug/documents")
 def list_documents():
