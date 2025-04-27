@@ -59,7 +59,8 @@ def query_gemini(user_prompt: str, examples_context: str = "", question: str = "
             full_prompt += f"\n\nHere are some example graded essays:\n{examples_context}"
         
         if question and essay:
-            full_prompt += f"\n\nNow, evaluate this new essay:\nNew question: {question}\nNew Essay: {essay}"
+            # full_prompt += f"\n\nNow, evaluate this new essay:\nNew question: {question}\nNew Essay: {essay}"
+            full_prompt += f'\n\nNow, evaluate this new essay:\n"""{question}"""\n"""{essay}"""'
         
         # Add any additional user prompt
         if user_prompt:
@@ -72,6 +73,7 @@ def query_gemini(user_prompt: str, examples_context: str = "", question: str = "
 
         if response:
             print("✅ Gemini API Response Received")
+            print(f"Raw response from Gemini: {response}")
             
             # Capture streamed response
             full_response = []
