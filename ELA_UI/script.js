@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+  
     // Password protection for testing purposes
     // const password = "test123";
     // let enteredPassword = prompt("Enter password to access the site:");
@@ -7,12 +8,13 @@ document.addEventListener("DOMContentLoaded", function () {
     //     document.body.innerHTML = "<h2>Access Denied</h2>";
     //     return;
     // }
+
     //----------------------------------------
     // 1) WORD COUNT HELPER
     //----------------------------------------
     function updateWordCount() {
-      const essayBox = document.querySelector(".desktop1-textarea2");
-      const wordCountInput = document.querySelector(".desktop1-wordcount input");
+      const essayBox = document.querySelector("#essay-text");
+      const wordCountInput = document.querySelector("#word-count");
       if (!essayBox || !wordCountInput) return;
 
       const text = essayBox.value.trim();
@@ -22,13 +24,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Update wordcount whenever user types in the Essay
-    document.querySelector(".desktop1-textarea2")
+    document.querySelector("#essay-text")
       .addEventListener("keyup", updateWordCount);
 
     //----------------------------------------
     // 2) FILE UPLOAD
     //----------------------------------------
-    document.querySelector(".desktop1-uploadfilebutton").addEventListener("click", () => {
+    document.querySelector(".file-upload button").addEventListener("click", () => {
         document.getElementById("fileInput").click();
     });
 
@@ -42,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // show filename
-      document.querySelector(".desktop1-input2").value = file.name;
+      document.querySelector(".file-upload input[type='text']").value = file.name;
       const extension = file.name.toLowerCase().split(".").pop();
 
       if (extension === "txt") {
@@ -112,14 +114,39 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     //----------------------------------------
-    // 3) PARSE QUESTION/ESSAY
+    // 3) INSERT TASK INSTRUCTIONS
+    //----------------------------------------
+    const taskInstructions = {
+      "General Task 1": "You must respond to a situation by writing a letter, for example, asking for information or explaining a situation. You should write at least 150 words in about 20 minutes.",
+      "General Task 2": "You must write an essay in response to a question. You should spend about 40 minutes on this task, and it is important that you write 250 words or more.",
+      "Academic Task 1": "You must write an essay in response to data (in the form of a bar chart, line graph, pie chart or table), a process or map. You should write at least 150 words.",
+      "Academic Task 2": "You must write an essay in response to a question. You should spend about 40 minutes on this task, and it is important that you write 250 words or more."
+    };
+
+    // Update instructions based on selected task type
+    const taskTypeSelect = document.getElementById('task-type');
+    const instructionsText = document.getElementById('instructions-text');
+
+    taskTypeSelect.addEventListener('change', function () {
+      const selectedTask = taskTypeSelect.value;
+      console.log('Selected Task:', selectedTask);
+      if (taskInstructions[selectedTask]) {
+          instructionsText.textContent = taskInstructions[selectedTask];
+      } else {
+          instructionsText.textContent = "Select a task type to view the instructions.";
+      }
+    });
+
+
+    //----------------------------------------
+    // 4) PARSE QUESTION/ESSAY
     //----------------------------------------
     function parseQuestionEssay(fullText) {
       // normalizing line breaks
       fullText = fullText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
-      const questionBox = document.querySelector(".desktop1-textarea3");
-      const essayBox    = document.querySelector(".desktop1-textarea2");
+      const questionBox = document.querySelector("#question-text");
+      const essayBox    = document.querySelector("#essay-text");
 
       // Attempt a multiline capture:
       const multiRegex = /\*\*\s*question:\s*\*\*([\s\S]+?)\*\*\s*essay:\s*\*\*([\s\S]+)/i;
@@ -139,41 +166,41 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     //----------------------------------------
-    // 4) PROCESS SUBMISSION
+    // 5) PROCESS SUBMISSION
     //----------------------------------------
-    document.querySelector(".desktop1-processbutton").addEventListener("click", function () {
+    document.querySelector(".process-btn").addEventListener("click", function () {
 
         // Gather data from fields
-        const email = document.querySelector(".desktop1-email input").value.trim();
+        const email = document.querySelector("#email").value.trim();
         if (!email || !email.includes("@")) {
             alert("Please enter a valid email address.");
             return;
         }
 
-        const question = document.querySelector(".desktop1-textarea3").value.trim();
-        const essay    = document.querySelector(".desktop1-textarea2").value.trim();
+        const question = document.querySelector("#question-text").value.trim();
+        const essay    = document.querySelector("#essay-text").value.trim();
         if (!question || !essay) {
             alert("Both Question and Essay fields must be filled.");
             return;
         }
 
         // read word count from input
-        const wordCount = document.querySelector(".desktop1-wordcount input").value || "0";
+        const wordCount = document.querySelector("#word-count").value || "0";
 
-        const submissionGroup = document.querySelector(".desktop1-submissiongroup select").value;
-        const taskType        = document.querySelector(".desktop1-tasktype select").value;
+        const submissionGroup = document.querySelector("#submission-group").value;
+        const taskType        = document.querySelector("#task-type").value;
 
         // Indicate we are "Processing"
-        document.querySelector(".desktop1-text10").textContent = "Processing...";
+        document.querySelector(".report-section").textContent = "Processing...";
 
         // Build a JSON payload
         const payload = {
-          // email,
+          email,
           question,
-          essay
-          // wordCount,
-          // submissionGroup,
-          // taskType
+          essay,
+          wordCount,
+          submissionGroup,
+          taskType
         };
 
         console.log("[Process Submission] Payload:", payload);
@@ -182,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
         //  OPTIONAL: API call commented out
         // -------------------------------------
         
-        fetch("http://192.168.1.17:8002/grade", {
+        fetch("http://127.0.0.1:8001/grade", {
           method: "POST",
           headers: {"x-api-key": "1234abcd","Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -190,12 +217,12 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
           console.log("API response data:", data);
-          document.querySelector(".desktop1-text10").textContent =
+          document.querySelector(".report-section").textContent =
             data.reportLink || "Request processed. See console for details.";
         })
         .catch(error => {
           console.error("API call error:", error);
-          document.querySelector(".desktop1-text10").textContent =
+          document.querySelector(".report-section").textContent =
             "Failed to process submission.";
         });
         
@@ -206,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     //----------------------------------------
-    // 5) HOVER EFFECTS
+    // 6) HOVER EFFECTS
     //----------------------------------------
     document.querySelectorAll("button").forEach(button => {
       button.addEventListener("mouseover", () => {

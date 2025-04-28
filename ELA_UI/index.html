@@ -1,167 +1,44 @@
 <!DOCTYPE html>
-<html lang="english">
+<html lang="en">
 
 <head>
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta charset="utf-8" />
-  <meta property="twitter:card" content="summary_large_image" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="twitter:card" content="summary_large_image" />
 
-  <!-- Force typed text in textareas/inputs to appear black -->
-  <style>
-    textarea,
-    .desktop1-input3 {
-      color: black !important;
-    }
-    textarea::placeholder,
-    .desktop1-input3::placeholder {
-      color: #999; /* placeholders are gray */
-    }
-  </style>
+    <title>ELA - English Language Assistant Pro</title>
 
-  <!-- Your main CSS, if desired -->
-  <link rel="stylesheet" href="./style.css" />
+    <!-- Stylesheets -->
+    <link href="./index.css" rel="stylesheet" />
 
-  <!-- pdf.js for PDFs -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"
-  ></script>
+    <!-- External libraries (for PDFs and DOCX handling) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
 
-  <!-- mammoth for DOCX -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"
-  ></script>
 </head>
 
 <body>
-
-    <div class="page-header">
-        <h1>ELA - English Language Assistant Pro</h1>
-    </div>
-
-    <link href="./index.css" rel="stylesheet" />
-
-    <div class="desktop1-container">
-    <div class="desktop1-desktop1">
-      <div class="desktop1-body">
-
-        <div class="desktop1-reportlink">
-          <div class="desktop1-textarea1">
-            <span class="desktop1-text10 BodyBase">
-              Submit an essay to view your results report
-            </span>
-            <img
-              src="public/external/dragi210-vuup.svg"
-              alt="DragI210"
-              class="desktop1-drag1"
-            />
-          </div>
-        </div>
-
-        <span class="desktop1-text11">
-          View your Results
-        </span>
-
-        <!-- Process Submission button -->
-        <button class="desktop1-processbutton">
-          <img
-            src="public/external/playi149-a39l.svg"
-            alt="PlayI149"
-            class="desktop1-play"
-          />
-          <span class="desktop1-text12 SingleLineBodyBase">
-            Process Submission
-          </span>
-        </button>
-
-        <!-- Word count -->
-        <div class="desktop1-wordcount">
-            <span class="desktop1-text21 BodyBase">Word count</span>
-            <input type="text" class="desktop1-input1" />
-        </div>
-
-        <!-- Essay box -->
-        <div class="desktop1-essaybox">
-          <span class="desktop1-text14 BodyBase">Essay</span>
-          <textarea
-            class="desktop1-textarea2"
-            rows="6"
-            placeholder="Paste your essay here, or if loading from a file, the essay text will appear here."
-          ></textarea>
-        </div>
-
-        <!-- Question box -->
-        <div class="desktop1-questionbox">
-          <span class="desktop1-text16 BodyBase">Question</span>
-          <textarea
-            class="desktop1-textarea3"
-            rows="4"
-            placeholder="If Generate question is yes, a question will appear here; else type or paste yours."
-          ></textarea>
-        </div>
-
-        <!-- Upload file controls -->
-        <div class="desktop1-uploadfilegroup">
-          <input
-            type="text"
-            placeholder="No file chosen"
-            class="desktop1-input2"
-            readonly
-          />
-          <button class="desktop1-uploadfilebutton">
-            <img
-              src="public/external/uploadi153-jmr8.svg"
-              alt="UploadI153"
-              class="desktop1-upload"
-            />
-            <span class="desktop1-text18 SingleLineBodyBase">
-              Choose File
-            </span>
-          </button>
-        </div>
-
-        <span class="desktop1-text19">
-          Upload a Question &amp; Essay (TXT, PDF, or DOCX)
-        </span>
-    
-        <!-- Additional dropdowns -->
-        <div class="desktop1-generatequestion">
-          <span class="desktop1-text21 BodyBase">Generate question</span>
-          <select class = "dropdown-select">
-            <option value="" disabled selected hidden>Select an option</option>
-            <option value="Yes">Yes - I require a question</option>
-            <option value="No">No - I will enter or upload a question</option>
-          </select>
-        </div>
-        <!-- download link for template -->
-        <div class="desktop1-downloadlink">
-            <a 
-              href="https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ELA/template.docx" 
-              download="ELA-Template.docx"
-              class="desktop1-downloadtemplatebutton"
-              >
-            <img
-                src="public/external/download-icon.svg"
-                alt="Download Icon"
-                class="desktop1-download"
-            />
-              <span class="desktop1-text20">Download Template</span>
-            </a>
-        </div>
-        <div class="desktop1-tasktype">
-          <span class="desktop1-text22 BodyBase">Task Type</span>
-          <select class = "dropdown-select">
-            <option value="" disabled selected hidden>Select an option</option>
-            <option value="Academic Task 1">Academic Task 1</option>
-            <option value="Academic Task 2">Academic Task 2</option>
-            <option value="General Task 1">General Task 1</option>
-            <option value="General Task 2">General Task 2</option>
-          </select>
-        </div>
-        <div class="desktop1-submissiongroup">
-          <span class="desktop1-text23 BodyBase">Submission Group</span>
-          <select class="dropdown-select">
-            <option value="" disabled selected hidden>Select an option</option>
+    <!-- Header -->
+    <header class="page-header">
+      <h1>ELA - English Language Assistant Pro</h1>
+    </header>
+  
+    <!-- Main container -->
+    <main class="main-container">
+      <h2 class="section-title">Submit an Essay</h2>
+  
+      <!-- Email Input -->
+      <div class="form-group">
+        <label for="email">Enter email</label>
+        <input type="email" id="email" placeholder="firstName.lastName@email.com" />
+      </div>
+  
+      <!-- Submission Group + Task Type (show on same row) -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="submission-group">Submission Group</label>
+          <select id="submission-group">
+            <option hidden>Select an option</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -170,33 +47,107 @@
             <option value="6">6</option>
           </select>
         </div>
-        <div class="desktop1-email">
-          <span class="desktop1-text24 BodyBase">Enter email</span>
-          <input
-            type="text"
-            placeholder="firstName.lastName@email.com"
-            class="desktop1-input3"
-          />
+        <div class="form-group">
+          <label for="task-type">Task Type</label>
+          <select id="task-type">
+            <option hidden>Select an option</option>
+            <option value="Academic Task 1">Academic Task 1</option>
+            <option value="Academic Task 2">Academic Task 2</option>
+            <option value="General Task 1">General Task 1</option>
+            <option value="General Task 2">General Task 2</option>
+          </select>
         </div>
-        <span class="desktop1-text25">Submit an Essay</span>
       </div>
-    </div>
-  </div>
+  
+      <!-- Generate Question + Download Template (show on same row) -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="generate-question">Generate Question</label>
+          <select id="generate-question">
+            <option hidden>Select an option</option>
+            <option value="Yes">Yes - I require a question</option>
+            <option value="No">No - I will enter or upload a question</option>
+          </select>
+        </div>
+        <div class="form-group download-template">
+          <a href="https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ELA_UI/template.docx" download="ELA-Template.docx">
+            <img src="public/external/download-icon.svg" alt="Download Icon" />
+            Download Template
+          </a>
+        </div>
+      </div>
+  
+      <!-- File Upload -->
+      <div class="form-group">
+        <label>Upload a Question & Essay (TXT, PDF, or DOCX)</label>
+        <div class="file-upload">
+          <input type="text" placeholder="No file chosen" readonly />
+          <button>
+            <img src="public/external/uploadi153-jmr8.svg" alt="Upload" />
+            Choose File
+          </button>
+        </div>
+      </div>
 
-  <!-- Hidden file input that we click programmatically -->
-  <input
-    id="fileInput"
-    type="file"
-    style="display: none;"
-    accept=".txt,.pdf,.docx"
-  />
+      <!-- Task Instructions -->
+      <div id="task-instructions" class="instructions-container">
+        <label for="taskType">Task Instructions</label>
+        <p id="instructions-text">Select a task type to view the instructions.</p>
+      </div>
+  
+      <!-- Question Textarea -->
+      <div class="form-group">
+        <label for="question-text">Question</label>
+        <textarea id="question-text" rows="4" placeholder="If Generate question is yes, a question will appear here; else type or paste yours."></textarea>
+      </div>
+  
+      <!-- Essay Textarea -->
+      <div class="form-group">
+        <label for="essay-text">Essay</label>
+        <textarea id="essay-text" rows="6" placeholder="Paste your essay here, or if loading from a file, the essay text will appear here."></textarea>
+      </div>
+  
+      <!-- Word Count -->
+      <div class="form-group">
+        <label for="word-count">Word count</label>
+        <input type="text" id="word-count" readonly/>
+      </div>
+  
+      <!-- Process Submission Button -->
+      <button class="process-btn">
+        <img src="public/external/playi149-a39l.svg" alt="Process" />
+        Process Submission
+      </button>
+  
+      <!-- View Results Text -->
+      <div class="results-text">View your Results</div>
+  
+      <!-- Report Section -->
+      <div class="report-section">
+        <p>Submit an essay to view your results report</p>
+      </div>
+  
+      <!-- Submit Feedback Link -->
+      <div class="feedback-section">
+        <a href="https://forms.office.com/r/6VVza6RudT" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#ffffff" class="desktop1-feedbackicon">
+                <path d="M21 4H3c-1.1 0-1.99.89-1.99 2L1 18c0 1.1.89 1.99 1.99 1.99H15l4 4V6c0-1.1-.89-2-2-2z"/>
+              </svg>
+          Submit Feedback
+        </a>
+      </div>
+    </main>
 
-  <!-- (Optional) Debug output areas if you want them:
-  <div id="output" style="white-space: pre-wrap; margin: 2rem 0;"></div>
-  <div id="feedback" style="margin-bottom: 2rem;"></div>
-  -->
+    <!-- Hidden file input -->
+    <input id="fileInput" type="file" style="display: none;" accept=".txt,.pdf,.docx" />
 
-  <!-- Main script -->
-  <script src="script.js"></script>
+    <!-- Optional Debug output areas -->
+    <!-- <div id="output" style="white-space: pre-wrap; margin: 2rem 0;"></div> -->
+    <!-- <div id="feedback" style="margin-bottom: 2rem;"></div> -->
+
+    <!-- Main script -->
+    <script src="script.js"></script>
+
 </body>
+
 </html>

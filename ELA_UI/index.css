@@ -1,545 +1,253 @@
-.page-header {
-  background-color: #001f3f; /* Navy blue */
-  color: white;
-  text-align: center;
-  padding: 20px 0;
+/* General page setup */
+body {
+  margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 24px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #f9fafb;
+  color: #333;
+}
+
+/* Header */
+.page-header {
+  background-color: #001f3f; 
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
 }
 
 .page-header h1 {
   margin: 0;
+  font-size: 2rem;
 }
 
-.desktop1-container {
-width: 100%;
-display: flex;
-overflow: auto;
-min-height: 100vh;
-align-items: center;
-flex-direction: column;
+/* Main container */
+.main-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-.desktop1-desktop1 {
-width: 100%;
-height: 1558px;
-display: flex;
-overflow: hidden;
-position: relative;
-align-items: flex-start;
-flex-shrink: 0;
-background-color: rgba(255, 255, 255, 1);
+/* Section Title */
+.section-title {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  color: #001f3f;
+  text-align: left;
 }
 
-.desktop1-body {
-top: 60px;
-left: 190px;
-width: 1005px;
-height: 1378px;
-display: flex;
-position: absolute;
-align-items: flex-start;
-flex-shrink: 0;
-justify-content: center;
+/* Form groups */
+.form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.desktop1-reportlink {
-gap: 8px;
-top: 1251px;
-left: 0px;
-width: 1005px;
-display: flex;
-position: absolute;
-align-items: flex-start;
-flex-shrink: 0;
-flex-direction: column;
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
-.desktop1-textarea1 {
-display: flex;
-padding: 12px 16px;
-overflow: hidden;
-position: relative;
-align-self: stretch;
-align-items: flex-start;
-flex-shrink: 0;
-border-color: rgba(217, 217, 217, 1);
-border-style: solid;
-border-width: 1px;
-border-radius: 8px;
-background-color: rgba(255, 255, 255, 1);
-}
-
-.desktop1-text10 {
-color: rgba(179, 179, 179, 1);
-height: auto;
-flex-grow: 1;
-text-align: left;
-line-height: 139.9999976158142%;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.desktop1-drag1 {
-top: 67.35354614257812px;
-left: 993.353515625px;
-width: 7px;
-height: 7px;
-z-index: 1;
-position: absolute;
-}
-
-.desktop1-text11 {
-top: 1198px;
-color: rgba(0, 0, 0, 1);
-width: 545px;
-height: auto;
-position: absolute;
-font-size: 18.407814025878906px;
-text-align: left;
-font-family: 'Segoe UI';
-font-weight: 700;
-line-height: normal;
-font-stretch: normal;
-text-decoration: none;
-}
-
-.desktop1-processbutton {
-gap: 8px;
-top: 1134px;
-left: 0px;
-width: 200px;
-display: flex;
-padding: 12px;
-overflow: hidden;
-position: absolute;
-align-items: center;
-border-color: #001f3f;
-border-style: solid;
-border-width: 1px;
-border-radius: 8px;
-justify-content: center;
-background-color: #001f3f;
-line-height: 1.5; 
-}
-
-.desktop1-play {
-width: 16px;
-height: 16px;
-}
-
-.desktop1-text12 {
-color: rgba(245, 245, 245, 1);
-height: auto;
-text-align: left;
-line-height: 100%;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.desktop1-wordcount {
-gap: 8px;
-top: 1035px;
-left: 3px;
-width: 197px;
-height: 70px;
-display: flex;
-position: absolute;
-align-items: flex-start;
-flex-shrink: 0;
-flex-direction: column;
-}
-
-.desktop1-text13 {
-color: rgba(30, 30, 30, 1);
-height: auto;
-align-self: stretch;
-text-align: left;
-line-height: 139.9999976158142%;
-}
-
-.desktop1-input1 {
-color: rgba(30, 30, 30, 1);
-display: flex;
-padding: 12px 16px;
-overflow: hidden;
-font-size: 16px;
-align-self: stretch;
-text-align: left;
-align-items: center;
-flex-shrink: 0;
-font-family: Inter;
-font-weight: 400;
-border-color: rgba(217, 217, 217, 1);
-border-style: solid;
-border-width: 1px;
-border-radius: 8px;
-justify-content: flex-end;
-background-color: rgba(255, 255, 255, 1);
-}
-
-.desktop1-essaybox {
-  position: absolute;
-  top: 740px;
-  left: 0px;
-  width: 1005px;
-  height: 283px;
-  display: flex; 
-  gap: 8px;
-  align-items: flex-start;
-  flex-shrink: 0;
-  flex-direction: column; 
-}
-
-.desktop1-text14 {
-color: rgba(30, 30, 30, 1);
-height: auto;
-align-self: stretch;
-text-align: left;
-line-height: 139.9999976158142%;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.desktop1-textarea2 {
-  width: 100%;
-  height: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-  resize: none;         
-  overflow-y: auto;         
-  font-family: 'Segoe UI';     
-  font-size: 14px;
-  border-color: rgba(217, 217, 217, 1);
-  border-style: solid;
-  border-width: 1px;
+.form-group input[type="email"],
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  padding: 0.75rem;
+  padding-right: 2.5rem;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 1);
+  font-size: 1rem;
 }
 
-.desktop1-text15 {
-color: rgba(179, 179, 179, 1);
-height: auto;
-flex-grow: 1;
-text-align: left;
-line-height: 139.9999976158142%;
+/* Form rows (two columns side by side) */
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.desktop1-drag2 {
-top: 240.35354614257812px;
-left: 993.353515625px;
-width: 7px;
-height: 7px;
-z-index: 1;
-position: absolute;
+.form-row .form-group {
+  flex: 1;
 }
 
-.desktop1-questionbox {
-gap: 8px;
-top: 572px;
-left: 0px;
-width: 1005px;
-display: flex;
-position: absolute;
-align-items: flex-start;
-flex-shrink: 0;
-flex-direction: column;
+/* Download Template link */
+.download-template {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
-.desktop1-text16 {
-color: rgba(30, 30, 30, 1);
-height: auto;
-align-self: stretch;
-text-align: left;
-line-height: 139.9999976158142%;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.download-template a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #001f3f;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
-.desktop1-textarea3 {
-  width: 100%;                 
-  height: 100%;               
-  padding: 10px;               
-  overflow: auto;              
-  resize: none;                
-  border: 1px solid rgba(217, 217, 217, 1);
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 1);
-  font-family: 'Segoe UI';        
-  font-size: 14px;             
-  box-sizing: border-box; 
+.download-template img {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
 }
 
-.desktop1-text17 {
-color: rgba(179, 179, 179, 1);
-height: auto;
-flex-grow: 1;
-text-align: left;
-line-height: 139.9999976158142%;
+/* File Upload Section */
+.file-upload {
+  display: flex;
+  gap: 1rem;
 }
 
-.desktop1-drag3 {
-top: 67.35354614257812px;
-left: 993.353515625px;
-width: 7px;
-height: 7px;
-z-index: 1;
-position: absolute;
+.file-upload input[type="text"] {
+  flex: 1;
+  background-color: #f1f5f9;
+  cursor: not-allowed;
 }
 
-.desktop1-uploadfilegroup {
-top: 481px;
-left: 0px;
-width: 253.6699981689453px;
-height: 40px;
-display: flex;
-position: absolute;
-align-items: center;
-flex-shrink: 1;
-}
-
-.desktop1-input2 {
-color: rgba(0, 0, 0, 1);
-width: 252.6699981689453px;
-height: 100%;
-display: flex;
-overflow: hidden;
-position: absolute;
-font-size: 14;
-text-align: left;
-align-items: center;
-flex-shrink: 0;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-font-weight: 400;
-border: 1px solid #ccc;  
-border-radius: 8px;  
-padding: 0 15px;
-}
-
-.desktop1-uploadfilebutton {
-gap: 8px;
-top: 0px;
-left: 0px;
-display: flex;
-padding: 10px 20px;
-overflow: hidden;
-position: absolute;
-align-items: center;
-border-color: #001f3f;
-border-style: solid;
-border-width: 1px;
-border-radius: 8px;
-justify-content: center;
-background-color: #001f3f;
-line-height: 1.5; /* Ensure consistent height with the download button */
-}
-
-.desktop1-upload {
-width: 16px;
-height: 16px;
-}
-
-.desktop1-text18 {
-color: rgba(245, 245, 245, 1);
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-height: auto;
-text-align: left;
-line-height: 100%;
-}
-
-.desktop1-text19 {
-top: 449px;
-left: 1px;
-color: rgba(0, 0, 0, 1);
-width: 403px;
-height: auto;
-position: absolute;
-font-size: 16px;
-font-style: Bold;
-text-align: left;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-font-weight: 700;
-line-height: normal;
-font-stretch: normal;
-text-decoration: none;
-}
-
-.desktop1-downloadtemplatebutton {
-  display: inline-flex; 
-  align-items: center; 
+.file-upload button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   background-color: #001f3f;
-  color: white !important;
-  padding: 10px 20px; 
+  color: white;
+  padding: 0.75rem 1.2rem;
   border: none;
   border-radius: 8px;
-  text-decoration: none;
-  font-size: 16px; 
-  font-family: 'Segoe UI';
-  font-weight: 400;
-  transition: background-color 0.3s ease;
+  font-size: 1rem;
   cursor: pointer;
-  white-space: nowrap; 
-  line-height: 1.5;
 }
 
-.desktop1-downloadtemplatebutton img {
-  margin-right: 8px; 
-  width: 20px; 
-  height: 20px;
+.file-upload button img {
+  width: 18px;
+  height: 18px;
 }
 
-.desktop1-downloadtemplatebutton:hover {
+/* Textareas */
+textarea {
+  resize: vertical;
+}
+
+/* Process Submission Button */
+.process-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #001f3f;
+  color: white;
+  font-size: 1.1rem;
+  padding: 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s;
+}
+
+.process-btn:hover {
   background-color: #001f3f;
 }
 
-.desktop1-download {
-width: 16px;
-height: 16px;
+.process-btn img {
+  width: 22px;
+  height: 22px;
 }
 
-.desktop1-text20 {
-color: white;
-height: auto;
-text-align: left;
-line-height: 100%;
+
+
+/* Report Section */
+.report-section {
+  background-color: #f1f5f9;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 10px;
+  margin-bottom: 2rem;
 }
 
-.desktop1-generatequestion {
-gap: 8px;
-top: 258px;
-left: 1px;
-width: 240px;
-display: flex;
-position: absolute;
-align-items: flex-start;
-flex-direction: column;
+.report-section p {
+  margin: 0;
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
-.desktop1-text21 {
-color: rgba(30, 30, 30, 1);
-height: auto;
-align-self: stretch;
-text-align: left;
-line-height: 139.9999976158142%;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.desktop1-tasktype {
-gap: 8px;
-top: 144px;
-left: 302px;
-width: 240px;
-display: flex;
-position: absolute;
-align-items: flex-start;
-flex-direction: column;
-}
-
-.desktop1-text22 {
-color: rgba(30, 30, 30, 1);
-height: auto;
-align-self: stretch;
-text-align: left;
-line-height: 139.9999976158142%;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.desktop1-submissiongroup {
-gap: 8px;
-top: 144px;
-left: 1px;
-width: 240px;
-display: flex;
-position: absolute;
-align-items: flex-start;
-flex-direction: column;
-}
-
-.desktop1-text23 {
-color: rgba(30, 30, 30, 1);
-height: auto;
-align-self: stretch;
-text-align: left;
-line-height: 139.9999976158142%;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.dropdown-select {
+/* Feedback Link Section */
+.feedback-section {
   width: 100%;
-  height: 40px;
-  padding: 8px 36px 8px 8px; 
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
+  padding: 0 1rem;
   box-sizing: border-box;
-  appearance: none; 
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2210%22%20height%3D%227%22%20viewBox%3D%220%200%2010%207%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M1%201L5%205L9%201%22%20stroke%3D%22%23333%22%20stroke-width%3D%222%22/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 12px 8px;
 }
 
-.desktop1-select3 {
-width: 100%;
-height: 31px;
+.feedback-section a {
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+  background-color: #001f3f;
+  color: white;
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%; 
+  box-sizing: border-box;
+  margin-top: 2rem; 
 }
 
-.desktop1-email {
-gap: 8px;
-top: 49px;
-left: 0px;
-width: 542px;
+.feedback-section a svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem; 
+}
+
+/* Style the Download Template and Submit Feedback links like buttons */
+.download-template a,
+.feedback-section a {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+background-color: #001f3f;
+color: white;
+padding: 0.75rem 1.2rem;
+border-radius: 8px;
+text-decoration: none;
+font-weight: 600;
+font-size: 1rem;
+cursor: pointer;
+transition: background-color 0.3s;
+}
+
+/* View your Results */
+.results-text {
+text-align: left; 
+font-size: 1.75rem; 
+color: #001f3f;
+font-weight: bold;
+margin-top: 3rem;
+margin-bottom: 1.5rem;
+}  
+
+/* Task Instructions */
+.instructions-container {
+margin-top: 1rem;
+margin-bottom: 1rem;
 display: flex;
-position: absolute;
-align-items: flex-start;
-flex-shrink: 0;
 flex-direction: column;
 }
 
-.desktop1-text24 {
-color: rgba(30, 30, 30, 1);
-height: auto;
-align-self: stretch;
-text-align: left;
-line-height: 139.9999976158142%;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.instructions-container label {
+font-weight: 600;
+margin-bottom: 0.5rem;
 }
 
-.desktop1-input3::placeholder {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
-  font-size: 14px;  
-  color: rgba(30, 30, 30, 0.5);  
-}
-
-.desktop1-input3 {
-color: rgba(179, 179, 179, 1);
-display: flex;
-padding: 12px 16px;
-overflow: hidden;
-font-size: 14px;
-align-self: stretch;
-text-align: left;
-align-items: center;
-flex-shrink: 0;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-font-weight: 400;
-border-color: #ccc;
-border-style: solid;
-border-width: 1px;
+#instructions-text {
+background-color: #f1f5f9;
+padding: 0.75rem;
 border-radius: 8px;
-background-color: rgba(255, 255, 255, 1);
-}
-
-.desktop1-text25 {
-color: rgba(0, 0, 0, 1);
-width: 611px;
-height: auto;
-position: absolute;
-font-size: 23.625px;
-text-align: left;
-font-family: 'Segoe UI';
-font-weight: 700;
-line-height: normal;
-font-stretch: normal;
-text-decoration: none;
+color: #555;
+min-height: 60px;
 }
