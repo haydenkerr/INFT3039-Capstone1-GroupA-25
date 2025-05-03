@@ -89,8 +89,8 @@ def create_log(tracking_id: str, log_type: str, log_message: str, submission_id:
         )
         results = session.execute(stmt)
         session.commit()
-        print(f"Log created: {log_type} - {log_message}")
-        print(results)
+        # print(f"Log created: {log_type} - {log_message}")
+        # print(results)
     except Exception as e:
         session.rollback()
         print("Error in create_log:", e)
