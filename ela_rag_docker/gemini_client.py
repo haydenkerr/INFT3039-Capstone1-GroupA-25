@@ -67,13 +67,13 @@ def query_gemini(user_prompt: str, examples_context: str = "", question: str = "
             full_prompt += f"\n\n{user_prompt}"
             
         print("📡 Sending request to Gemini...")
-        print(f"📝 Prompt start: {full_prompt[:300]}...")  # Print only first 300 chars
+        # print(f"📝 Prompt start: {full_prompt[:300]}...")  # Print only first 300 chars
 
         response = chat_session.send_message(full_prompt)
 
         if response:
             print("✅ Gemini API Response Received")
-            print(f"Raw response from Gemini: {response}")
+            
             
             # Capture streamed response
             full_response = []
@@ -84,6 +84,7 @@ def query_gemini(user_prompt: str, examples_context: str = "", question: str = "
             response_text = " ".join(full_response).strip()
 
             if response_text:
+                # print(response_text)
                 return response_text
             else:
                 print("⚠️ No valid text in response")

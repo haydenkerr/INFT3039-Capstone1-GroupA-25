@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //----------------------------------------
     // 1) WORD COUNT HELPER
     //----------------------------------------
+
     function updateWordCount() {
       const essayBox = document.querySelector("#essay-text");
       const wordCountInput = document.querySelector("#word-count");
@@ -165,72 +166,83 @@ document.addEventListener("DOMContentLoaded", function () {
       essayBox.value    = eMatch ? eMatch[1].trim() : "";
     }
 
-    //----------------------------------------
-    // 5) PROCESS SUBMISSION
-    //----------------------------------------
-    document.querySelector(".process-btn").addEventListener("click", function () {
+//----------------------------------------
+// 5) PROCESS SUBMISSION
+//----------------------------------------
+document.querySelector(".process-btn").addEventListener("click", function () {
 
-        // Gather data from fields
-        const email = document.querySelector("#email").value.trim();
-        if (!email || !email.includes("@")) {
-            alert("Please enter a valid email address.");
-            return;
-        }
+  // Gather data from fields
+  const email = document.querySelector("#email").value.trim();
+  if (!email || !email.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+  }
 
-        const question = document.querySelector("#question-text").value.trim();
-        const essay    = document.querySelector("#essay-text").value.trim();
-        if (!question || !essay) {
-            alert("Both Question and Essay fields must be filled.");
-            return;
-        }
+  const question = document.querySelector("#question-text").value.trim();
+  const essay    = document.querySelector("#essay-text").value.trim();
+  if (!question || !essay) {
+      alert("Both Question and Essay fields must be filled.");
+      return;
+  }
 
-        // read word count from input
-        const wordCount = document.querySelector("#word-count").value || "0";
+  // read word count from input
+  const wordCount = document.querySelector("#word-count").value || "0";
 
-        const submissionGroup = document.querySelector("#submission-group").value;
-        const taskType        = document.querySelector("#task-type").value;
+  const submissionGroup = document.querySelector("#submission-group").value;
+  const taskType        = document.querySelector("#task-type").value;
 
-        // Indicate we are "Processing"
-        document.querySelector(".report-section").textContent = "Processing...";
+  // Indicate we are "Processing"
+  document.querySelector(".report-section").textContent = "Processing...";
 
-        // Build a JSON payload
-        const payload = {
-          email,
-          question,
-          essay,
-          wordCount,
-          submissionGroup,
-          taskType
-        };
+  // Build a JSON payload
+  const payload = {
+    email,
+    question,
+    essay,
+    wordCount,
+    submissionGroup,
+    taskType
+  };
 
-        console.log("[Process Submission] Payload:", payload);
+  console.log("[Process Submission] Payload:", payload);
 
-        // -------------------------------------
-        //  OPTIONAL: API call commented out
-        // -------------------------------------
-        
-        fetch("http://127.0.0.1:8001/grade", {
-          method: "POST",
-          headers: {"x-api-key": "1234abcd","Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-          console.log("API response data:", data);
-          document.querySelector(".report-section").textContent =
-            data.reportLink || "Request processed. See console for details.";
-        })
-        .catch(error => {
-          console.error("API call error:", error);
-          document.querySelector(".report-section").textContent =
-            "Failed to process submission.";
-        });
-        
+  // -------------------------------------
+  //  OPTIONAL: API call commented out
+  // -------------------------------------
+  // const host_port = "https://ela-api.example.com"; // replace with actual API endpoint 
+  const host_port = "http://192.168.1.17:8001"       
+  fetch(host_port + "/grade", {
+    method: "POST",
+    headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("API response data:", data);
 
-        // For now, just indicate done
-        // document.querySelector(".desktop1-text10").textContent =
-        //   "Submission processed (no live API call).";
-    });
+    // Extract tracking_id and grading_result
+    const trackingId = data.tracking_id;
+    const gradingResult = data.grading_result;
+
+    console.log("Tracking ID:", trackingId);
+    console.log("Grading Result:", gradingResult);
+
+    // Update report section with tracking ID as a URL link and overall band
+    if (gradingResult && gradingResult.bands) {
+      document.querySelector(".report-section").innerHTML =
+      `<b>Review Feedback:</b> <a href="${host_port}/results/${trackingId}" target="_blank">${host_port}/results/${trackingId}</a><br>
+      <b>Overall Band:</b> ${gradingResult.bands.overall}<br>`;
+    } else {
+      document.querySelector(".report-section").innerHTML =
+      `<b>Review Feedback:</b> <a href="${host_port}/results/${trackingId}" target="_blank">${host_port}/results/${trackingId}</a><br>`;
+    }
+  })
+  .catch(error => {
+    console.error("API call error:", error);
+    document.querySelector(".report-section").textContent =
+      "Failed to process submission.";
+  });
+});
 
     //----------------------------------------
     // 6) HOVER EFFECTS

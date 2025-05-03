@@ -25,8 +25,8 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
 
-app = FastAPI(    title="ELA Finetuned RAG API",
-    description="This API allows quesiton/essay pairing to query a finetune model with RAG system with Gemini.",
+app = FastAPI(    title="ELA RAG API",
+    description="This API allows quesiton/essay pairing to query with RAG context system with Gemini LLM.",
     version="1.0.0",
     # docs_url= "/mydocs",  # Change the Swagger docs URL
     # redoc_url= "/myredoc"  # Change the Redoc docs URL
@@ -71,14 +71,11 @@ class Document:
 
 @app.post("/grade", dependencies=[Depends(verify_api_key)])
 def grade_essay(request: EssayRequest):
-
     # Create unique tracking id & initial log
     tracking_id = str(uuid.uuid4())
     create_log(tracking_id, "API receives request", "Request received and parsing started")
 
-    # Perform initial database retrievals and insertions
     try:
-        
         # Step 1: Get or insert user
         user_id = get_or_create_user(request.email)
 
@@ -106,27 +103,18 @@ def grade_essay(request: EssayRequest):
         )
 
     except Exception as e:
-        # Add error to log if not successfully inserted
-        create_log(
-            tracking_id,
-            "Error",
-            f"Pre-Gemini Database Error: {str(e)}"
-        )
-
+        create_log(tracking_id, "Error", f"Pre-Gemini Database Error: {str(e)}")
         raise HTTPException(status_code=500, detail="Error performing pre-gemini database insertions.")
 
     # Get similar examples using vector search
     query_embedding = np.array(get_embedding(request.question)).astype('float32')
     results = vector_db.search(query_embedding, top_k=5)
-    
-    # Format examples into context
     examples_context = "\n\n".join([content for content, score in results])
-    
+
     print(f"📨 Input to Gemini:\nQuestion: {request.question}\nEssay: {request.essay}")
     create_log(tracking_id, "Sent to Gemini", "Sending question, essay, and similar examples to model", submission_id)
 
     try:
-        # Pass to gemini_client with question and essay
         llm_response = query_gemini(
             user_prompt="",
             examples_context=examples_context,
@@ -135,56 +123,33 @@ def grade_essay(request: EssayRequest):
         )
 
         if not llm_response:
-            create_log(
-                tracking_id,
-                "Error",
-                "No response received from Gemini",
-                submission_id = submission_id
-            )
+            create_log(tracking_id, "Error", "No response received from Gemini", submission_id=submission_id)
             raise HTTPException(status_code=502, detail="No response from Gemini model")
-        
+
     except Exception as e:
-        create_log(
-            tracking_id,
-            "Error",
-            f"Gemini model call failed: {str(e)}",
-            submission_id = submission_id
-        )
-        raise HTTPException(status_code=500, detail = "Error communicating with Gemini model")
-    
-    print(f"LLM Response: {llm_response}")  # Log the raw Gemini response
+        create_log(tracking_id, "Error", f"Gemini model call failed: {str(e)}", submission_id=submission_id)
+        raise HTTPException(status_code=500, detail="Error communicating with Gemini model")
+
+    print(f"LLM Response: {llm_response}")
     create_log(tracking_id, "Receive model response", "Received response from Gemini", submission_id)
-    
+
     # First try direct JSON parsing
     try:
         grading_result = json.loads(llm_response)
-        print(grading_result)
 
         try:
             results_data = prepare_results_from_grading_data(submission_id, grading_result)
             insert_results(submission_id, results_data)
 
-            create_log(
-                tracking_id,
-                "Post-Gemini Database Insertions",
-                "Results successfully inserted into database",
-                submission_id = submission_id
-            )
-        
-        except Exception as db_error:
-            create_log(
-                tracking_id,
-                "Error",
-                f"Error inserting results into database {str(db_error)}",
-                submission_id = submission_id
-            )
+            create_log(tracking_id, "Post-Gemini Database Insertions", "Results successfully inserted into database", submission_id=submission_id)
 
+        except Exception as db_error:
+            create_log(tracking_id, "Error", f"Error inserting results into database {str(db_error)}", submission_id=submission_id)
             raise HTTPException(status_code=500, detail="Error saving results to database.")
 
-        return grading_result
-    
+        return {"tracking_id": tracking_id, "grading_result": grading_result}
+
     except json.JSONDecodeError:
-        # Use the parsing function when JSON extraction fails
         import re
         try:
             formatted_json = parse_grading_response(llm_response)
@@ -193,40 +158,24 @@ def grade_essay(request: EssayRequest):
                 results_data = prepare_results_from_grading_data(submission_id, formatted_json)
                 insert_results(submission_id, results_data)
 
-                create_log(
-                    tracking_id,
-                    "Post-Gemini Database Insertions",
-                    "Results successfully inserted into database",
-                    submission_id = submission_id
-                )
+                create_log(tracking_id, "Post-Gemini Database Insertions", "Results successfully inserted into database", submission_id=submission_id)
 
             except Exception as db_error:
-                create_log(
-                    tracking_id,
-                    "Error",
-                    f"Error inserting results into database {str(db_error)}",
-                    submission_id = submission_id
-                )
+                create_log(tracking_id, "Error", f"Error inserting results into database {str(db_error)}", submission_id=submission_id)
+                raise HTTPException(status_code=500, detail="Error saving results to database.")
 
-                raise HTTPException(status_code=500, detail = "Error saving results to database.")
+            return {"tracking_id": tracking_id, "grading_result": formatted_json}
 
-            return formatted_json
         except Exception as e:
+            create_log(tracking_id, "Error", f"LLM response parsing failed: {str(e)}", submission_id=submission_id)
 
-            create_log(
-                tracking_id,
-                "Error",
-                "LLM response parsing failed: {str(e)}",
-                submission_id = submission_id
-            )
-
-            # Return formatted error if parsing fails
             return {
+                "tracking_id": tracking_id,
                 "error": "Could not parse LLM response",
                 "message": str(e),
                 "raw_response": llm_response
             }
-
+            
 # Locate the directory for the results template
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 template_dir = os.path.join(project_root, 'ELA_UI')

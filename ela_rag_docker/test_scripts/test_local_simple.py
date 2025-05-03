@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 
 # load test data set
-# host_port = "3.26.39.72:8000"
+# host_port = "3.107.188.95:8002"
 # Docker
 host_port = "192.168.1.17:8001"
 # Define the GitHub raw CSV URL
@@ -25,6 +25,7 @@ API_KEY = "1234abcd"
 essayGrade = {
     "question": df_test.iloc[question_id]["question"],
     "essay": df_test.iloc[question_id]["essay"]
+    
     }
 
 response = requests.post(
@@ -62,3 +63,14 @@ responseGet = requests.get(
 )
 
 print(responseGet.json())
+
+
+
+# test results return from database
+tracking_id = "3e19f672-76aa-4fc5-ace6-f25a836713cd"
+responseGet = requests.get(
+    "http://"+host_port+"/results/"+tracking_id,
+    headers={"x-api-key": API_KEY}
+    
+)
+print(responseGet.text)

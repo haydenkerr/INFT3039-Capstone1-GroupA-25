@@ -6,6 +6,9 @@ from sqlalchemy.orm import sessionmaker
 
 
 # Load environment variables from .env file
+
+# os.chdir("./ela_rag_docker")
+# os.getcwd()
 load_dotenv()
 
 # Database connection string from the .env file
@@ -84,8 +87,10 @@ def create_log(tracking_id: str, log_type: str, log_message: str, submission_id:
             log_message=log_message,
             log_timestamp=datetime.utcnow()
         )
-        session.execute(stmt)
+        results = session.execute(stmt)
         session.commit()
+        print(f"Log created: {log_type} - {log_message}")
+        print(results)
     except Exception as e:
         session.rollback()
         print("Error in create_log:", e)
