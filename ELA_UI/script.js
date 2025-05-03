@@ -227,7 +227,7 @@ document.querySelector(".process-btn").addEventListener("click", function () {
     console.log("Tracking ID:", trackingId);
     console.log("Grading Result:", gradingResult);
 
-    // Update report section with tracking ID as a URL link and overall band
+    // Update report section with tracking ID as a URL link and overall band.
     if (gradingResult && gradingResult.bands) {
       document.querySelector(".report-section").innerHTML =
       `<b>Review Feedback:</b> <a href="${host_port}/results/${trackingId}" target="_blank">${host_port}/results/${trackingId}</a><br>
