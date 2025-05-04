@@ -59,11 +59,15 @@
 
         <div class="results">
             <h2>Results</h2>
+            
+            <p><span class="competency-name">Overall Score:</span> {{ "%.1f"|format(overall_score) }}</p>
+
             {% for result in results %}
                 <div class="result-item">
-                    <p><span class="competency-name">{{ result.competency_name }}:</span></p>
-                    <p>Score: {{ result.score }}</p>
-                    <p>Feedback: {{ result.feedback_summary }}</p>
+                    <p class="competency-line">
+                        <span class="competency-name">{{ result.competency_name }}:</span> {{ "%.1f"|format(result.score) }}
+                    </p>
+                    <p class="preserve-line-breaks"> {{ result.feedback_summary }}</p>
                 </div>
             {% endfor %}
         </div>

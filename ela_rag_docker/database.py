@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from datetime import datetime
-from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, DateTime, Boolean, Text, insert, select, ForeignKey, DECIMAL
+from sqlalchemy import create_engine, Table, Column, Integer, Float, String, MetaData, DateTime, Boolean, Text, insert, select, update, ForeignKey, DECIMAL
 from sqlalchemy.orm import sessionmaker
 
 
@@ -54,7 +54,9 @@ submissions = Table(
     Column("task_id", Integer, nullable=False),
     Column("submission_group", Integer, nullable=False),
     Column("submission_timestamp", DateTime, default=datetime.utcnow),
-    Column("essay_response", Text, nullable=False)
+    Column("essay_response", Text, nullable=False),
+    Column("overall_score", Float, nullable=True),
+    Column("validated", Boolean, nullable=True)
 )
 
 results = Table(
@@ -146,7 +148,7 @@ def get_or_create_question(question_text: str, task_id: int):
         stmt = insert(questions).values(
             question_text=question_text,
             task_id=task_id,
-            iscustom=None,
+            iscustom=True,
             created_at=datetime.utcnow()
         ).returning(questions.c.question_id)
         result = session.execute(stmt).fetchone()
@@ -182,13 +184,43 @@ def insert_submission(user_id: int, task_id: int, question_id: int, submission_g
     finally:
         session.close()
 
+# Function to calculate overall score with rounding
+def calculate_overall_score(results_data: list) -> float:
+    
+    scores = [item["score"] for item in results_data if item.get("score") is not None]
+
+    if not scores or len(scores) != 4:
+        raise ValueError("Expected scores for all 4 competencies")
+
+    average = sum(scores) / 4
+
+    # Apply IELTS-specific rounding
+    if average % 1 == 0.25:
+        overall_score = round(average + 0.25, 1)
+    elif average % 1 == 0.75:
+        overall_score = round(average + 0.25, 1)
+    else:
+        overall_score = round(average * 2) / 2  # rounds to nearest 0.5
+
+    return overall_score
+
 # Function to insert results
 def insert_results(submission_id: int, results_data: list):
     session = SessionLocal()
     try:
         stmt = insert(results)
         session.execute(stmt, results_data)
+
+        overall_score = calculate_overall_score(results_data)
+
+        session.execute(
+            update(submissions)
+            .where(submissions.c.submission_id == submission_id)
+            .values(overall_score = overall_score)
+        )
+
         session.commit()
+        return overall_score
     except Exception as e:
         session.rollback()
         print("Error in insert_results:", e)

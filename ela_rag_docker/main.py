@@ -139,7 +139,7 @@ def grade_essay(request: EssayRequest):
 
         try:
             results_data = prepare_results_from_grading_data(submission_id, grading_result)
-            insert_results(submission_id, results_data)
+            overall_score = insert_results(submission_id, results_data)
 
             create_log(tracking_id, "Post-Gemini Database Insertions", "Results successfully inserted into database", submission_id=submission_id)
 
@@ -147,7 +147,7 @@ def grade_essay(request: EssayRequest):
             create_log(tracking_id, "Error", f"Error inserting results into database {str(db_error)}", submission_id=submission_id)
             raise HTTPException(status_code=500, detail="Error saving results to database.")
 
-        return {"tracking_id": tracking_id, "grading_result": grading_result}
+        return {"tracking_id": tracking_id, "grading_result": grading_result, "overall_score": overall_score}
 
     except json.JSONDecodeError:
         import re
@@ -156,7 +156,7 @@ def grade_essay(request: EssayRequest):
 
             try:
                 results_data = prepare_results_from_grading_data(submission_id, formatted_json)
-                insert_results(submission_id, results_data)
+                overall_score = insert_results(submission_id, results_data)
 
                 create_log(tracking_id, "Post-Gemini Database Insertions", "Results successfully inserted into database", submission_id=submission_id)
 
@@ -164,7 +164,7 @@ def grade_essay(request: EssayRequest):
                 create_log(tracking_id, "Error", f"Error inserting results into database {str(db_error)}", submission_id=submission_id)
                 raise HTTPException(status_code=500, detail="Error saving results to database.")
 
-            return {"tracking_id": tracking_id, "grading_result": formatted_json}
+            return {"tracking_id": tracking_id, "grading_result": formatted_json, "overall_score": overall_score}
 
         except Exception as e:
             create_log(tracking_id, "Error", f"LLM response parsing failed: {str(e)}", submission_id=submission_id)
@@ -198,6 +198,7 @@ def show_results(tracking_id: str):
         
         submission_id = submission.submission_id
         question_id = submission.question_id 
+        overall_score = submission.overall_score
 
         # Fetch related question, essay, and results
         question = session.execute(
@@ -216,6 +217,7 @@ def show_results(tracking_id: str):
         response_data = {
             "question": question,
             "essay": essay,
+            "overall_score": overall_score,
             "results": [{
                 "competency_name": result.competency_name,
                 "score": result.score,
@@ -245,6 +247,9 @@ def show_results(tracking_id: str):
         )
 
         return HTMLResponse(content=f"An error occurred: {str(e)}", status_code=500)
+    
+    finally:
+        session.close()
 
 
 @app.get("/debug/documents")

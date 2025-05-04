@@ -210,7 +210,7 @@ document.querySelector(".process-btn").addEventListener("click", function () {
   //  OPTIONAL: API call commented out
   // -------------------------------------
   // const host_port = "https://ela-api.example.com"; // replace with actual API endpoint 
-  const host_port = "http://192.168.1.17:8001"       
+  const host_port = "http://127.0.0.1:8001"       
   fetch(host_port + "/grade", {
     method: "POST",
     headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
@@ -223,18 +223,22 @@ document.querySelector(".process-btn").addEventListener("click", function () {
     // Extract tracking_id and grading_result
     const trackingId = data.tracking_id;
     const gradingResult = data.grading_result;
+    const overallScore = data.overall_score;
 
     console.log("Tracking ID:", trackingId);
     console.log("Grading Result:", gradingResult);
+    console.log("Overall Score:", overallScore);
 
     // Update report section with tracking ID as a URL link and overall band.
-    if (gradingResult && gradingResult.bands) {
+    if (gradingResult && overallScore) {
       document.querySelector(".report-section").innerHTML =
-      `<b>Review Feedback:</b> <a href="${host_port}/results/${trackingId}" target="_blank">${host_port}/results/${trackingId}</a><br>
-      <b>Overall Band:</b> ${gradingResult.bands.overall}<br>`;
+      `<p><b>Submission Processed</b></p>
+      <p>Overall Score: ${overallScore}</p>
+      <p><a href="${host_port}/results/${trackingId}" target="_blank">Click here to view your full results</a></p>`;
     } else {
       document.querySelector(".report-section").innerHTML =
-      `<b>Review Feedback:</b> <a href="${host_port}/results/${trackingId}" target="_blank">${host_port}/results/${trackingId}</a><br>`;
+      `<p><b>Submission Processed</b></p>
+      <p><a href="${host_port}/results/${trackingId}" target="_blank">Click here to view your full results</a></p>`;
     }
   })
   .catch(error => {
