@@ -175,10 +175,7 @@ def grade_essay(request: EssayRequest):
                 "message": str(e),
                 "raw_response": llm_response
             }
-            
-# Locate the directory for the results template
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-template_dir = os.path.join(project_root, 'ELA_UI')
+template_dir = os.path.dirname(__file__)
 template_env = Environment(loader=FileSystemLoader(template_dir))
 
 @app.get("/results/{tracking_id}", response_class=HTMLResponse)
