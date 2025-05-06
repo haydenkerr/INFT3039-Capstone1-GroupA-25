@@ -25,6 +25,8 @@ chat_session = model.start_chat(history=[])
 
 def load_system_prompt():
     """Load the system prompt from GitHub"""
+    # TODO create option to load different markdown dependant on the task type selected in the UI
+    # url = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ela_rag_docker/system.md"
     url = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ela_rag_docker/system.md"
     try:
         response = requests.get(url)
