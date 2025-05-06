@@ -88,6 +88,7 @@ You must evaluate the following student essay according to the IELTS Writing Ban
    - After the written feedback, you **must** output a **markdown table** summarizing the scores.
    - Use this exact format:
 
+**Output Format:** Structure your response as follows:
 | Criterion | Band Score |
 | --------- | ---------- |
 | Task Response | X |
@@ -95,6 +96,11 @@ You must evaluate the following student essay according to the IELTS Writing Ban
 | Lexical Resource | X |
 | Grammatical Range & Accuracy | X |
 | **Overall Band Score** | **X** |
+
+
+
+
+
 
 **Important:**  
 - Use numeric band scores between **0 and 9**. Only allow decimals of 0.5 (e.g., 6.5).

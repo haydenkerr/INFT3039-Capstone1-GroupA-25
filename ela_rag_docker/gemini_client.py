@@ -16,34 +16,39 @@ generation_config = {
   "response_mime_type": "text/plain",
 }
 
+
 model = genai.GenerativeModel(
   model_name="gemini-2.0-flash",
   generation_config=generation_config,
 )
 
+
+
 chat_session = model.start_chat(history=[])
 
-def load_system_prompt():
+def load_system_prompt(task_id):
     """Load the system prompt from GitHub"""
-    # TODO create option to load different markdown dependant on the task type selected in the UI
-    # url = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ela_rag_docker/system.md"
-    url = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ela_rag_docker/system.md"
+    
+    prompt_urls = {
+        # 2: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task2_academic_system_prompt.md",
+        3: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task1_general_system_prompt.md",
+        4: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task2_general_system_prompt.md"
+    }
+
+    url = prompt_urls.get(task_id, "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/default_system_prompt.md")
+    
     try:
-        response = requests.get(url)
-        return response.text
+        sys_prompt = requests.get(url).text
+        refinement = requests.get("https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/prompt_refinement.md").text
+        return sys_prompt + "\n\n" + refinement
     except Exception as e:
         print(f"Error loading system prompt: {str(e)}")
-        # Fallback to local file if available
-        try:
-            with open("system.md", "r", encoding="utf-8") as f:
-                return f.read()
-        except:
-            return "You are an IELTS essay evaluator. Evaluate essays based on the IELTS criteria."
+        return "You are an IELTS essay evaluator. Evaluate essays based on the IELTS criteria."
 
-# Load system prompt once at module initialization
-SYSTEM_PROMPT = load_system_prompt()
+# # Load system prompt once at module initialization
+# SYSTEM_PROMPT = load_system_prompt(task_id)
 
-def query_gemini(user_prompt: str, examples_context: str = "", question: str = "", essay: str = "") -> str:
+def query_gemini(task_id: int, user_prompt: str, examples_context: str = "", question: str = "", essay: str = "") -> str:
     """
     Sends a prompt to Google Gemini and returns the response as a string.
     
@@ -55,7 +60,8 @@ def query_gemini(user_prompt: str, examples_context: str = "", question: str = "
     """
     try:
         # If question and essay are provided, use them in the prompt
-        full_prompt = SYSTEM_PROMPT
+        system_prompt = load_system_prompt(task_id)
+        full_prompt = system_prompt
         
         if examples_context:
             full_prompt += f"\n\nHere are some example graded essays:\n{examples_context}"

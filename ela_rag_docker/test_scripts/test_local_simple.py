@@ -24,23 +24,31 @@ question_id = 152
 API_KEY = "1234abcd"
 essayGrade = {
     "email": "hayden@google.com",
-    "question": df_test.iloc[question_id]["question"],
-    "essay": df_test.iloc[question_id]["essay"],
+    "question": """You are experiencing financial problems and want to ask your landlord if you can pay your rent late. Write a letter to your landlord. In your letter explain:  
+- Why you are writing to him.
+- Why you cannot pay the rent.
+- When you will pay the rent.""",
+    "essay": """Dear Mr. Smith,
+ 
+I hope this message finds you well. I am writing to inform you that I am facing some financial difficulties this month due to an unexpected family emergency. As a result, I will not be able to pay my rent on time. I will ensure the full rent is paid by the 20th of this month. I appreciate your understanding and patience.
+ 
+Yours sincerely,
+John Doe""",
     "wordCount": 265,
     "submissionGroup":6,
     "taskType":"General Task 1"    
     
     }
 
-# essayGrade= {
-#   "email": "string",
-#   "question": "string",
-#   "essay": "string",
-#   "wordCount": 0,
-#   "submissionGroup": 0,
-#   "taskType": "string"
-# }
-
+# essayGrade = {
+#     "email": "hayden@google.com",
+#     "question": df_test.iloc[question_id]["question"],
+#     "essay": df_test.iloc[question_id]["essay"],
+#     "wordCount": 265,
+#     "submissionGroup":6,
+#     "taskType":"General Task 1"    
+    
+#     }
 response = requests.post(
     host_port+"/grade",
     headers={"x-api-key": API_KEY},

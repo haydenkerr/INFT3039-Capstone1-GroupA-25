@@ -116,6 +116,7 @@ def grade_essay(request: EssayRequest):
 
     try:
         llm_response = query_gemini(
+            task_id=task_id,  # Pass task_id to the query_gemini function to select the correct system prompt
             user_prompt="",
             examples_context=examples_context,
             question=request.question,
