@@ -17,10 +17,8 @@ df_test = df_test[['prompt', 'essay', 'band', 'cleaned_evaluation','Task Achieve
 df_test.rename(columns={'prompt':'question'}, inplace=True)
 
 # Example test case
-question_id = 152
+question_id = 199
 # word wrap the text output below  
-
-
 
 API_KEY = "1234abcd"
 essayGrade = {
