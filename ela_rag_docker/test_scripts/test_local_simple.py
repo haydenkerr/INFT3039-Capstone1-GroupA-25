@@ -2,9 +2,9 @@ import requests
 import pandas as pd
 
 # load test data set
-# host_port = "3.27.223.201:8002"
+host_port = "https://3.27.223.201"
 # Docker
-host_port = "http://127.0.0.1:8001"
+# host_port = "http://127.0.0.1:8001"
 # Define the GitHub raw CSV URL
 csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
@@ -16,7 +16,7 @@ df_test = df_test[['prompt', 'essay', 'band', 'cleaned_evaluation','Task Achieve
 df_test.rename(columns={'prompt':'question'}, inplace=True)
 
 # Example test case
-question_id = 196
+question_id = 193
 # word wrap the text output below  
 
 
@@ -50,6 +50,7 @@ response = requests.post(
     host_port+"/grade",
     headers={"x-api-key": API_KEY},
     json=essayGrade,
+    verify=False
 )
 print(response.json())
 

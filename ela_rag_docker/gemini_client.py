@@ -85,7 +85,8 @@ def query_gemini(task_id: int, user_prompt: str, examples_context: str = "", que
             # Safely extract the JSON payload
             if hasattr(response, 'candidates') and response.candidates:
                 try:
-                    json_output = response.candidates[0].content.parts[0].function_call.args
+                    json_output = response.candidates[0].content.parts[0].text
+                    # print(response.candidates[0].content.parts[0].text)
                     return json.dumps(json_output)  # Return a JSON string
                 except Exception as e:
                     return f"⚠️ Failed to extract JSON from Gemini response: {str(e)}"

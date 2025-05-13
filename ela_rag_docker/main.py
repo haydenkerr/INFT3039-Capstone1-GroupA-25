@@ -102,6 +102,7 @@ def grade_essay(request: EssayRequest):
             submission_id=submission_id
         )
 
+
     except Exception as e:
         create_log(tracking_id, "Error", f"Pre-Gemini Database Error: {str(e)}")
         raise HTTPException(status_code=500, detail="Error performing pre-gemini database insertions.")
@@ -176,8 +177,8 @@ def grade_essay(request: EssayRequest):
                 "message": str(e),
                 "raw_response": llm_response
             }
-template_dir = os.path.dirname(__file__)
-template_env = Environment(loader=FileSystemLoader(template_dir))
+# template_dir = os.path.dirname(__file__)
+# template_env = Environment(loader=FileSystemLoader(template_dir))
 
 @app.get("/results/{tracking_id}", response_class=HTMLResponse)
 def show_results(tracking_id: str):
@@ -249,8 +250,8 @@ def show_results(tracking_id: str):
     finally:
         session.close()
 
-
-@app.get("/debug/documents")
+# add dependencies=[Depends(verify_api_key)]
+@app.get("/debug/documents" )
 def list_documents():
     """Debug endpoint to check loaded documents"""
     return {
