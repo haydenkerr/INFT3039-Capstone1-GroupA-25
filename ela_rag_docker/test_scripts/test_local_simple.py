@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 
 # load test data set
-host_port = "https://3.27.223.201"
+host_port = "http://3.24.180.235:8002"
 # Docker
 # host_port = "http://127.0.0.1:8001"
 # Define the GitHub raw CSV URL
@@ -59,6 +59,7 @@ response = requests.post(
     host_port+"/query",
     headers={"x-api-key": API_KEY},
     json=query,
+    verify=False
 )
 
 
@@ -77,7 +78,8 @@ print(responseGet.json())
 
 responseGet = requests.get(
     host_port+"/debug/test",
-    headers={"x-api-key": API_KEY}
+    headers={"x-api-key": API_KEY},
+    verify=False
     
 )
 
