@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 
 # load test data set
+# host_port = "http://ielts-unisa-groupa.me:8002"
 host_port = "http://3.24.180.235:8002"
 # Docker
 # host_port = "http://127.0.0.1:8001"
@@ -75,11 +76,11 @@ responseGet = requests.get(
 print(responseGet.json())
 
 
-
+host_port = "http://3.24.180.235:8002"
 responseGet = requests.get(
     host_port+"/debug/test",
     headers={"x-api-key": API_KEY},
-    verify=False
+
     
 )
 
@@ -95,3 +96,16 @@ responseGet = requests.get(
     
 )
 print(responseGet.text)
+
+
+
+response = requests.get(
+    "https://ielts-unisa-groupa.me/debug/test",
+    headers={"x-api-key": "1234abcd"},
+    timeout=10
+)
+
+print("STATUS:", response.status_code)
+print("LOCATION:", response.headers.get("Location"))
+print("SERVER:", response.headers.get("Server"))
+print("CF-RAY:", response.headers.get("CF-RAY"))
