@@ -110,7 +110,25 @@ def grade_essay(request: EssayRequest):
     # Get similar examples using vector search
     query_embedding = np.array(get_embedding(request.question)).astype('float32')
     results = vector_db.search(query_embedding, top_k=5)
-    examples_context = "\n\n".join([content for content, score in results])
+    examples_context = "\n\n".join([content for index, content, score in results])
+
+    # Unpack each item from results and append to list for logging
+    vector_db_logs = []
+
+    for index_position, metadata, distance in results:
+        vector_db_logs.append({
+            "index_position": int(index_position),
+            "metadata": metadata,
+            "distance": distance
+        })
+
+    try:
+        create_vector_db_log(submission_id, vector_db_logs)
+        create_log(tracking_id, "Created vector_db_logs", "Logged the vector_db examples", submission_id)
+
+    except Exception as e:
+        create_log(tracking_id, "Error", f"Vector_db logging failed: {str(e)}", submission_id=submission_id)
+        raise HTTPException(status_code=500, detail="Error logging vector db examples")
 
     print(f"📨 Input to Gemini:\nQuestion: {request.question}\nEssay: {request.essay}")
     create_log(tracking_id, "Sent to Gemini", "Sending question, essay, and similar examples to model", submission_id)

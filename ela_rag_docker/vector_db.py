@@ -42,7 +42,7 @@ class VectorDatabase:
         results = []
         for i, idx in enumerate(indices[0]):
             doc_metadata = self.metadata.get(str(idx), "Unknown")
-            results.append((doc_metadata, float(distances[0][i])))
+            results.append((idx, doc_metadata, float(distances[0][i])))
 
         # print(f"📖 Retrieved Metadata: {results}")
 
