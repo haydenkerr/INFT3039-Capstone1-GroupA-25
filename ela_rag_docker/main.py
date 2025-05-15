@@ -71,21 +71,19 @@ class Document:
 
 @app.post("/grade", dependencies=[Depends(verify_api_key)])
 def grade_essay(request: EssayRequest):
+
     # Create unique tracking id & initial log
     tracking_id = str(uuid.uuid4())
     create_log(tracking_id, "API receives request", "Request received and parsing started")
 
+    # Pre-gemini database insertions
     try:
-        # Step 1: Get or insert user
+        # Prepare the supporting submission data
         user_id = get_or_create_user(request.email)
-
-        # Step 2: Get task_id from task_name
         task_id = get_task_id(request.taskType)
-
-        # Step 3: Get or insert question
         question_id = get_or_create_question(request.question, task_id)
 
-        # Step 4: Insert submission
+        # Insert submission
         submission_id = insert_submission(
             user_id=user_id,
             task_id=task_id,
@@ -94,14 +92,13 @@ def grade_essay(request: EssayRequest):
             essay_response=request.essay
         )
 
-        # Step 5: Add log for successful insertion
+        # Create successful log
         create_log(
             tracking_id,
             "Pre-Gemini database insertions",
             f"User ID: {user_id}, Task ID: {task_id}, Question ID: {question_id}, Submission ID: {submission_id}",
             submission_id=submission_id
         )
-
 
     except Exception as e:
         create_log(tracking_id, "Error", f"Pre-Gemini Database Error: {str(e)}")
@@ -217,7 +214,6 @@ def show_results(tracking_id: str):
         question_id = submission.question_id 
         overall_score = submission.overall_score
 
-        # Fetch related question, essay, and results
         question = session.execute(
             select(questions.c.question_text)
             .where(questions.c.question_id == question_id)
