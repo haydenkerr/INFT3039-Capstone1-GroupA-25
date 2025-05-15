@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from sqlalchemy import create_engine, Table, Column, Integer, Float, String, MetaData, DateTime, Boolean, Text, insert, select, update, ForeignKey, DECIMAL
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
 
 
 # Load environment variables from .env file
@@ -249,3 +250,33 @@ def prepare_results_from_grading_data(submission_id: int, grading_result: dict) 
         })
 
     return results_data
+
+# Function to return one randomly selected question for given task type
+def get_random_question(task_name: str):
+    session = SessionLocal()
+
+    try:
+        task_id = get_task_id(task_name)
+
+        stmt = (
+            select(questions.c.question_text)
+            .where(
+                questions.c.task_id == task_id,
+                questions.c.iscustom == False
+            ).order_by(func.random())
+            .limit(1)
+        )
+
+        result = session.execute(stmt).scalar_one_or_none()
+
+        if result is None:
+            raise ValueError(f"No approved questions found for task id {task_id}")
+        
+        return result
+    
+    except Exception as e:
+        print("Error in get_random_question", e)
+        raise
+
+    finally:
+        session.close()
