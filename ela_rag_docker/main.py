@@ -1,5 +1,8 @@
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from pydantic import BaseModel
 from file_parser import extract_text
 import numpy as np
@@ -35,13 +38,16 @@ app = FastAPI(    title="ELA RAG API",
 
 # Allow CORS (Adjust origins as per your security requirements)
 #  need to check this , as
+
+app.add_middleware(ProxyHeadersMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Change to your frontend URL for security
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
-)
+    )
 
 vector_db = VectorDatabase(embedding_dim=384)
 
