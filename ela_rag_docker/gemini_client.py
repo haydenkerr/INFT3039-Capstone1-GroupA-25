@@ -2,6 +2,7 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 import requests
+import json
 
 load_dotenv()  # Load API Key from `.env` file
 
@@ -16,32 +17,39 @@ generation_config = {
   "response_mime_type": "text/plain",
 }
 
+
 model = genai.GenerativeModel(
   model_name="gemini-2.0-flash",
   generation_config=generation_config,
 )
 
+
+
 chat_session = model.start_chat(history=[])
 
-def load_system_prompt():
+def load_system_prompt(task_id):
     """Load the system prompt from GitHub"""
-    url = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/ela_rag_docker/system.md"
+    
+    prompt_urls = {
+        # 2: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task2_academic_system_prompt.md",
+        3: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task1generalprompt_v6.md",
+        4: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task2generalprompt_v7.md"
+    }
+
+    url = prompt_urls.get(task_id, "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/system.md")
+    
     try:
-        response = requests.get(url)
-        return response.text
+        sys_prompt = requests.get(url).text
+        refinement = requests.get("https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/prompt_refinement.md").text
+        return sys_prompt + "\n\n" + refinement
     except Exception as e:
         print(f"Error loading system prompt: {str(e)}")
-        # Fallback to local file if available
-        try:
-            with open("system.md", "r", encoding="utf-8") as f:
-                return f.read()
-        except:
-            return "You are an IELTS essay evaluator. Evaluate essays based on the IELTS criteria."
+        return "You are an IELTS essay evaluator. Evaluate essays based on the IELTS criteria."
 
-# Load system prompt once at module initialization
-SYSTEM_PROMPT = load_system_prompt()
+# # Load system prompt once at module initialization
+# SYSTEM_PROMPT = load_system_prompt(task_id)
 
-def query_gemini(user_prompt: str, examples_context: str = "", question: str = "", essay: str = "") -> str:
+def query_gemini(task_id: int, user_prompt: str, examples_context: str = "", question: str = "", essay: str = "") -> str:
     """
     Sends a prompt to Google Gemini and returns the response as a string.
     
@@ -53,45 +61,46 @@ def query_gemini(user_prompt: str, examples_context: str = "", question: str = "
     """
     try:
         # If question and essay are provided, use them in the prompt
-        full_prompt = SYSTEM_PROMPT
-        
+        system_prompt = load_system_prompt(task_id)
+        full_prompt = system_prompt
+
         if examples_context:
             full_prompt += f"\n\nHere are some example graded essays:\n{examples_context}"
-        
+
         if question and essay:
             # full_prompt += f"\n\nNow, evaluate this new essay:\nNew question: {question}\nNew Essay: {essay}"
             full_prompt += f'\n\nNow, evaluate this new essay:\n"""{question}"""\n"""{essay}"""'
-        
+
         # Add any additional user prompt
         if user_prompt:
             full_prompt += f"\n\n{user_prompt}"
-            
+
         print("📡 Sending request to Gemini...")
         # print(f"📝 Prompt start: {full_prompt[:300]}...")  # Print only first 300 chars
+        if generation_config["response_mime_type"] == "application/json":
+            response = model.generate_content(full_prompt)
+            print(f":Full prompt: {full_prompt}")
+            print("✅ Gemini API JSON response received")
+            print(f"📜 Gemini response: {response}")  # Print the entire response for debugging
+            # Safely extract the JSON payload
+            if hasattr(response, 'candidates') and response.candidates:
+                try:
+                    json_output = response.candidates[0].content.parts[0].text
+                    # print(response.candidates[0].content.parts[0].text)
+                    return json.dumps(json_output)  # Return a JSON string
+                except Exception as e:
+                    return f"⚠️ Failed to extract JSON from Gemini response: {str(e)}"
+            else:
+                return "⚠️ No candidates found in Gemini response."
 
-        response = chat_session.send_message(full_prompt)
-
-        if response:
-            print("✅ Gemini API Response Received")
-            
-            
-            # Capture streamed response
+        else:
+            # Fallback for text/plain MIME
+            response = chat_session.send_message(full_prompt)
             full_response = []
             for chunk in response:
                 if hasattr(chunk, "text"):
                     full_response.append(chunk.text)
-
-            response_text = " ".join(full_response).strip()
-
-            if response_text:
-                # print(response_text)
-                return response_text
-            else:
-                print("⚠️ No valid text in response")
-                return "⚠️ No valid response from Gemini."
-        else:
-            print("⚠️ Gemini API returned None")
-            return "⚠️ Gemini API Error: No response received."
+            return " ".join(full_response).strip()
 
     except Exception as e:
         print(f"❌ Gemini API Error: {str(e)}")
