@@ -138,9 +138,53 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  //--------------------------------------
+  // 4) GET QUESTION BANK QUESTION
+  //--------------------------------------
+
+  const taskName = document.getElementById("task-type");
+  const questionSelect = document.getElementById('generate-question');
+  const questionText = document.getElementById('question-text');
+  const essayText = document.getElementById('essay-text');
+
+  questionSelect.addEventListener('change', function () {
+    const selectedQuestion = questionSelect.value;
+    const selectedTask = taskName.value;
+    console.log('Selected Question Response:', selectedQuestion);
+    console.log('Selected Task:', selectedTask);
+
+    // Display error pop up if they try to ask for a question before selecting task  
+    if (selectedQuestion == "Yes" && selectedTask == "Select an option") {
+      alert("You must select a Task Type.");
+      questionSelect.value = "Select an option"; // Set question drop down back to default
+      return;
+    }
+
+    if (selectedQuestion == "Yes") {
+      
+      const host_port = "http://127.0.0.1:8001"    
+  
+      fetch(host_port + `/questions?task_name=${selectedTask}`, {
+      method: "GET",
+      headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
+      })
+      .then(response => response.json())
+      .then(data => {
+      console.log("API response question:", data);
+
+      const sampleQuestion = data.question;
+
+      questionText.textContent = sampleQuestion;
+      })
+
+    } else {
+      questionText.placeholder = "Upload a file, or enter your own question here";
+      essayText.placeholder = "Upload a file, or enter your own essay here";
+    }
+  });  
 
   //----------------------------------------
-  // 4) PARSE QUESTION/ESSAY
+  // 5) PARSE QUESTION/ESSAY
   //----------------------------------------
   function parseQuestionEssay(fullText) {
     // normalizing line breaks
@@ -167,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 //----------------------------------------
-// 5) PROCESS SUBMISSION
+// 6) PROCESS SUBMISSION
 //----------------------------------------
 document.querySelector(".process-btn").addEventListener("click", function () {
 
@@ -237,8 +281,8 @@ console.log("[Process Submission] Payload:", payload);
 //  OPTIONAL: API call commented out
 // -------------------------------------
 // const host_port = "https://ela-api.example.com"; // replace with actual API endpoint 
-// const host_port = "http://127.0.0.1:8001"    
-const host_port = "http://3.24.180.235:8002"   
+const host_port = "http://127.0.0.1:8001"    
+// const host_port = "http://3.24.180.235:8002"   
 fetch(host_port + "/grade", {
   method: "POST",
   headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
@@ -277,7 +321,7 @@ fetch(host_port + "/grade", {
 });
 
   //----------------------------------------
-  // 6) HOVER EFFECTS
+  // 7) HOVER EFFECTS
   //----------------------------------------
   document.querySelectorAll("button").forEach(button => {
     button.addEventListener("mouseover", () => {
@@ -287,4 +331,4 @@ fetch(host_port + "/grade", {
       button.style.opacity = "1";
     });
   });
-});
+})

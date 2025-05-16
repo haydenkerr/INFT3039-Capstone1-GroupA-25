@@ -1,4 +1,4 @@
-/* General page setup */
+/* General setup */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -123,7 +123,7 @@ body {
   height: 18px;
 }
 
-/* Textareas */
+/* Question & Essay Text Areas */
 textarea {
   resize: vertical;
 }
@@ -204,7 +204,7 @@ textarea {
   margin-right: 0.75rem; 
 }
 
-/* Style the Download Template and Submit Feedback links like buttons */
+/* Style the Download Template and Submit Feedback links like the other buttons */
 .download-template a,
 .feedback-section a {
 display: inline-flex;
@@ -221,7 +221,7 @@ cursor: pointer;
 transition: background-color 0.3s;
 }
 
-/* View your Results */
+/* View Results Box*/
 .results-text {
 text-align: left; 
 font-size: 1.75rem; 

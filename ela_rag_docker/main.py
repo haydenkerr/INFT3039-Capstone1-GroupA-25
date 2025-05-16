@@ -26,7 +26,7 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
 
 app = FastAPI(    title="ELA RAG API",
-    description="This API allows quesiton/essay pairing to query with RAG context system with Gemini LLM.",
+    description="This API allows question/essay pairing to query with RAG context system with Gemini LLM.",
     version="1.0.0",
     # docs_url= "/mydocs",  # Change the Swagger docs URL
     # redoc_url= "/myredoc"  # Change the Redoc docs URL
@@ -68,6 +68,39 @@ class EssayRequest(BaseModel):
 class Document:
     def __init__(self, page_content):
         self.page_content = page_content
+
+# Questions endpoint
+@app.get("/questions")
+def get_random_question(task_name: str):
+
+    session = SessionLocal()
+
+    try:
+        task_id = get_task_id(task_name)
+
+        stmt = (
+            select(questions.c.question_text)
+            .where(
+                questions.c.task_id == task_id,
+                questions.c.iscustom == False
+            ).order_by(func.random())
+            .limit(1)
+        )
+
+        result = session.execute(stmt).scalar()
+
+        if result is None:
+            raise ValueError(f"No approved questions found for task id {task_id}")
+        
+        return {"question": result}
+    
+    except Exception as e:
+        print("Error in get_random_question", e)
+        raise
+
+    finally:
+        session.close()
+
 
 @app.post("/grade", dependencies=[Depends(verify_api_key)])
 def grade_essay(request: EssayRequest):

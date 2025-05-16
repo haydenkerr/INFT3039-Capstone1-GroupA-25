@@ -108,11 +108,11 @@ def get_or_create_user(email: str):
         stmt = select(users).where(users.c.email == email)
         result = session.execute(stmt).fetchone()
         if result:
-            return result[0]  # return user_id
+            return result[0] 
         stmt = insert(users).values(email=email, created_at=datetime.utcnow()).returning(users.c.user_id)
         result = session.execute(stmt).fetchone()
         session.commit()
-        return result[0]  # return new user_id
+        return result[0] 
     except Exception as e:
         session.rollback()
         print("Error in get_or_create_user:", e)
@@ -250,33 +250,3 @@ def prepare_results_from_grading_data(submission_id: int, grading_result: dict) 
         })
 
     return results_data
-
-# Function to return one randomly selected question for given task type
-def get_random_question(task_name: str):
-    session = SessionLocal()
-
-    try:
-        task_id = get_task_id(task_name)
-
-        stmt = (
-            select(questions.c.question_text)
-            .where(
-                questions.c.task_id == task_id,
-                questions.c.iscustom == False
-            ).order_by(func.random())
-            .limit(1)
-        )
-
-        result = session.execute(stmt).scalar_one_or_none()
-
-        if result is None:
-            raise ValueError(f"No approved questions found for task id {task_id}")
-        
-        return result
-    
-    except Exception as e:
-        print("Error in get_random_question", e)
-        raise
-
-    finally:
-        session.close()
