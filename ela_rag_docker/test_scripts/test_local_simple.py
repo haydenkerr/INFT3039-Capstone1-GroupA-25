@@ -4,10 +4,10 @@ import json
 
 # load test data set
 # host_port = "http://"+"3.106.58.24:8002"
-host_port = "https://"+"ielts-unisa-groupa.me"
+# host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
 # host_port = "http://"+"192.168.1.17:8001"
-# host_port = "http://"+"127.0.0.1:8001"
+host_port = "http://"+"127.0.0.1:8001"
 # Define the GitHub raw CSV URL
 csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
@@ -92,7 +92,6 @@ print(responseGet.json())
 # test results return from database
 tracking_id = "3e19f672-76aa-4fc5-ace6-f25a836713cd"
 responseGet = requests.get(
-    host_port+"/results/"+tracking_id,
     host_port+"/results/"+tracking_id,
     headers={"x-api-key": API_KEY}
     

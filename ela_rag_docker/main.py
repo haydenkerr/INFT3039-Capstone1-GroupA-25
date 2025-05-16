@@ -183,8 +183,8 @@ def grade_essay(request: EssayRequest):
                 "message": str(e),
                 "raw_response": llm_response
             }
-# template_dir = os.path.dirname(__file__)
-# template_env = Environment(loader=FileSystemLoader(template_dir))
+template_dir = os.path.dirname(__file__)
+template_env = Environment(loader=FileSystemLoader(template_dir))
 
 @app.get("/results/{tracking_id}", response_class=HTMLResponse)
 def show_results(tracking_id: str):
