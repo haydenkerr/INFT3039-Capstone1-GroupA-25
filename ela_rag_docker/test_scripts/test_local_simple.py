@@ -1,8 +1,10 @@
 import requests
 import pandas as pd
+import json
 
 # load test data set
-host_port = "http://"+"3.27.223.201:8002"
+# host_port = "http://"+"3.106.58.24:8002"
+host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
 # host_port = "http://"+"192.168.1.17:8001"
 # host_port = "http://"+"127.0.0.1:8001"
@@ -61,8 +63,7 @@ print(responseGet.json())
 responseGet = requests.get(
     host_port+"/debug/test",
     headers={"x-api-key": API_KEY}
-    
-)
+    )
 
 print(responseGet.json())
 

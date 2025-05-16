@@ -207,11 +207,11 @@ document.querySelector(".process-btn").addEventListener("click", function () {
   console.log("[Process Submission] Payload:", payload);
 
   // -------------------------------------
-  //  OPTIONAL: API call commented out
+  //   API call
   // -------------------------------------
-  // const host_port = "https://ela-api.example.com"; // replace with actual API endpoint 
-  // const host_port = "http://127.0.0.1:8001"
-  const host_port = "http://3.27.223.201:8002"        
+  
+  
+  const host_port = "https://ielts-unisa-groupa.me"        
   fetch(host_port + "/grade", {
     method: "POST",
     headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
