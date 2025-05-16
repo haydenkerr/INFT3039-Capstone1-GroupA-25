@@ -77,21 +77,19 @@ class Document:
 
 @app.post("/grade", dependencies=[Depends(verify_api_key)])
 def grade_essay(request: EssayRequest):
+
     # Create unique tracking id & initial log
     tracking_id = str(uuid.uuid4())
     create_log(tracking_id, "API receives request", "Request received and parsing started")
 
+    # Pre-gemini database insertions
     try:
-        # Step 1: Get or insert user
+        # Prepare the supporting submission data
         user_id = get_or_create_user(request.email)
-
-        # Step 2: Get task_id from task_name
         task_id = get_task_id(request.taskType)
-
-        # Step 3: Get or insert question
         question_id = get_or_create_question(request.question, task_id)
 
-        # Step 4: Insert submission
+        # Insert submission
         submission_id = insert_submission(
             user_id=user_id,
             task_id=task_id,
@@ -100,14 +98,13 @@ def grade_essay(request: EssayRequest):
             essay_response=request.essay
         )
 
-        # Step 5: Add log for successful insertion
+        # Create successful log
         create_log(
             tracking_id,
             "Pre-Gemini database insertions",
             f"User ID: {user_id}, Task ID: {task_id}, Question ID: {question_id}, Submission ID: {submission_id}",
             submission_id=submission_id
         )
-
 
     except Exception as e:
         create_log(tracking_id, "Error", f"Pre-Gemini Database Error: {str(e)}")
@@ -116,7 +113,25 @@ def grade_essay(request: EssayRequest):
     # Get similar examples using vector search
     query_embedding = np.array(get_embedding(request.question)).astype('float32')
     results = vector_db.search(query_embedding, top_k=5)
-    examples_context = "\n\n".join([content for content, score in results])
+    examples_context = "\n\n".join([content for index, content, score in results])
+
+    # Unpack each item from results and append to list for logging
+    vector_db_logs = []
+
+    for index_position, metadata, distance in results:
+        vector_db_logs.append({
+            "index_position": int(index_position),
+            "metadata": metadata,
+            "distance": distance
+        })
+
+    try:
+        create_vector_db_log(submission_id, vector_db_logs)
+        create_log(tracking_id, "Created vector_db_logs", "Logged the vector_db examples", submission_id)
+
+    except Exception as e:
+        create_log(tracking_id, "Error", f"Vector_db logging failed: {str(e)}", submission_id=submission_id)
+        raise HTTPException(status_code=500, detail="Error logging vector db examples")
 
     print(f"📨 Input to Gemini:\nQuestion: {request.question}\nEssay: {request.essay}")
     create_log(tracking_id, "Sent to Gemini", "Sending question, essay, and similar examples to model", submission_id)
@@ -205,7 +220,6 @@ def show_results(tracking_id: str):
         question_id = submission.question_id 
         overall_score = submission.overall_score
 
-        # Fetch related question, essay, and results
         question = session.execute(
             select(questions.c.question_text)
             .where(questions.c.question_id == question_id)
