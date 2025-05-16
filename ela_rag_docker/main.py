@@ -108,6 +108,7 @@ def grade_essay(request: EssayRequest):
             submission_id=submission_id
         )
 
+
     except Exception as e:
         create_log(tracking_id, "Error", f"Pre-Gemini Database Error: {str(e)}")
         raise HTTPException(status_code=500, detail="Error performing pre-gemini database insertions.")
@@ -122,6 +123,7 @@ def grade_essay(request: EssayRequest):
 
     try:
         llm_response = query_gemini(
+            task_id=task_id,  # Pass task_id to the query_gemini function to select the correct system prompt
             user_prompt="",
             examples_context=examples_context,
             question=request.question,
@@ -181,11 +183,8 @@ def grade_essay(request: EssayRequest):
                 "message": str(e),
                 "raw_response": llm_response
             }
-            
-# Locate the directory for the results template
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-template_dir = os.path.join(project_root, 'ELA_UI')
-template_env = Environment(loader=FileSystemLoader(template_dir))
+# template_dir = os.path.dirname(__file__)
+# template_env = Environment(loader=FileSystemLoader(template_dir))
 
 @app.get("/results/{tracking_id}", response_class=HTMLResponse)
 def show_results(tracking_id: str):
@@ -257,8 +256,8 @@ def show_results(tracking_id: str):
     finally:
         session.close()
 
-
-@app.get("/debug/documents")
+# add dependencies=[Depends(verify_api_key)]
+@app.get("/debug/documents" )
 def list_documents():
     """Debug endpoint to check loaded documents"""
     return {

@@ -23,6 +23,22 @@ question_id = 199
 # word wrap the text output below  
 
 API_KEY = "1234abcd"
+# essayGrade = {
+#     "email": "hayden@google.com",
+#     "question": """You are experiencing financial problems and want to ask your landlord if you can pay your rent late. Write a letter to your landlord. In your letter explain:  
+# - Why you are writing to him.
+# - Why you cannot pay the rent.
+# - When you will pay the rent.""",
+#     "essay": """Dear Mr. Bloke, 
+# I hope this message finds you well. I am writing to inform you that I am facing some financial difficulties this month due to an unexpected family emergency. As a result, I will not be able to pay my rent on time. I will ensure the full rent is paid by the 20th of this month. I appreciate your understanding and patience.
+# Yours sincerely,
+# Jane Doe""",
+#     "wordCount": 265,
+#     "submissionGroup":6,
+#     "taskType":"General Task 1"    
+    
+#     }
+
 essayGrade = {
     "email": "hayden@google.com",
     "question": df_test.iloc[question_id]["question"],
@@ -31,19 +47,22 @@ essayGrade = {
     "submissionGroup":6,
     "taskType":"General Task 1"    
     }
-
 response = requests.post(
+    host_port+"/grade",
     host_port+"/grade",
     headers={"x-api-key": API_KEY},
     json=essayGrade,
+    verify=False
 )
 print(response.json())
 
 query = {"query_text": "What is the main idea of the text?"}
 response = requests.post(
     host_port+"/query",
+    host_port+"/query",
     headers={"x-api-key": API_KEY},
     json=query,
+    verify=False
 )
 
 
@@ -52,6 +71,7 @@ print(response.json())
 
 responseGet = requests.get(
     host_port+"/debug/documents",
+    host_port+"/debug/documents",
     headers={"x-api-key": API_KEY}
     
 )
@@ -59,7 +79,7 @@ responseGet = requests.get(
 print(responseGet.json())
 
 
-
+host_port = "http://3.24.180.235:8002"
 responseGet = requests.get(
     host_port+"/debug/test",
     headers={"x-api-key": API_KEY}
@@ -73,7 +93,21 @@ print(responseGet.json())
 tracking_id = "3e19f672-76aa-4fc5-ace6-f25a836713cd"
 responseGet = requests.get(
     host_port+"/results/"+tracking_id,
+    host_port+"/results/"+tracking_id,
     headers={"x-api-key": API_KEY}
     
 )
 print(responseGet.text)
+
+
+
+response = requests.get(
+    "https://ielts-unisa-groupa.me/debug/test",
+    headers={"x-api-key": "1234abcd"},
+    timeout=10
+)
+
+print("STATUS:", response.status_code)
+print("LOCATION:", response.headers.get("Location"))
+print("SERVER:", response.headers.get("Server"))
+print("CF-RAY:", response.headers.get("CF-RAY"))
