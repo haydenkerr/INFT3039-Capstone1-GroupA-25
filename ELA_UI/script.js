@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+  const host_port = "https://ielts-unisa-groupa.me"  
+  // const host_port = "http://127.0.0.1:8008"        
+      
+  // const host_port = "http://3.24.180.235:8002"
   
     // Password protection for testing purposes
     // const password = "test123";
@@ -146,6 +151,25 @@ document.addEventListener("DOMContentLoaded", function () {
       // normalizing line breaks
       fullText = fullText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
+      const questionBox = document.querySelector("#question-text");
+      const essayBox    = document.querySelector("#essay-text");
+
+      // Attempt a multiline capture:
+      const multiRegex = /\*\*\s*question:\s*\*\*([\s\S]+?)\*\*\s*essay:\s*\*\*([\s\S]+)/i;
+      const multiMatch = fullText.match(multiRegex);
+      if (multiMatch) {
+        questionBox.value = multiMatch[1].trim();
+        essayBox.value    = multiMatch[2].trim();
+        return;
+      }
+
+      // fallback approach
+      const qMatch = fullText.match(/\*\*\s*question:\s*\*\*(.*?)\n/i);
+      const eMatch = fullText.match(/\*\*\s*essay:\s*\*\*(.*)/is);
+
+      questionBox.value = qMatch ? qMatch[1].trim() : "";
+      essayBox.value    = eMatch ? eMatch[1].trim() : "";
+    }
 
   //--------------------------------------
   // 4) GET QUESTION BANK QUESTION
@@ -171,8 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (selectedQuestion == "Yes") {
       
-      // const host_port = "http://127.0.0.1:8001"   
-      const host_port = "http://3.24.180.235:8002"
+
   
       fetch(host_port + `/questions?task_name=${selectedTask}`, {
       method: "GET",
@@ -192,34 +215,6 @@ document.addEventListener("DOMContentLoaded", function () {
       essayText.placeholder = "Upload a file, or enter your own essay here";
     }
   });  
-
-  //----------------------------------------
-  // 5) PARSE QUESTION/ESSAY
-  //----------------------------------------
-  function parseQuestionEssay(fullText) {
-    // normalizing line breaks
-    fullText = fullText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-
-      const questionBox = document.querySelector("#question-text");
-      const essayBox    = document.querySelector("#essay-text");
-
-      // Attempt a multiline capture:
-      const multiRegex = /\*\*\s*question:\s*\*\*([\s\S]+?)\*\*\s*essay:\s*\*\*([\s\S]+)/i;
-      const multiMatch = fullText.match(multiRegex);
-      if (multiMatch) {
-        questionBox.value = multiMatch[1].trim();
-        essayBox.value    = multiMatch[2].trim();
-        return;
-      }
-
-
-      // fallback approach
-      const qMatch = fullText.match(/\*\*\s*question:\s*\*\*(.*?)\n/i);
-      const eMatch = fullText.match(/\*\*\s*essay:\s*\*\*(.*)/is);
-
-      questionBox.value = qMatch ? qMatch[1].trim() : "";
-      essayBox.value    = eMatch ? eMatch[1].trim() : "";
-    }
 
 //----------------------------------------
 // 6) PROCESS SUBMISSION
@@ -266,7 +261,6 @@ document.querySelector(".process-btn").addEventListener("click", function () {
   // -------------------------------------
   
   
-  const host_port = "https://ielts-unisa-groupa.me"        
   fetch(host_port + "/grade", {
     method: "POST",
     headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
@@ -316,18 +310,5 @@ document.querySelector(".process-btn").addEventListener("click", function () {
       button.style.opacity = "1";
     });
   });
-})
-
-    //----------------------------------------
-    // 6) HOVER EFFECTS
-    //----------------------------------------
-    document.querySelectorAll("button").forEach(button => {
-      button.addEventListener("mouseover", () => {
-        button.style.opacity = "0.8";
-      });
-      button.addEventListener("mouseout", () => {
-        button.style.opacity = "1";
-      });
-    });
-});
-
+}
+);
