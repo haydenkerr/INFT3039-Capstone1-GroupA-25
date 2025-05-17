@@ -79,6 +79,45 @@ submissions_log = Table(
     Column("tracking_id", String(36), nullable=False)
 )
 
+vector_db_log = Table(
+    "vector_db_log", metadata,
+    Column("vector_db_log_id", Integer, primary_key=True, autoincrement=True),
+    Column("submission_id", Integer, nullable=False),
+    Column("index_position", Integer, nullable=False),
+    Column("metadata", Text, nullable=False),
+    Column("distance", Float),
+    Column("created_at", DateTime, default=datetime.utcnow)
+)
+
+# Function to add logs to the vector_db_log table
+def create_vector_db_log(submission_id: int, vector_db_logs: list):
+    session = SessionLocal()
+    try:
+        for log_entry in vector_db_logs:
+            index_position = log_entry['index_position']
+            metadata = log_entry['metadata']
+            distance = log_entry['distance']
+
+            stmt = insert(vector_db_log).values(
+                submission_id = submission_id,
+                index_position = index_position,
+                metadata = metadata,
+                distance = distance,
+                created_at = datetime.utcnow()
+            )
+
+            session.execute(stmt)
+        
+        session.commit()
+
+    except Exception as e:
+        session.rollback()
+        print("Error in create_vector_db_log:", e)
+        raise
+
+    finally:
+        session.close()
+
 # Function to add a log to the submissions_log table
 def create_log(tracking_id: str, log_type: str, log_message: str, submission_id: int = None):
     session = SessionLocal()
