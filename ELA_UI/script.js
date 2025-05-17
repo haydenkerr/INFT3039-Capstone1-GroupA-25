@@ -162,7 +162,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (selectedQuestion == "Yes") {
       
-      const host_port = "http://127.0.0.1:8001"    
+      // const host_port = "http://127.0.0.1:8001"   
+      const host_port = "http://3.24.180.235:8002"
   
       fetch(host_port + `/questions?task_name=${selectedTask}`, {
       method: "GET",
@@ -281,8 +282,8 @@ console.log("[Process Submission] Payload:", payload);
 //  OPTIONAL: API call commented out
 // -------------------------------------
 // const host_port = "https://ela-api.example.com"; // replace with actual API endpoint 
-const host_port = "http://127.0.0.1:8001"    
-// const host_port = "http://3.24.180.235:8002"   
+// const host_port = "http://127.0.0.1:8001"    
+const host_port = "http://3.24.180.235:8002"   
 fetch(host_port + "/grade", {
   method: "POST",
   headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
