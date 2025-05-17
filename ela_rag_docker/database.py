@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from sqlalchemy import create_engine, Table, Column, Integer, Float, String, MetaData, DateTime, Boolean, Text, insert, select, update, ForeignKey, DECIMAL
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
 
 
 # Load environment variables from .env file
@@ -146,11 +147,11 @@ def get_or_create_user(email: str):
         stmt = select(users).where(users.c.email == email)
         result = session.execute(stmt).fetchone()
         if result:
-            return result[0]  # return user_id
+            return result[0] 
         stmt = insert(users).values(email=email, created_at=datetime.utcnow()).returning(users.c.user_id)
         result = session.execute(stmt).fetchone()
         session.commit()
-        return result[0]  # return new user_id
+        return result[0] 
     except Exception as e:
         session.rollback()
         print("Error in get_or_create_user:", e)
