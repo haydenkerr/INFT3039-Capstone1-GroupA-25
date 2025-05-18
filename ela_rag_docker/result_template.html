@@ -62,14 +62,50 @@
             
             <p><span class="competency-name">Overall Score:</span> {{ "%.1f"|format(overall_score) }}</p>
 
-            {% for result in results %}
+            <!-- {% for result in results %}
                 <div class="result-item">
                     <p class="competency-line">
                         <span class="competency-name">{{ result.competency_name }}:</span> {{ "%.1f"|format(result.score) }}
                     </p>
                     <p class="preserve-line-breaks"> {{ result.feedback_summary }}</p>
                 </div>
+            {% endfor %} -->
+            {% for result in results %}
+                <div class="result-item">
+                    <p class="competency-line">
+                        <span class="competency-name">{{ result.competency_name }}:</span>
+                        {% if result.competency_name in [
+                            "Task Response",
+                            "Coherence and Cohesion",
+                            "Lexical Resource",
+                            "Grammatical Range and Accuracy"
+                        ] %}
+                            {{ "%.1f"|format(result.score) }}
+                        {% endif %}
+                    </p>
+                    <p class="preserve-line-breaks">{{ result.feedback_summary }}</p>
+                </div>
             {% endfor %}
+
+            <h2>Scoring Table</h2>
+            <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+                <tr>
+                    <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Criterion</th>
+                    <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Band Score</th>
+                </tr>
+                {% for result in results if result.competency_name in [
+                    "Task Response", "Coherence and Cohesion", "Lexical Resource", "Grammatical Range and Accuracy"
+                ] %}
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">{{ result.competency_name }}</td>
+                    <td style="border: 1px solid #ccc; padding: 8px; text-align: center;">{{ "%.1f"|format(result.score) }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><strong>Overall Band Score</strong></td>
+                    <td style="border: 1px solid #ccc; padding: 8px; text-align: center;"><strong>{{ "%.1f"|format(overall_score) }}</strong></td>
+                </tr>
+            </table>
         </div>
     </div>
 </body>

@@ -333,20 +333,55 @@ def search_vector_db(request: QueryRequest):
 def test_response():
     return {"This is a test": "response"}
 
+###helper for table render in html###
+def build_score_table(bands: dict) -> str:
+    if not all(bands.get(k) is not None for k in ["task_response", "coherence_cohesion", "lexical_resource", "grammatical_range", "overall"]):
+        return ""
+
+    table = [
+        "| Criterion | Band Score |",
+        "| --------- | ---------- |",
+        f"| Task Response | {bands['task_response']} |",
+        f"| Coherence and Cohesion | {bands['coherence_cohesion']} |",
+        f"| Lexical Resource | {bands['lexical_resource']} |",
+        f"| Grammatical Range & Accuracy | {bands['grammatical_range']} |",
+        f"| **Overall Band Score** | **{bands['overall']}** |"
+    ]
+    return "\n".join(table)
+
 def parse_grading_response(raw_response):
     # Extract band scores from the response
-    task_response_score = re.search(r"Task Response\s*\|\s*(\d+)", raw_response)
+    #task_response_score = re.search(r"Task Response\s*\|\s*(\d+)", raw_response)
+    task_response_score = re.search(r"(?:Task Response|Task Achievement)\s*\|\s*(\d+)", raw_response)
     coherence_score = re.search(r"Coherence and Cohesion\s*\|\s*(\d+)", raw_response)
     lexical_score = re.search(r"Lexical Resource\s*\|\s*(\d+)", raw_response)
     grammar_score = re.search(r"Grammatical Range & Accuracy\s*\|\s*(\d+)", raw_response)
     overall_score = re.search(r"\*\*Overall Band Score\*\*\s*\|\s*\*\*(\d+)\*\*", raw_response)
     
-    # Extract feedback sections
-    task_response_feedback = re.search(r"\*\*Task Response:\*\*\s*(.*?)(?=\*\*Coherence and Cohesion:|$)", raw_response, re.DOTALL)
-    coherence_feedback = re.search(r"\*\*Coherence and Cohesion:\*\*\s*(.*?)(?=\*\*Lexical Resource:|$)", raw_response, re.DOTALL)
-    lexical_feedback = re.search(r"\*\*Lexical Resource:\*\*\s*(.*?)(?=\*\*Grammatical Range and Accuracy:|$)", raw_response, re.DOTALL)
-    grammar_feedback = re.search(r"\*\*Grammatical Range and Accuracy:\*\*\s*(.*?)$", raw_response, re.DOTALL)
-    
+    task_response_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**(?:Task Response|Task Achievement)\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Coherence and Cohesion\**[:\-]?)",
+    raw_response, re.DOTALL)
+
+    coherence_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**Coherence and Cohesion\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Lexical Resource\**[:\-]?)",
+    raw_response, re.DOTALL)
+
+    lexical_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**Lexical Resource\**[:\-]?\s*(.*?)(?=(?:^|\n)[#\d.\s]*\**(?:Grammatical Range & Accuracy|Grammatical Range and Accuracy)\**|$)",
+    raw_response, re.DOTALL)
+
+    grammar_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**(?:Grammatical Range & Accuracy|Grammatical Range and Accuracy)\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Overall Band Score)",
+    raw_response, re.DOTALL)
+
+    overall_summary_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**Overall Band Score Summary\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Feedback\**[:\-]?)",
+    raw_response, re.DOTALL)
+
+    general_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**Feedback\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Scoring Table\**[:\-]?)",
+    raw_response, re.DOTALL)
+
     # Format the JSON response
     formatted_json = {
         "bands": {
@@ -360,8 +395,17 @@ def parse_grading_response(raw_response):
             "task_response": task_response_feedback.group(1).strip() if task_response_feedback else "",
             "coherence_cohesion": coherence_feedback.group(1).strip() if coherence_feedback else "",
             "lexical_resource": lexical_feedback.group(1).strip() if lexical_feedback else "",
-            "grammatical_range": grammar_feedback.group(1).strip() if grammar_feedback else ""
-        }
+            "grammatical_range": grammar_feedback.group(1).strip() if grammar_feedback else "",
+            "overall_summary": overall_summary_feedback.group(1).strip() if overall_summary_feedback else "",
+            "general_feedback": general_feedback.group(1).strip() if general_feedback else ""
+        },
+        "score_table": build_score_table({
+            "task_response": task_response_score.group(1) if task_response_score else None,
+            "coherence_cohesion": coherence_score.group(1) if coherence_score else None,
+            "lexical_resource": lexical_score.group(1) if lexical_score else None,
+            "grammatical_range": grammar_score.group(1) if grammar_score else None,
+            "overall": overall_score.group(1) if overall_score else None
+        })
     }
     
     return formatted_json
