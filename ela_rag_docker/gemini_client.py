@@ -24,27 +24,57 @@ model = genai.GenerativeModel(
 )
 
 
-
 chat_session = model.start_chat(history=[])
 
-def load_system_prompt(task_id):
-    """Load the system prompt from GitHub"""
-    
-    prompt_urls = {
-        # 2: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task2_academic_system_prompt.md",
-        3: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task1generalprompt_v6.md",
-        4: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/task2generalprompt_v7.md"
+def load_system_prompt(task_id, local_override=True):
+    """Load the system prompt from local file (if available) or GitHub as fallback"""
+
+    local_paths = {
+        1: "task1generalprompt_v6.md",
+        2: "task2generalprompt_v7.md",
+        3: "task2generalprompt_v7.md",
+        4: "task2generalprompt_v7.md"
     }
 
-    url = prompt_urls.get(task_id, "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/system.md")
-    
+    remote_urls = {
+        1: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/task1generalprompt_v6.md",
+        2: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/task2generalprompt_v7.md",
+        3: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/task1generalprompt_v7.md",
+        4: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/task2generalprompt_v7.md"
+    }
+
+    refinement_local = "prompt_refinement.md"
+    refinement_url = "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/prompt_refinement.md"
+
+    # Try to load main system prompt
     try:
-        sys_prompt = requests.get(url).text
-        refinement = requests.get("https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/refs/heads/staging/ela_rag_docker/prompt_refinement.md").text
-        return sys_prompt + "\n\n" + refinement
+        if local_override and task_id in local_paths and os.path.exists(local_paths[task_id]):
+            with open(local_paths[task_id], "r", encoding="utf-8") as f:
+                sys_prompt = f.read()
+            print(f"✅ Loaded system prompt locally from: {local_paths[task_id]}")
+        else:
+            url = remote_urls.get(task_id, remote_urls[4])
+            sys_prompt = requests.get(url).text
+            print(f"🌐 Loaded system prompt from GitHub: {url}")
     except Exception as e:
-        print(f"Error loading system prompt: {str(e)}")
-        return "You are an IELTS essay evaluator. Evaluate essays based on the IELTS criteria."
+        print(f"❌ Failed to load system prompt: {e}")
+        sys_prompt = "You are an IELTS essay evaluator. Evaluate essays based on the IELTS criteria."
+
+    # Try to load refinement markdown
+    try:
+        if local_override and os.path.exists(refinement_local):
+            with open(refinement_local, "r", encoding="utf-8") as f:
+                refinement = f.read()
+            print(f"✅ Loaded refinement locally from: {refinement_local}")
+        else:
+            refinement = requests.get(refinement_url).text
+            print(f"🌐 Loaded refinement from GitHub: {refinement_url}")
+    except Exception as e:
+        print(f"⚠️ Could not load refinement: {e}")
+        refinement = ""
+
+    # Combine and return
+    return sys_prompt + "\n\n" + refinement
 
 # # Load system prompt once at module initialization
 # SYSTEM_PROMPT = load_system_prompt(task_id)
@@ -82,11 +112,13 @@ def query_gemini(task_id: int, user_prompt: str, examples_context: str = "", que
             print(f":Full prompt: {full_prompt}")
             print("✅ Gemini API JSON response received")
             print(f"📜 Gemini response: {response}")  # Print the entire response for debugging
+            
+            if hasattr(response,"text"):
+                return response.text
             # Safely extract the JSON payload
-            if hasattr(response, 'candidates') and response.candidates:
+            elif hasattr(response, 'candidates') and response.candidates:
                 try:
-                    json_output = response.candidates[0].content.parts[0].text
-                    # print(response.candidates[0].content.parts[0].text)
+                    json_output = response.candidates[0].content.parts[0].function_call.args
                     return json.dumps(json_output)  # Return a JSON string
                 except Exception as e:
                     return f"⚠️ Failed to extract JSON from Gemini response: {str(e)}"
