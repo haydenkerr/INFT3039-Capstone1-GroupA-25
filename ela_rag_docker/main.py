@@ -76,7 +76,9 @@ class Document:
         self.page_content = page_content
 
 # Questions endpoint
-@app.get("/questions")
+@app.get("/questions",
+         summary="Get a random question",
+         description="Returns a random question from the database for a specific task.")
 def get_random_question(task_name: str):
 
     session = SessionLocal()
@@ -108,7 +110,9 @@ def get_random_question(task_name: str):
         session.close()
 
 
-@app.post("/grade", dependencies=[Depends(verify_api_key)])
+@app.post("/grade", dependencies=[Depends(verify_api_key)],
+          summary="Grade an essay",
+          description="Grades an essay based on the provided question and returns the grading result.")
 def grade_essay(request: EssayRequest):
 
     # Create unique tracking id & initial log
@@ -234,7 +238,9 @@ def grade_essay(request: EssayRequest):
 template_dir = os.path.dirname(__file__)
 template_env = Environment(loader=FileSystemLoader(template_dir))
 
-@app.get("/results/{tracking_id}", response_class=HTMLResponse)
+@app.get("/results/{tracking_id}", response_class=HTMLResponse,
+         summary="Get results for a specific tracking ID",
+         description="Returns the results of the essay grading process for a specific tracking ID.")
 def show_results(tracking_id: str):
 
     session = SessionLocal()
@@ -304,32 +310,39 @@ def show_results(tracking_id: str):
         session.close()
 
 # add dependencies=[Depends(verify_api_key)]
-@app.get("/debug/documents" )
+@app.get("/debug/documents",
+         summary="Debug endpoint to check loaded documents",
+         description="Returns the total number of documents and a sample of metadata.")
 def list_documents():
     """Debug endpoint to check loaded documents"""
     return {
         "total_documents": vector_db.index.ntotal, 
         "metadata_count": len(vector_db.metadata),
         "metadata_sample": list(vector_db.metadata.items())[:5] if vector_db.metadata else []
+  
+  
     }
-@app.post("/query", dependencies=[Depends(verify_api_key)])
-def search_vector_db(request: QueryRequest):
-    query_embedding = np.array(get_embedding(request.query_text)).astype('float32')
-    results = vector_db.search(query_embedding, top_k=3)
+    # commented out the below, as errors based on text / output
+# @app.post("/query", dependencies=[Depends(verify_api_key)])
+# def search_vector_db(request: QueryRequest):
+#     query_embedding = np.array(get_embedding(request.query_text)).astype('float32')
+#     results = vector_db.search(query_embedding, top_k=3)
 
-    # Ensure conversion of NumPy float32 to Python float
-    formatted_results = [
-        {"text": res[0], "score": float(res[1])}  # Convert numpy.float32 to float
-        for res in results
-    ]
+#     # Ensure conversion of NumPy float32 to Python float
+#     formatted_results = [
+#         {"text": res[1], "score": float(res[2])}  # Use res[1] for text, res[2] for score
+#         for res in results
+#     ]
 
-    # Construct a prompt for Google Gemini
-    context = "\n".join([f"{res['text']} (score: {res['score']})" for res in formatted_results])
-    prompt = f"Based on this context:\n{context}\nAnswer the query: {request.query_text}"
-    gemini_response = query_gemini(prompt)
-    return {"retrieved_context": formatted_results, "llm_response": gemini_response}
+#     # Construct a prompt for Google Gemini
+#     context = "\n".join([f"{res['text']} (score: {res['score']})" for res in formatted_results])
+#     prompt = f"Based on this context:\n{context}\nAnswer the query: {request.query_text}"
+#     gemini_response = query_gemini(prompt)
+#     return {"retrieved_context": formatted_results, "llm_response": gemini_response}
 
-@app.get("/debug/test")
+@app.get("/debug/test",
+         summary="Test Endpoint",
+         description="Returns a simple test response to verify the API is running.")
 def test_response():
     return {"This is a test": "response"}
 
@@ -411,7 +424,9 @@ def parse_grading_response(raw_response):
     return formatted_json
 
 
-@app.post("/ingest-from-url", dependencies=[Depends(verify_api_key)])
+@app.post("/ingest-from-url", dependencies=[Depends(verify_api_key)],
+          summary="Ingest a file from a URL",
+          description="Ingests a file from a public GitHub or raw file URL and adds it to the vector database.")
 def ingest_file_from_url(url: str = Query(..., description="Public GitHub or raw file URL")):
     try:
         # Download file to temp
