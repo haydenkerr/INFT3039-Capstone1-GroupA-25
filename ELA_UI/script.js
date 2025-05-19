@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   const host_port = "https://ielts-unisa-groupa.me"  
-  // const host_port = "http://127.0.0.1:8008"        
+  //const host_port = "http://127.0.0.1:8008"    
+  // const host_port = "http://127.0.0.1:8001"      
       
   // const host_port = "http://3.24.180.235:8002"
   
@@ -235,11 +236,38 @@ document.querySelector(".process-btn").addEventListener("click", function () {
       return;
   }
 
+  const submissionGroup = document.querySelector("#submission-group").value;
+  const taskType        = document.querySelector("#task-type").value;
+
+  if (submissionGroup === "Select an option") {
+    alert("You must select a Submission Group.");
+    return;
+  }
+
+  if (taskType === "Select an option") {
+    alert("You must select a Task Type.");
+    return;
+  }
+
   // read word count from input
   const wordCount = document.querySelector("#word-count").value || "0";
 
-  const submissionGroup = document.querySelector("#submission-group").value;
-  const taskType        = document.querySelector("#task-type").value;
+   const minWordCounts = {
+    "General Task 1": 150,
+    "General Task 2": 250,
+    "Academic Task 1": 150,
+    "Academic Task 2": 250
+  }
+
+  // Display confirm message if word count less than task minimum
+  if (minWordCounts[taskType]) {
+    const minCount = minWordCounts[taskType];
+    const currentCount = parseInt(wordCount, 10);
+    if (currentCount < minCount) {
+      const proceed = confirm(`Are you sure you want to submit? The minimum word count for this task is ${minCount} words.`);
+      if (!proceed) return;
+    }
+  }
 
   // Indicate we are "Processing"
   document.querySelector(".report-section").textContent = "Processing...";
