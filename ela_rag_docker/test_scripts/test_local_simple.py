@@ -4,10 +4,10 @@ import json
 
 # load test data set
 # host_port = "http://"+"3.106.58.24:8002"
-host_port = "https://"+"ielts-unisa-groupa.me"
+# host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
 # host_port = "http://"+"192.168.1.17:8001"
-# host_port = "http://"+"127.0.0.1:8001"
+host_port = "http://"+"127.0.0.1:8008"
 # Define the GitHub raw CSV URL
 csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
@@ -19,7 +19,7 @@ df_test = df_test[['prompt', 'essay', 'band', 'cleaned_evaluation','Task Achieve
 df_test.rename(columns={'prompt':'question'}, inplace=True)
 
 # Example test case
-question_id = 199
+question_id = 191
 # word wrap the text output below  
 
 API_KEY = "1234abcd"
@@ -59,8 +59,8 @@ query = {"query_text": "What is the main idea of the text?"}
 response = requests.post(
     host_port+"/query",
     headers={"x-api-key": API_KEY},
-    json=query,
-    verify=False
+    json=query
+ 
 )
 
 

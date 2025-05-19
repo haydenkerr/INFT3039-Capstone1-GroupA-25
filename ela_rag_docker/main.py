@@ -29,7 +29,7 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
 
 app = FastAPI(    title="ELA RAG API",
-    description="This API allows quesiton/essay pairing to query with RAG context system with Gemini LLM.",
+    description="This API allows question/essay pairing to query with RAG context system with Gemini LLM.",
     version="1.0.0",
     # docs_url= "/mydocs",  # Change the Swagger docs URL
     # redoc_url= "/myredoc"  # Change the Redoc docs URL
@@ -75,7 +75,44 @@ class Document:
     def __init__(self, page_content):
         self.page_content = page_content
 
-@app.post("/grade", dependencies=[Depends(verify_api_key)])
+# Questions endpoint
+@app.get("/questions",
+         summary="Get a random question",
+         description="Returns a random question from the database for a specific task.")
+def get_random_question(task_name: str):
+
+    session = SessionLocal()
+
+    try:
+        task_id = get_task_id(task_name)
+
+        stmt = (
+            select(questions.c.question_text)
+            .where(
+                questions.c.task_id == task_id,
+                questions.c.iscustom == False
+            ).order_by(func.random())
+            .limit(1)
+        )
+
+        result = session.execute(stmt).scalar()
+
+        if result is None:
+            raise ValueError(f"No approved questions found for task id {task_id}")
+        
+        return {"question": result}
+    
+    except Exception as e:
+        print("Error in get_random_question", e)
+        raise
+
+    finally:
+        session.close()
+
+
+@app.post("/grade", dependencies=[Depends(verify_api_key)],
+          summary="Grade an essay",
+          description="Grades an essay based on the provided question and returns the grading result.")
 def grade_essay(request: EssayRequest):
 
     # Create unique tracking id & initial log
@@ -201,7 +238,9 @@ def grade_essay(request: EssayRequest):
 template_dir = os.path.dirname(__file__)
 template_env = Environment(loader=FileSystemLoader(template_dir))
 
-@app.get("/results/{tracking_id}", response_class=HTMLResponse)
+@app.get("/results/{tracking_id}", response_class=HTMLResponse,
+         summary="Get results for a specific tracking ID",
+         description="Returns the results of the essay grading process for a specific tracking ID.")
 def show_results(tracking_id: str):
 
     session = SessionLocal()
@@ -271,49 +310,91 @@ def show_results(tracking_id: str):
         session.close()
 
 # add dependencies=[Depends(verify_api_key)]
-@app.get("/debug/documents" )
+@app.get("/debug/documents",
+         summary="Debug endpoint to check loaded documents",
+         description="Returns the total number of documents and a sample of metadata.")
 def list_documents():
     """Debug endpoint to check loaded documents"""
     return {
         "total_documents": vector_db.index.ntotal, 
         "metadata_count": len(vector_db.metadata),
         "metadata_sample": list(vector_db.metadata.items())[:5] if vector_db.metadata else []
+  
+  
     }
-@app.post("/query", dependencies=[Depends(verify_api_key)])
-def search_vector_db(request: QueryRequest):
-    query_embedding = np.array(get_embedding(request.query_text)).astype('float32')
-    results = vector_db.search(query_embedding, top_k=3)
+    # commented out the below, as errors based on text / output
+# @app.post("/query", dependencies=[Depends(verify_api_key)])
+# def search_vector_db(request: QueryRequest):
+#     query_embedding = np.array(get_embedding(request.query_text)).astype('float32')
+#     results = vector_db.search(query_embedding, top_k=3)
 
-    # Ensure conversion of NumPy float32 to Python float
-    formatted_results = [
-        {"text": res[0], "score": float(res[1])}  # Convert numpy.float32 to float
-        for res in results
-    ]
+#     # Ensure conversion of NumPy float32 to Python float
+#     formatted_results = [
+#         {"text": res[1], "score": float(res[2])}  # Use res[1] for text, res[2] for score
+#         for res in results
+#     ]
 
-    # Construct a prompt for Google Gemini
-    context = "\n".join([f"{res['text']} (score: {res['score']})" for res in formatted_results])
-    prompt = f"Based on this context:\n{context}\nAnswer the query: {request.query_text}"
-    gemini_response = query_gemini(prompt)
-    return {"retrieved_context": formatted_results, "llm_response": gemini_response}
+#     # Construct a prompt for Google Gemini
+#     context = "\n".join([f"{res['text']} (score: {res['score']})" for res in formatted_results])
+#     prompt = f"Based on this context:\n{context}\nAnswer the query: {request.query_text}"
+#     gemini_response = query_gemini(prompt)
+#     return {"retrieved_context": formatted_results, "llm_response": gemini_response}
 
-@app.get("/debug/test")
+@app.get("/debug/test",
+         summary="Test Endpoint",
+         description="Returns a simple test response to verify the API is running.")
 def test_response():
     return {"This is a test": "response"}
 
+###helper for table render in html###
+def build_score_table(bands: dict) -> str:
+    if not all(bands.get(k) is not None for k in ["task_response", "coherence_cohesion", "lexical_resource", "grammatical_range", "overall"]):
+        return ""
+
+    table = [
+        "| Criterion | Band Score |",
+        "| --------- | ---------- |",
+        f"| Task Response | {bands['task_response']} |",
+        f"| Coherence and Cohesion | {bands['coherence_cohesion']} |",
+        f"| Lexical Resource | {bands['lexical_resource']} |",
+        f"| Grammatical Range & Accuracy | {bands['grammatical_range']} |",
+        f"| **Overall Band Score** | **{bands['overall']}** |"
+    ]
+    return "\n".join(table)
+
 def parse_grading_response(raw_response):
     # Extract band scores from the response
-    task_response_score = re.search(r"Task Response\s*\|\s*(\d+)", raw_response)
+    #task_response_score = re.search(r"Task Response\s*\|\s*(\d+)", raw_response)
+    task_response_score = re.search(r"(?:Task Response|Task Achievement)\s*\|\s*(\d+)", raw_response)
     coherence_score = re.search(r"Coherence and Cohesion\s*\|\s*(\d+)", raw_response)
     lexical_score = re.search(r"Lexical Resource\s*\|\s*(\d+)", raw_response)
     grammar_score = re.search(r"Grammatical Range & Accuracy\s*\|\s*(\d+)", raw_response)
     overall_score = re.search(r"\*\*Overall Band Score\*\*\s*\|\s*\*\*(\d+)\*\*", raw_response)
     
-    # Extract feedback sections
-    task_response_feedback = re.search(r"\*\*Task Response:\*\*\s*(.*?)(?=\*\*Coherence and Cohesion:|$)", raw_response, re.DOTALL)
-    coherence_feedback = re.search(r"\*\*Coherence and Cohesion:\*\*\s*(.*?)(?=\*\*Lexical Resource:|$)", raw_response, re.DOTALL)
-    lexical_feedback = re.search(r"\*\*Lexical Resource:\*\*\s*(.*?)(?=\*\*Grammatical Range and Accuracy:|$)", raw_response, re.DOTALL)
-    grammar_feedback = re.search(r"\*\*Grammatical Range and Accuracy:\*\*\s*(.*?)$", raw_response, re.DOTALL)
-    
+    task_response_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**(?:Task Response|Task Achievement)\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Coherence and Cohesion\**[:\-]?)",
+    raw_response, re.DOTALL)
+
+    coherence_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**Coherence and Cohesion\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Lexical Resource\**[:\-]?)",
+    raw_response, re.DOTALL)
+
+    lexical_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**Lexical Resource\**[:\-]?\s*(.*?)(?=(?:^|\n)[#\d.\s]*\**(?:Grammatical Range & Accuracy|Grammatical Range and Accuracy)\**|$)",
+    raw_response, re.DOTALL)
+
+    grammar_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**(?:Grammatical Range & Accuracy|Grammatical Range and Accuracy)\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Overall Band Score)",
+    raw_response, re.DOTALL)
+
+    overall_summary_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**Overall Band Score Summary\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Feedback\**[:\-]?)",
+    raw_response, re.DOTALL)
+
+    general_feedback = re.search(
+    r"(?:^|\n)[#\d.\s]*\**Feedback\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Scoring Table\**[:\-]?)",
+    raw_response, re.DOTALL)
+
     # Format the JSON response
     formatted_json = {
         "bands": {
@@ -327,14 +408,25 @@ def parse_grading_response(raw_response):
             "task_response": task_response_feedback.group(1).strip() if task_response_feedback else "",
             "coherence_cohesion": coherence_feedback.group(1).strip() if coherence_feedback else "",
             "lexical_resource": lexical_feedback.group(1).strip() if lexical_feedback else "",
-            "grammatical_range": grammar_feedback.group(1).strip() if grammar_feedback else ""
-        }
+            "grammatical_range": grammar_feedback.group(1).strip() if grammar_feedback else "",
+            "overall_summary": overall_summary_feedback.group(1).strip() if overall_summary_feedback else "",
+            "general_feedback": general_feedback.group(1).strip() if general_feedback else ""
+        },
+        "score_table": build_score_table({
+            "task_response": task_response_score.group(1) if task_response_score else None,
+            "coherence_cohesion": coherence_score.group(1) if coherence_score else None,
+            "lexical_resource": lexical_score.group(1) if lexical_score else None,
+            "grammatical_range": grammar_score.group(1) if grammar_score else None,
+            "overall": overall_score.group(1) if overall_score else None
+        })
     }
     
     return formatted_json
 
 
-@app.post("/ingest-from-url", dependencies=[Depends(verify_api_key)])
+@app.post("/ingest-from-url", dependencies=[Depends(verify_api_key)],
+          summary="Ingest a file from a URL",
+          description="Ingests a file from a public GitHub or raw file URL and adds it to the vector database.")
 def ingest_file_from_url(url: str = Query(..., description="Public GitHub or raw file URL")):
     try:
         # Download file to temp

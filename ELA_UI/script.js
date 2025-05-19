@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+
+  const host_port = "https://ielts-unisa-groupa.me"  
+  //const host_port = "http://127.0.0.1:8008"    
+  // const host_port = "http://127.0.0.1:8001"      
+
+      
+  // const host_port = "http://3.24.180.235:8002"
   
     // Password protection for testing purposes
     // const password = "test123";
@@ -166,8 +174,53 @@ document.addEventListener("DOMContentLoaded", function () {
       essayBox.value    = eMatch ? eMatch[1].trim() : "";
     }
 
+  //--------------------------------------
+  // 4) GET QUESTION BANK QUESTION
+  //--------------------------------------
+
+  const taskName = document.getElementById("task-type");
+  const questionSelect = document.getElementById('generate-question');
+  const questionText = document.getElementById('question-text');
+  const essayText = document.getElementById('essay-text');
+
+  questionSelect.addEventListener('change', function () {
+    const selectedQuestion = questionSelect.value;
+    const selectedTask = taskName.value;
+    console.log('Selected Question Response:', selectedQuestion);
+    console.log('Selected Task:', selectedTask);
+
+    // Display error pop up if they try to ask for a question before selecting task  
+    if (selectedQuestion == "Yes" && selectedTask == "Select an option") {
+      alert("You must select a Task Type.");
+      questionSelect.value = "Select an option"; // Set question drop down back to default
+      return;
+    }
+
+    if (selectedQuestion == "Yes") {
+      
+
+  
+      fetch(host_port + `/questions?task_name=${selectedTask}`, {
+      method: "GET",
+      headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
+      })
+      .then(response => response.json())
+      .then(data => {
+      console.log("API response question:", data);
+
+      const sampleQuestion = data.question;
+
+      questionText.textContent = sampleQuestion;
+      })
+
+    } else {
+      questionText.placeholder = "Upload a file, or enter your own question here";
+      essayText.placeholder = "Upload a file, or enter your own essay here";
+    }
+  });  
+
 //----------------------------------------
-// 5) PROCESS SUBMISSION
+// 6) PROCESS SUBMISSION
 //----------------------------------------
 document.querySelector(".process-btn").addEventListener("click", function () {
 
@@ -185,11 +238,38 @@ document.querySelector(".process-btn").addEventListener("click", function () {
       return;
   }
 
+  const submissionGroup = document.querySelector("#submission-group").value;
+  const taskType        = document.querySelector("#task-type").value;
+
+  if (submissionGroup === "Select an option") {
+    alert("You must select a Submission Group.");
+    return;
+  }
+
+  if (taskType === "Select an option") {
+    alert("You must select a Task Type.");
+    return;
+  }
+
   // read word count from input
   const wordCount = document.querySelector("#word-count").value || "0";
 
-  const submissionGroup = document.querySelector("#submission-group").value;
-  const taskType        = document.querySelector("#task-type").value;
+   const minWordCounts = {
+    "General Task 1": 150,
+    "General Task 2": 250,
+    "Academic Task 1": 150,
+    "Academic Task 2": 250
+  }
+
+  // Display confirm message if word count less than task minimum
+  if (minWordCounts[taskType]) {
+    const minCount = minWordCounts[taskType];
+    const currentCount = parseInt(wordCount, 10);
+    if (currentCount < minCount) {
+      const proceed = confirm(`Are you sure you want to submit? The minimum word count for this task is ${minCount} words.`);
+      if (!proceed) return;
+    }
+  }
 
   // Indicate we are "Processing"
   document.querySelector(".report-section").textContent = "Processing...";
@@ -211,7 +291,6 @@ document.querySelector(".process-btn").addEventListener("click", function () {
   // -------------------------------------
   
   
-  const host_port = "https://ielts-unisa-groupa.me"        
   fetch(host_port + "/grade", {
     method: "POST",
     headers: { "x-api-key": "1234abcd", "Content-Type": "application/json" },
@@ -249,15 +328,17 @@ document.querySelector(".process-btn").addEventListener("click", function () {
   });
 });
 
-    //----------------------------------------
-    // 6) HOVER EFFECTS
-    //----------------------------------------
-    document.querySelectorAll("button").forEach(button => {
-      button.addEventListener("mouseover", () => {
-        button.style.opacity = "0.8";
-      });
-      button.addEventListener("mouseout", () => {
-        button.style.opacity = "1";
-      });
+
+  //----------------------------------------
+  // 7) HOVER EFFECTS
+  //----------------------------------------
+  document.querySelectorAll("button").forEach(button => {
+    button.addEventListener("mouseover", () => {
+      button.style.opacity = "0.8";
     });
-});
+    button.addEventListener("mouseout", () => {
+      button.style.opacity = "1";
+    });
+  });
+}
+);

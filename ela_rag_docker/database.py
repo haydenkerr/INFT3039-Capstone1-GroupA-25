@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from sqlalchemy import create_engine, Table, Column, Integer, Float, String, MetaData, DateTime, Boolean, Text, insert, select, update, ForeignKey, DECIMAL
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
 
 
 # Load environment variables from .env file
@@ -146,11 +147,11 @@ def get_or_create_user(email: str):
         stmt = select(users).where(users.c.email == email)
         result = session.execute(stmt).fetchone()
         if result:
-            return result[0]  # return user_id
+            return result[0] 
         stmt = insert(users).values(email=email, created_at=datetime.utcnow()).returning(users.c.user_id)
         result = session.execute(stmt).fetchone()
         session.commit()
-        return result[0]  # return new user_id
+        return result[0] 
     except Exception as e:
         session.rollback()
         print("Error in get_or_create_user:", e)
@@ -225,21 +226,32 @@ def insert_submission(user_id: int, task_id: int, question_id: int, submission_g
 
 # Function to calculate overall score with rounding
 def calculate_overall_score(results_data: list) -> float:
-    
-    scores = [item["score"] for item in results_data if item.get("score") is not None]
+    # Only average the 4 IELTS scoring criteria
+    core_keys = {
+        "Task Response",
+        "Coherence and Cohesion",
+        "Lexical Resource",
+        "Grammatical Range and Accuracy"
+    }
 
-    if not scores or len(scores) != 4:
-        raise ValueError("Expected scores for all 4 competencies")
+    core_scores = [
+        item["score"]
+        for item in results_data
+        if item["competency_name"] in core_keys and item["score"] is not None
+    ]
 
-    average = sum(scores) / 4
+    if len(core_scores) != 4:
+        raise ValueError("Expected scores for the 4 IELTS core competencies")
 
-    # Apply IELTS-specific rounding
+    average = sum(core_scores) / 4
+
+    # IELTS-specific rounding
     if average % 1 == 0.25:
         overall_score = round(average + 0.25, 1)
     elif average % 1 == 0.75:
         overall_score = round(average + 0.25, 1)
     else:
-        overall_score = round(average * 2) / 2  # rounds to nearest 0.5
+        overall_score = round(average * 2) / 2
 
     return overall_score
 
@@ -273,13 +285,20 @@ def prepare_results_from_grading_data(submission_id: int, grading_result: dict) 
         "task_response": "Task Response",
         "coherence_cohesion": "Coherence and Cohesion",
         "lexical_resource": "Lexical Resource",
-        "grammatical_range": "Grammatical Range and Accuracy"
+        "grammatical_range": "Grammatical Range and Accuracy",
+        "overall_summary": "Overall Summary",
+        "general_feedback": "Overall Feedback"
     }
 
     results_data = []
     for key, label in competency_map.items():
         score = grading_result["bands"].get(key)
         feedback = grading_result["feedback"].get(key, "")
+
+        # Only skip if both score and feedback are missing (important for non-scored ones)
+        if score is None and not feedback.strip():
+            continue
+
         results_data.append({
             "submission_id": submission_id,
             "competency_name": label,
