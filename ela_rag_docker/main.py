@@ -28,6 +28,11 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
 
+import smtplib
+import dotenv
+from email.mime.text import MIMEText
+
+
 app = FastAPI(    title="ELA RAG API",
     description="This API allows question/essay pairing to query with RAG context system with Gemini LLM.",
     version="1.0.0",
@@ -203,6 +208,9 @@ def grade_essay(request: EssayRequest):
 
             create_log(tracking_id, "Post-Gemini Database Insertions", "Results successfully inserted into database", submission_id=submission_id)
 
+            # Send results email to user
+            send_results_email(request.email, tracking_id)
+
         except Exception as db_error:
             create_log(tracking_id, "Error", f"Error inserting results into database {str(db_error)}", submission_id=submission_id)
             raise HTTPException(status_code=500, detail="Error saving results to database.")
@@ -219,6 +227,9 @@ def grade_essay(request: EssayRequest):
                 overall_score = insert_results(submission_id, results_data)
 
                 create_log(tracking_id, "Post-Gemini Database Insertions", "Results successfully inserted into database", submission_id=submission_id)
+                # Send results email to user
+                send_results_email(request.email, tracking_id)
+
 
             except Exception as db_error:
                 create_log(tracking_id, "Error", f"Error inserting results into database {str(db_error)}", submission_id=submission_id)
@@ -339,6 +350,31 @@ def list_documents():
 #     prompt = f"Based on this context:\n{context}\nAnswer the query: {request.query_text}"
 #     gemini_response = query_gemini(prompt)
 #     return {"retrieved_context": formatted_results, "llm_response": gemini_response}
+
+def send_results_email(to_email, tracking_id, host_url="https://ielts-unisa-groupa.me"):
+    subject = "Your ELA Results Are Ready"
+    results_link = f"{host_url}/results/{tracking_id}"
+    body = f"Thank you for your submission. You can view your results here:\n{results_link}"
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = "ela.ielts.project@gmail.com"
+    msg["To"] = to_email
+
+    # Update these with your SMTP server details
+    smtp_server = "email-smtp.ap-southeast-2.amazonaws.com"
+    smtp_port = 587
+    smtp_user = dotenv.get_key(dotenv.find_dotenv(), "smtp_user")
+    smtp_password = dotenv.get_key(dotenv.find_dotenv(), "smtp_password")
+    
+
+    try:
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.sendmail(msg["From"], [to_email], msg.as_string())
+            print(f"Email sent to {to_email}")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
 @app.get("/debug/test",
          summary="Test Endpoint",
