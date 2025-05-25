@@ -4,6 +4,10 @@ FROM python:3.12
 # Set the working directory
 WORKDIR /app
 
+# Install wkhtmltopdf and its dependencies from Debian repo
+RUN apt-get update && \
+    apt-get install -y wkhtmltopdf xfonts-75dpi xfonts-base
+
 # Copy the source code
 COPY . .
 

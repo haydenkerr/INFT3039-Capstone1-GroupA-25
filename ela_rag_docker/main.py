@@ -31,6 +31,8 @@ from jinja2 import Environment, FileSystemLoader
 import smtplib
 import dotenv
 from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+import pdfkit
 
 
 app = FastAPI(    title="ELA RAG API",
@@ -351,21 +353,45 @@ def list_documents():
 #     gemini_response = query_gemini(prompt)
 #     return {"retrieved_context": formatted_results, "llm_response": gemini_response}
 
+
+
 def send_results_email(to_email, tracking_id, host_url="https://ielts-unisa-groupa.me"):
     subject = "Your ELA Results Are Ready"
     results_link = f"{host_url}/results/{tracking_id}"
     body = f"Thank you for your submission. You can view your results here:\n{results_link}"
+
+    # Generate PDF from the results page
+    pdf_filename = f"results_{tracking_id}.pdf"
+    pdf_url = results_link
+    try:
+        pdfkit.from_url(pdf_url, pdf_filename)
+    except Exception as e:
+        print(f"Failed to generate PDF: {e}")
+        pdf_filename = None
+
     msg = MIMEText(body)
     msg["Subject"] = subject
     msg["From"] = "ela.ielts.project@gmail.com"
     msg["To"] = to_email
 
-    # Update these with your SMTP server details
+    # If PDF was generated, attach it
+    if pdf_filename and os.path.exists(pdf_filename):
+        with open(pdf_filename, "rb") as f:
+            part = MIMEApplication(f.read(), _subtype="pdf")
+            part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(pdf_filename))
+            from email.mime.multipart import MIMEMultipart
+            multipart_msg = MIMEMultipart()
+            multipart_msg.attach(MIMEText(body, "plain"))
+            multipart_msg.attach(part)
+            multipart_msg["Subject"] = subject
+            multipart_msg["From"] = msg["From"]
+            multipart_msg["To"] = msg["To"]
+            msg = multipart_msg
+
     smtp_server = "email-smtp.ap-southeast-2.amazonaws.com"
     smtp_port = 587
     smtp_user = dotenv.get_key(dotenv.find_dotenv(), "smtp_user")
     smtp_password = dotenv.get_key(dotenv.find_dotenv(), "smtp_password")
-    
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
@@ -375,6 +401,10 @@ def send_results_email(to_email, tracking_id, host_url="https://ielts-unisa-grou
             print(f"Email sent to {to_email}")
     except Exception as e:
         print(f"Failed to send email: {e}")
+    finally:
+        # Clean up the PDF file
+        if pdf_filename and os.path.exists(pdf_filename):
+            os.remove(pdf_filename)
 
 @app.get("/debug/test",
          summary="Test Endpoint",
