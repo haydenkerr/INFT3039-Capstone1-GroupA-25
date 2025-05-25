@@ -490,6 +490,77 @@ def parse_grading_response(raw_response):
     return formatted_json
 
 
+@app.get("/submissions/{email}", response_class=HTMLResponse,
+         summary="List all submissions for a user",
+         description="Returns a table of all previous submissions for the given email address.")
+def list_user_submissions(email: str):
+    session = SessionLocal()
+    try:
+        # Get user_id for the email
+        user = session.execute(
+            select(users.c.user_id).where(users.c.email == email)
+        ).fetchone()
+        if not user:
+            return HTMLResponse(content=f"No submissions found for {email}", status_code=404)
+        user_id = user.user_id
+
+        # Get all submissions for this user
+        submissions_data = session.execute(
+            select(
+                submissions.c.submission_timestamp,
+                submissions.c.submission_id,
+                submissions.c.question_id,
+                submissions.c.essay_response,
+                submissions.c.overall_score
+            ).where(submissions.c.user_id == user_id)
+            .order_by(submissions.c.submission_timestamp.desc())
+        ).fetchall()
+
+        # Get tracking_ids for each submission
+        tracking_ids = {}
+        for row in submissions_data:
+            log = session.execute(
+                select(submissions_log.c.tracking_id)
+                .where(submissions_log.c.submission_id == row.submission_id)
+                .order_by(submissions_log.c.log_timestamp.asc())
+            ).fetchone()
+            tracking_ids[row.submission_id] = log.tracking_id if log else None
+
+        # Get questions for each question_id
+        question_texts = {}
+        for row in submissions_data:
+            if row.question_id not in question_texts:
+                q = session.execute(
+                    select(questions.c.question_text)
+                    .where(questions.c.question_id == row.question_id)
+                ).scalar()
+                question_texts[row.question_id] = q
+
+        # Prepare data for template
+        submissions_list = []
+        for row in submissions_data:
+            submitted_date = row.submission_timestamp.strftime("%Y-%m-%d %H:%M")
+            tracking_id = tracking_ids.get(row.submission_id, "")
+            question = question_texts.get(row.question_id, "")
+            essay = (row.essay_response[:100] + "...") if len(row.essay_response) > 100 else row.essay_response
+            overall_score = row.overall_score if row.overall_score is not None else ""
+            submissions_list.append({
+                "submitted_date": submitted_date,
+                "tracking_id": tracking_id,
+                "question": question,
+                "essay": essay,
+                "overall_score": overall_score
+            })
+
+        template = template_env.get_template('submissions_template.html')
+        html_content = template.render(email=email, submissions=submissions_list)
+        return HTMLResponse(content=html_content, status_code=200)
+    except Exception as e:
+        return HTMLResponse(content=f"Error: {str(e)}", status_code=500)
+    finally:
+        session.close()
+
+
 @app.post("/ingest-from-url", dependencies=[Depends(verify_api_key)],
           summary="Ingest a file from a URL",
           description="Ingests a file from a public GitHub or raw file URL and adds it to the vector database.")

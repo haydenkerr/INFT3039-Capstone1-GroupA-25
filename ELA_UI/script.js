@@ -340,5 +340,17 @@ document.querySelector(".process-btn").addEventListener("click", function () {
       button.style.opacity = "1";
     });
   });
+
+  // View My Previous Submissions button handler
+    document.getElementById('view-submissions-btn').onclick = function() {
+      const email = document.getElementById('email').value.trim();
+      if (!email) {
+        alert("Please enter your email address first.");
+        return;
+      }
+      // Open the real endpoint URL in a new tab
+      window.open(host_port +`/submissions/${encodeURIComponent(email)}`, '_blank');
+    };
+
 }
 );
