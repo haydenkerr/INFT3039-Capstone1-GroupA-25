@@ -37,14 +37,14 @@ def load_system_prompt(task_id, local_override=True):
     }
 
     remote_urls = {
-        1: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/task1generalprompt_v6.md",
-        2: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/task2generalprompt_v7.md",
-        3: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/task1generalprompt_v7.md",
-        4: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/task2generalprompt_v7.md"
+        1: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25-System-Prompts/refs/heads/main/task1generalprompt_v6.md",
+        2: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25-System-Prompts/refs/heads/main/task2generalprompt_v7.md",
+        3: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25-System-Prompts/refs/heads/main/task2generalprompt_v7.md",
+        4: "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25-System-Prompts/refs/heads/main/task2generalprompt_v7.md"
     }
 
     refinement_local = "prompt_refinement.md"
-    refinement_url = "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25/staging/ela_rag_docker/prompt_refinement.md"
+    refinement_url = "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25-System-Prompts/refs/heads/main/prompt_refinement.md"
 
     # Try to load main system prompt
     try:
