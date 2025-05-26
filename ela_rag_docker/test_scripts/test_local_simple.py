@@ -7,7 +7,9 @@ import json
 # host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
 # host_port = "http://"+"192.168.1.17:8001"
-host_port = "http://"+"127.0.0.1:8008"
+# host_port = "http://"+"127.0.0.1:8008" # local fastapi
+host_port = "http://"+"127.0.0.1:8002" # local docker 
+
 # Define the GitHub raw CSV URL
 csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
@@ -40,7 +42,7 @@ API_KEY = "1234abcd"
 #     }
 
 essayGrade = {
-    "email": "hayden@google.com",
+    "email": "hayden.kerr@gmail.com",
     "question": df_test.iloc[question_id]["question"],
     "essay": df_test.iloc[question_id]["essay"],
     "wordCount": 265,
@@ -55,6 +57,7 @@ response = requests.post(
 )
 print(response.json())
 
+# test the query endpoint Remove from the main.py, need to
 query = {"query_text": "What is the main idea of the text?"}
 response = requests.post(
     host_port+"/query",
