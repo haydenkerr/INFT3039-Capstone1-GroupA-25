@@ -59,10 +59,17 @@ app.add_middleware(
 vector_db = VectorDatabase(embedding_dim=384)
 
 
-AMPLIFY_BASE_URL = os.getenv("AMPLIFY_BASE_URL", "https://main.d3f79dfa9zi46n.amplifyapp.com")
+AMPLIFY_BASE_URL = os.getenv("AMPLIFY_BASE_URL", "https://main.d3f79dfa9zi46n.amplifyapp.com/")
+AMPLIFY_UNAME = os.getenv("AMPLIFY_UNAME")
+AMPLIFY_PWORD = os.getenv("AMPLIFY_PWORD")
+
 def fetch_template(template_name):
     url = f"{AMPLIFY_BASE_URL}/templates/{template_name}"
-    resp = requests.get(url)
+  # Only use auth for staging
+    if "staging" in AMPLIFY_BASE_URL:
+        resp = requests.get(url, auth=(AMPLIFY_UNAME, AMPLIFY_PWORD))
+    else:
+        resp = requests.get(url)
     resp.raise_for_status()
     return resp.text
 
@@ -211,7 +218,7 @@ def grade_essay(request: EssayRequest):
     # First try direct JSON parsing
     try:
         grading_result = json.loads(llm_response)
-
+        print(f"Grading Result: {grading_result}")
         try:
             results_data = prepare_results_from_grading_data(submission_id, grading_result)
             overall_score = insert_results(submission_id, results_data)
@@ -231,7 +238,7 @@ def grade_essay(request: EssayRequest):
         import re
         try:
             formatted_json = parse_grading_response(llm_response)
-
+            print(f"Formatted JSON: {formatted_json}")
             try:
                 results_data = prepare_results_from_grading_data(submission_id, formatted_json)
                 overall_score = insert_results(submission_id, results_data)
@@ -256,6 +263,7 @@ def grade_essay(request: EssayRequest):
                 "message": str(e),
                 "raw_response": llm_response
             }
+            
 template_dir = os.path.dirname(__file__)
 template_env = Environment(loader=FileSystemLoader(template_dir))
 

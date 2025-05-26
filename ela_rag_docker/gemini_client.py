@@ -15,6 +15,7 @@ generation_config = {
   "top_k": 40,
   "max_output_tokens": 8192,
   "response_mime_type": "text/plain",
+  #"response_mime_type": "application/json",
 }
 
 
@@ -45,6 +46,7 @@ def load_system_prompt(task_id, local_override=True):
 
     refinement_local = "prompt_refinement.md"
     refinement_url = "https://raw.githubusercontent.com/haydenkerr/INFT3039-Capstone1-GroupA-25-System-Prompts/refs/heads/main/prompt_refinement.md"
+
 
     # Try to load main system prompt
     try:
@@ -113,26 +115,44 @@ def query_gemini(task_id: int, user_prompt: str, examples_context: str = "", que
             print("✅ Gemini API JSON response received")
             print(f"📜 Gemini response: {response}")  # Print the entire response for debugging
             
-            if hasattr(response,"text"):
-                return response.text
-            # Safely extract the JSON payload
-            elif hasattr(response, 'candidates') and response.candidates:
+            if hasattr(response, 'candidates') and response.candidates:
                 try:
-                    json_output = response.candidates[0].content.parts[0].function_call.args
-                    return json.dumps(json_output)  # Return a JSON string
+                    parts = response.candidates[0].content.parts
+                    if parts and hasattr(parts[0], "text"):
+                        return parts[0].text
+                    elif hasattr(response, "text"):
+                        return response.text
+                    else:
+                        return str(response)
                 except Exception as e:
-                    return f"⚠️ Failed to extract JSON from Gemini response: {str(e)}"
+                    return f"⚠️ Failed to extract text from Gemini response: {str(e)}"
             else:
                 return "⚠️ No candidates found in Gemini response."
 
-        else:
+        #else:
             # Fallback for text/plain MIME
+            #response = chat_session.send_message(full_prompt)
+            #full_response = []
+            #for chunk in response:
+            #    if hasattr(chunk, "text"):
+            #        full_response.append(chunk.text)
+            #return " ".join(full_response).strip()
+        else:
+            # Fallback for text/plain MIME (this branch is always used with current config)
             response = chat_session.send_message(full_prompt)
+
             full_response = []
             for chunk in response:
                 if hasattr(chunk, "text"):
                     full_response.append(chunk.text)
-            return " ".join(full_response).strip()
+
+            response_text = " ".join(full_response).strip()
+
+            # Debug: show type and first part of response
+            print("🧪 Response type:", type(response_text))
+            print("🧪 Response preview:\n", response_text[:500])
+
+            return response_text
 
     except Exception as e:
         print(f"❌ Gemini API Error: {str(e)}")
