@@ -6,10 +6,8 @@ import json
 # host_port = "http://"+"3.106.58.24:8002"
 # host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
-# host_port = "http://"+"192.168.1.17:8001"
-host_port = "http://"+"127.0.0.1:8008" # local fastapi
-# host_port = "http://"+"127.0.0.1:8002" # local docker 
-
+host_port = "http://"+"127.0.0.1:8001" #docker local
+# host_port = "http://"+"127.0.0.1:8008" # fastapi local
 # Define the GitHub raw CSV URL
 csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
@@ -21,25 +19,23 @@ df_test = df_test[['prompt', 'essay', 'band', 'cleaned_evaluation','Task Achieve
 df_test.rename(columns={'prompt':'question'}, inplace=True)
 
 # Example test case
-question_id = 170
+question_id = 148
 # word wrap the text output below  
 
 API_KEY = "1234abcd"
-# essayGrade = {
-#     "email": "hayden@google.com",
-#     "question": """You are experiencing financial problems and want to ask your landlord if you can pay your rent late. Write a letter to your landlord. In your letter explain:  
-# - Why you are writing to him.
-# - Why you cannot pay the rent.
-# - When you will pay the rent.""",
-#     "essay": """Dear Mr. Bloke, 
-# I hope this message finds you well. I am writing to inform you that I am facing some financial difficulties this month due to an unexpected family emergency. As a result, I will not be able to pay my rent on time. I will ensure the full rent is paid by the 20th of this month. I appreciate your understanding and patience.
-# Yours sincerely,
-# Jane Doe""",
-#     "wordCount": 265,
-#     "submissionGroup":6,
-#     "taskType":"General Task 1"    
+essayGrade = {
+    "email": "hayden.kerr@gmail.com",
+    "question": """Some people believe that children should spend more time on school subjects, while others think they should have more free time. Discuss both views and give your opinion.""",
+    "essay": """Introduction: The allocation of time for children between school subjects and leisure time is a subject of constant debate. Some argue that children should devote more time to school subjects, emphasizing academic excellence. In contrast, others endorse a balanced approach that allows children more free time. This task will discuss both perspectives and give my own opinion. Body paragraph 1:
+    On the one hand, proponents of an academic-focused approach argue that more time for school subjects is necessary for a child's intellectual development. They argue that a strong educational foundation is critical in a competitive world, where academic achievements open doors to future opportunities. furthermore, a structured academic schedule instills discipline and time management proficiency, preparing children for the demands of the majority.
+Body Paragraph 2:
+On the other hand, proponents of the balanced approach argue that children need free time for their overall well-being. They believe that too much emphasis on academics can lead to stress and collapse. Giving children more free time enables them to explore their interests, develop hobbies, and engage in recreational activities. This formless time encourages creativity, social relations, and individual growth.
+In my opinion, balancing school subjects and free time is the most effective approach. While academic excellence is important, free time is equally important for a child's holistic development. A well-rounded education should include not only formal education but also opportunities for relaxation, exploration, and self-discovery. Achieving this balance ensures that children can do better academically while enjoying a fulfilling and healthy childhood. In the end, the key is in moderation and honoring that both aspects play an important role in a child's development and happiness.""",
+    "wordCount": 265,
+    "submissionGroup":6,
+    "taskType":"Academic Task 1"    
     
-#     }
+    }
 
 essayGrade = {
     "email": "hayden.kerr@gmail.com",
@@ -57,13 +53,12 @@ response = requests.post(
 )
 print(response.json())
 
-# test the query endpoint Remove from the main.py, need to
 query = {"query_text": "What is the main idea of the text?"}
 response = requests.post(
     host_port+"/query",
     headers={"x-api-key": API_KEY},
-    json=query
- 
+    json=query,
+    verify=False
 )
 
 
@@ -90,18 +85,9 @@ print(responseGet.json())
 
 
 # test results return from database
-tracking_id = "3f47b13b-c68d-496b-a808-c74c86d03044"
+tracking_id = "7fda868d-8cb5-40e9-b02a-25d6fab89d33"
 responseGet = requests.get(
     host_port+"/results/"+tracking_id,
-    headers={"x-api-key": API_KEY}
-    
-)
-print(responseGet.text)
-
-# test all results return from 
-email_address = "hayden.kerr@gmail.com"
-responseGet = requests.get(
-    host_port+"/submissions/"+email_address,
     headers={"x-api-key": API_KEY}
     
 )

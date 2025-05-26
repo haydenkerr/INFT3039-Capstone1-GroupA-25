@@ -218,7 +218,7 @@ def grade_essay(request: EssayRequest):
     # First try direct JSON parsing
     try:
         grading_result = json.loads(llm_response)
-
+        print(f"Grading Result: {grading_result}")
         try:
             results_data = prepare_results_from_grading_data(submission_id, grading_result)
             overall_score = insert_results(submission_id, results_data)
@@ -238,7 +238,7 @@ def grade_essay(request: EssayRequest):
         import re
         try:
             formatted_json = parse_grading_response(llm_response)
-
+            print(f"Formatted JSON: {formatted_json}")
             try:
                 results_data = prepare_results_from_grading_data(submission_id, formatted_json)
                 overall_score = insert_results(submission_id, results_data)
@@ -263,6 +263,7 @@ def grade_essay(request: EssayRequest):
                 "message": str(e),
                 "raw_response": llm_response
             }
+            
 template_dir = os.path.dirname(__file__)
 template_env = Environment(loader=FileSystemLoader(template_dir))
 
