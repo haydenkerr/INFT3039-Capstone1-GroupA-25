@@ -4,10 +4,10 @@ import json
 
 # load test data set
 # host_port = "http://"+"3.106.58.24:8002"
-# host_port = "https://"+"ielts-unisa-groupa.me"
+host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
 # host_port = "http://"+"192.168.1.17:8001"
-host_port = "http://"+"127.0.0.1:8008" # local fastapi
+# host_port = "http://"+"127.0.0.1:8008" # local fastapi
 # host_port = "http://"+"127.0.0.1:8002" # local docker 
 
 # Define the GitHub raw CSV URL
@@ -21,7 +21,7 @@ df_test = df_test[['prompt', 'essay', 'band', 'cleaned_evaluation','Task Achieve
 df_test.rename(columns={'prompt':'question'}, inplace=True)
 
 # Example test case
-question_id = 191
+question_id = 172
 # word wrap the text output below  
 
 API_KEY = "1234abcd"
@@ -90,7 +90,7 @@ print(responseGet.json())
 
 
 # test results return from database
-tracking_id = "3e19f672-76aa-4fc5-ace6-f25a836713cd"
+tracking_id = "3ba6c355-8a95-4045-aeb4-3c2476644e01"
 responseGet = requests.get(
     host_port+"/results/"+tracking_id,
     headers={"x-api-key": API_KEY}

@@ -26,7 +26,7 @@ import uuid
 from fastapi.responses import HTMLResponse
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 
 import smtplib
 import dotenv
@@ -57,6 +57,14 @@ app.add_middleware(
     )
 
 vector_db = VectorDatabase(embedding_dim=384)
+
+
+AMPLIFY_BASE_URL = os.getenv("AMPLIFY_BASE_URL", "https://main.d3f79dfa9zi46n.amplifyapp.com")
+def fetch_template(template_name):
+    url = f"{AMPLIFY_BASE_URL}/templates/{template_name}"
+    resp = requests.get(url)
+    resp.raise_for_status()
+    return resp.text
 
 # API Key for authentication
 API_KEY = "1234abcd"
@@ -255,9 +263,7 @@ template_env = Environment(loader=FileSystemLoader(template_dir))
          summary="Get results for a specific tracking ID",
          description="Returns the results of the essay grading process for a specific tracking ID.")
 def show_results(tracking_id: str):
-
     session = SessionLocal()
-
     try:
         submission = session.execute(
             select(submissions)
@@ -284,7 +290,7 @@ def show_results(tracking_id: str):
             .where(results.c.submission_id == submission_id)
         ).fetchall()
 
-        # Format and return results
+        # Prepare data for template
         response_data = {
             "question": question,
             "essay": essay,
@@ -295,32 +301,17 @@ def show_results(tracking_id: str):
                 "feedback_summary": result.feedback_summary,
             } for result in results_data]
         }
-
-        template = template_env.get_template('result_template.html')
+        
+        # Fetch template from Amplify
+        template_str = fetch_template('result_template.html')
+        template = Template(template_str)
         html_content = template.render(response_data)
-
-        create_log(
-            tracking_id=tracking_id, 
-            log_type="Results Accessed", 
-            log_message="Results returned to the API for the user", 
-            submission_id=submission_id
-        )
-
         return HTMLResponse(content=html_content, status_code=200)
-    
     except Exception as e:
-
-        create_log(
-            tracking_id=tracking_id, 
-            log_type="Error", 
-            log_message=f"Error occurred while returning results to the API: {str(e)}", 
-            submission_id=submission_id
-        )
-
         return HTMLResponse(content=f"An error occurred: {str(e)}", status_code=500)
-    
     finally:
         session.close()
+
 
 # add dependencies=[Depends(verify_api_key)]
 @app.get("/debug/documents",
@@ -411,6 +402,8 @@ def send_results_email(to_email, tracking_id, host_url="https://ielts-unisa-grou
          description="Returns a simple test response to verify the API is running.")
 def test_response():
     return {"This is a test": "response"}
+
+
 
 ###helper for table render in html###
 def build_score_table(bands: dict) -> str:
@@ -552,7 +545,9 @@ def list_user_submissions(email: str):
                 "overall_score": overall_score
             })
 
-        template = template_env.get_template('submissions_template.html')
+        # Fetch template from Amplify
+        template_str = fetch_template('submissions_template.html')
+        template = Template(template_str)
         html_content = template.render(email=email, submissions=submissions_list)
         return HTMLResponse(content=html_content, status_code=200)
     except Exception as e:

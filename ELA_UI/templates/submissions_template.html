@@ -41,10 +41,23 @@
     </style>
 </head>
 <body>
+        <!-- <div style="margin-bottom: 20px;">
+            <a id="back-to-main" style="font-weight:bold;">&#8592; Back to Main Page</a>
+        </div>
+        <script>
+        // Try to use the referrer if it matches your UI domains, otherwise fallback to a default
+        const ref = document.referrer;
+        let uiBase = "http://127.0.0.1:8008"; // default
+               if (ref.includes("127.0.0.1")) {
+            uiBase = "http://127.0.0.1:8008";
+        } else if (ref.includes("staging.d3f79dfa9zi46n.amplifyapp.com")) {
+            uiBase = "https://staging.d3f79dfa9zi46n.amplifyapp.com";
+        } else if (ref.includes("main.d3f79dfa9zi46n.amplifyapp.com")) {
+            uiBase = "https://main.d3f79dfa9zi46n.amplifyapp.com";
+        }
+        document.getElementById("back-to-main").href = uiBase + "/index.html";
+        </script> -->
     <div class="container">
-            <div style="margin-bottom: 20px;">
-                <a href="/index.html" style="font-weight:bold;">&#8592; Back to Main Page</a>
-            </div>
         <h1>Previous Submissions for {{ email }}</h1>
         <table>
             <tr>
@@ -59,7 +72,7 @@
                 <td>{{ row.submitted_date }}</td>
                 <td>
                   {% if row.tracking_id %}
-                    <a href="https://ielts-unisa-groupa.me/results/{{ row.tracking_id }}" target="_blank">{{ row.tracking_id }}</a>
+                    <a href="/results/{{ row.tracking_id }}" target="_blank">{{ row.tracking_id }}</a>
                   {% endif %}
                 </td>
                 <td>{{ row.question }}</td>
