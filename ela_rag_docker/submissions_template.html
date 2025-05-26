@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Previous Submissions for {{ email }}</title>
+     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            text-align: left;
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+        .preserve-line-breaks {
+            white-space: pre-line; 
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .competency-name {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+            <div style="margin-bottom: 20px;">
+                <a href="/index.html" style="font-weight:bold;">&#8592; Back to Main Page</a>
+            </div>
+        <h1>Previous Submissions for {{ email }}</h1>
+        <table>
+            <tr>
+                <th>submitted_date</th>
+                <th>tracking_id</th>
+                <th>question</th>
+                <th>essay</th>
+                <th>overall_score</th>
+            </tr>
+            {% for row in submissions %}
+            <tr>
+                <td>{{ row.submitted_date }}</td>
+                <td>
+                  {% if row.tracking_id %}
+                    <a href="https://ielts-unisa-groupa.me/results/{{ row.tracking_id }}" target="_blank">{{ row.tracking_id }}</a>
+                  {% endif %}
+                </td>
+                <td>{{ row.question }}</td>
+                <td>{{ row.essay }}</td>
+                <td>{{ row.overall_score }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
+</html>
