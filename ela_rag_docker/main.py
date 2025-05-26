@@ -59,10 +59,17 @@ app.add_middleware(
 vector_db = VectorDatabase(embedding_dim=384)
 
 
-AMPLIFY_BASE_URL = os.getenv("AMPLIFY_BASE_URL", "https://main.d3f79dfa9zi46n.amplifyapp.com")
+AMPLIFY_BASE_URL = os.getenv("AMPLIFY_BASE_URL", "https://main.d3f79dfa9zi46n.amplifyapp.com/")
+AMPLIFY_UNAME = os.getenv("AMPLIFY_UNAME")
+AMPLIFY_PWORD = os.getenv("AMPLIFY_PWORD")
+
 def fetch_template(template_name):
     url = f"{AMPLIFY_BASE_URL}/templates/{template_name}"
-    resp = requests.get(url)
+  # Only use auth for staging
+    if "staging" in AMPLIFY_BASE_URL:
+        resp = requests.get(url, auth=(AMPLIFY_UNAME, AMPLIFY_PWORD))
+    else:
+        resp = requests.get(url)
     resp.raise_for_status()
     return resp.text
 
