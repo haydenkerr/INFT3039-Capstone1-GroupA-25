@@ -6,10 +6,12 @@ import json
 # host_port = "http://"+"3.106.58.24:8002"
 # host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
-host_port = "http://"+"127.0.0.1:8001" #docker local
+host_port = "http://"+"127.0.0.1:8002" #docker local
 # host_port = "http://"+"127.0.0.1:8008" # fastapi local
 # Define the GitHub raw CSV URL
-csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
+# csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
+
+xls_url_test = ""
 
 # Load the CSV data
 df_test = pd.read_csv(csv_url_test)
@@ -25,15 +27,22 @@ question_id = 148
 API_KEY = "1234abcd"
 essayGrade = {
     "email": "hayden.kerr@gmail.com",
-    "question": """Some people believe that children should spend more time on school subjects, while others think they should have more free time. Discuss both views and give your opinion.""",
-    "essay": """Introduction: The allocation of time for children between school subjects and leisure time is a subject of constant debate. Some argue that children should devote more time to school subjects, emphasizing academic excellence. In contrast, others endorse a balanced approach that allows children more free time. This task will discuss both perspectives and give my own opinion. Body paragraph 1:
-    On the one hand, proponents of an academic-focused approach argue that more time for school subjects is necessary for a child's intellectual development. They argue that a strong educational foundation is critical in a competitive world, where academic achievements open doors to future opportunities. furthermore, a structured academic schedule instills discipline and time management proficiency, preparing children for the demands of the majority.
-Body Paragraph 2:
-On the other hand, proponents of the balanced approach argue that children need free time for their overall well-being. They believe that too much emphasis on academics can lead to stress and collapse. Giving children more free time enables them to explore their interests, develop hobbies, and engage in recreational activities. This formless time encourages creativity, social relations, and individual growth.
-In my opinion, balancing school subjects and free time is the most effective approach. While academic excellence is important, free time is equally important for a child's holistic development. A well-rounded education should include not only formal education but also opportunities for relaxation, exploration, and self-discovery. Achieving this balance ensures that children can do better academically while enjoying a fulfilling and healthy childhood. In the end, the key is in moderation and honoring that both aspects play an important role in a child's development and happiness.""",
+    "question": """Reporting of crimes and other kinds of violent news on television and in newspapers can have adverse consquences. This kind of information should be restricted from being shown in the media. 
+To what extent do you agree or disagree with this statement?
+Give reasons for your answer and include any relevant examples from your own knowledge or experience.""",
+    "essay": """
+In today's media-saturated world, crime and violence dominate headlines across television and print platforms. While it is argued that such content can cause harmful effects on public perception and mental health, I believe that completely restricting this information would be an overreach. Instead, the media should adopt a more responsible approach to reporting without fully censoring such news.
+
+On one hand, the continuous exposure to violent content can lead to desensitization, anxiety, and fear among the public. For instance, frequent reporting of crimes such as murder or terrorism may cause individuals to feel unsafe in their own communities, even when the actual risk is minimal. Moreover, young viewers who are repeatedly exposed to aggressive behaviour may develop a distorted understanding of acceptable social conduct. Studies in child psychology have shown correlations between exposure to violent media and increased aggression in youth.
+
+However, despite these concerns, restricting crime reporting altogether could suppress vital public awareness. News about criminal activities often serves a critical role in alerting citizens to potential dangers and holding authorities accountable. For example, media coverage of corruption or police misconduct has, in numerous cases, led to public pressure and subsequent institutional reform. Furthermore, in democratic societies, the freedom of the press is a fundamental right. Imposing broad restrictions on content could set a dangerous precedent for censorship and the erosion of transparency.
+
+Rather than enforcing outright bans, the emphasis should be placed on how crime and violence are portrayed. Media outlets should avoid sensationalism and instead focus on facts, context, and potential solutions. Educational framing—such as including expert commentary or highlighting community resilience—can mitigate negative psychological effects while still informing the public.
+
+In conclusion, although violent news can indeed have adverse effects, I disagree with the idea of fully restricting such content in the media. A balanced and ethical approach to reporting, rather than censorship, is a more effective and democratic solution.""",
     "wordCount": 265,
     "submissionGroup":6,
-    "taskType":"Academic Task 1"    
+    "taskType":"Academic Task 2"    
     
     }
 
@@ -53,16 +62,16 @@ response = requests.post(
 )
 print(response.json())
 
-query = {"query_text": "What is the main idea of the text?"}
-response = requests.post(
-    host_port+"/query",
-    headers={"x-api-key": API_KEY},
-    json=query,
-    verify=False
-)
+# query = {"query_text": "What is the main idea of the text?"}
+# response = requests.post(
+#     host_port+"/query",
+#     headers={"x-api-key": API_KEY},
+#     json=query,
+#     verify=False
+# )
 
 
-print(response.json())
+# print(response.json())
 
 
 responseGet = requests.get(
@@ -93,6 +102,16 @@ responseGet = requests.get(
 )
 print(responseGet.text)
 
+
+# test results return from submissions
+email = "hayden.kerr@gmail.com"
+ 
+responseGet = requests.get(
+    host_port+"/submissions/"+email,
+    headers={"x-api-key": API_KEY}
+    
+)
+print(responseGet.text)
 
 
 response = requests.get(
