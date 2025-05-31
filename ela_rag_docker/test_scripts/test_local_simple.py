@@ -6,8 +6,8 @@ import json
 # host_port = "http://"+"3.106.58.24:8002"
 # host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
-host_port = "http://"+"127.0.0.1:8002" #docker local
-# host_port = "http://"+"127.0.0.1:8008" # fastapi local
+# host_port = "http://"+"127.0.0.1:8002" #docker local
+host_port = "http://"+"127.0.0.1:8008" # fastapi local
 # Define the GitHub raw CSV URL
 # csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
@@ -37,7 +37,10 @@ df_test
 
 
 # Example test case
-question_id = 148
+import random
+# Select a random question_id from the test data set
+question_id = random.randint(0, len(df_test) - 1)
+
 # word wrap the text output below  
 
 API_KEY = "1234abcd"

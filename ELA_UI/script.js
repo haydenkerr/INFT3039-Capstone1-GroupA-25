@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   // const host_port = "https://ielts-unisa-groupa.me"  
-  const host_port = "http://127.0.0.1:8008"    
-  // const host_port = "http://127.0.0.1:8002"      
+  // const host_port = "http://127.0.0.1:8008"    
+  const host_port = "http://127.0.0.1:8002"      
 
       
   // const host_port = "http://3.24.180.235:8002"
