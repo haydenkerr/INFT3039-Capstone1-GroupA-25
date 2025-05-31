@@ -73,7 +73,7 @@ This repository contains the source code for the ELA (English Language Assessmen
 
 1. **Clone the repository**  
    ```sh
-   git clone https://github.com/<your-org>/ela-capstone1.git
+   git clone https://github.com/<your-org>/INFT3039-Capstone1-GroupA-25.git
    cd ela-capstone1/ela_rag_docker
    ```
 
