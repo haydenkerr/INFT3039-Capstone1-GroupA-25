@@ -4,10 +4,10 @@ import json
 
 # load test data set
 # host_port = "http://"+"3.106.58.24:8002"
-# host_port = "https://"+"ielts-unisa-groupa.me"
+host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
 # host_port = "http://"+"127.0.0.1:8002" #docker local
-host_port = "http://"+"127.0.0.1:8008" # fastapi local
+# host_port = "http://"+"127.0.0.1:8008" # fastapi local
 # Define the GitHub raw CSV URL
 # csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
@@ -38,32 +38,35 @@ df_test
 
 # Example test case
 import random
-# Select a random question_id from the test data set
-question_id = random.randint(0, len(df_test) - 1)
+# Randomly select a question ID from the test set
+# For testing purposes, we can set a specific question_id
 
+# question_id = 148
 # word wrap the text output below  
 
 API_KEY = "1234abcd"
-# essayGrade = {
-#     "email": "hayden.kerr@gmail.com",
-#     "question": """Reporting of crimes and other kinds of violent news on television and in newspapers can have adverse consquences. This kind of information should be restricted from being shown in the media. 
-# To what extent do you agree or disagree with this statement?
-# Give reasons for your answer and include any relevant examples from your own knowledge or experience.""",
-#     "essay": """
-# In today's media-saturated world, crime and violence dominate headlines across television and print platforms. While it is argued that such content can cause harmful effects on public perception and mental health, I believe that completely restricting this information would be an overreach. Instead, the media should adopt a more responsible approach to reporting without fully censoring such news.
+essayGrade = {
+    "email": "hayden.kerr@gmail.com",
+    "question": """"Some people think that it is better for children to grow up in the countryside, while others believe that living in a city is more beneficial for their development.
 
-# On one hand, the continuous exposure to violent content can lead to desensitization, anxiety, and fear among the public. For instance, frequent reporting of crimes such as murder or terrorism may cause individuals to feel unsafe in their own communities, even when the actual risk is minimal. Moreover, young viewers who are repeatedly exposed to aggressive behaviour may develop a distorted understanding of acceptable social conduct. Studies in child psychology have shown correlations between exposure to violent media and increased aggression in youth.
+Discuss both views and give your own opinion."
+""",
+    "essay": """
+"The environment in which children grow up can have a significant impact on their development. While some believe that a rural upbringing offers a healthier and more peaceful lifestyle, others argue that growing up in a city provides more opportunities for learning and personal growth. Both perspectives have merit, but I believe that urban environments offer more advantages overall.
 
-# However, despite these concerns, restricting crime reporting altogether could suppress vital public awareness. News about criminal activities often serves a critical role in alerting citizens to potential dangers and holding authorities accountable. For example, media coverage of corruption or police misconduct has, in numerous cases, led to public pressure and subsequent institutional reform. Furthermore, in democratic societies, the freedom of the press is a fundamental right. Imposing broad restrictions on content could set a dangerous precedent for censorship and the erosion of transparency.
+Supporters of countryside living often point to the cleaner air, closer connection to nature, and slower pace of life. Children in rural areas may enjoy more outdoor activities, experience less stress, and have stronger community ties. These factors can contribute to physical well-being and emotional security during early development.
 
-# Rather than enforcing outright bans, the emphasis should be placed on how crime and violence are portrayed. Media outlets should avoid sensationalism and instead focus on facts, context, and potential solutions. Educational framing—such as including expert commentary or highlighting community resilience—can mitigate negative psychological effects while still informing the public.
+However, growing up in a city exposes children to a wide range of educational and cultural opportunities. Urban areas typically offer better schools, libraries, and extracurricular programs. Children also benefit from access to museums, theatres, and diverse communities, which can broaden their understanding of the world. While city life can be fast-paced and sometimes overwhelming, it also prepares young people for modern life in a globalized society.
 
-# In conclusion, although violent news can indeed have adverse effects, I disagree with the idea of fully restricting such content in the media. A balanced and ethical approach to reporting, rather than censorship, is a more effective and democratic solution.""",
-#     "wordCount": 265,
-#     "submissionGroup":6,
-#     "taskType":"Academic Task 2"    
+In my opinion, although the countryside provides a peaceful environment, the resources and exposure available in cities play a more critical role in a child’s intellectual and social development. With proper guidance and support, the challenges of urban living can be managed effectively.
+
+In conclusion, both the countryside and the city have unique benefits, but I believe the city better equips children for the future by offering more varied and stimulating experiences."
+""",
+    "wordCount": 247,
+    "submissionGroup":3,
+    "taskType":"General Task 2"    
     
-#     }
+    }
 
 # loop through the test data set and post each essay to the API
 for index, row in df_test.iterrows():
@@ -82,13 +85,15 @@ for index, row in df_test.iterrows():
     )
     print(response.json())
 
+
+question_id = random.randint(0, len(df_test) - 1)
 essayGrade = {
     "email": "hayden.kerr@gmail.com",
     "question": df_test.iloc[question_id]["question_text"],
     "essay": df_test.iloc[question_id]["complete_essay"],
     "wordCount": len(row["complete_essay"].split()),
     "submissionGroup":6,
-    "taskType": row["taskType"]   
+    "taskType": row["taskType"]    
     }
 
 
