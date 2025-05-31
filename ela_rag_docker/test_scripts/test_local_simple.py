@@ -81,11 +81,11 @@ for index, row in df_test.iterrows():
 
 essayGrade = {
     "email": "hayden.kerr@gmail.com",
-    "question": df_test.iloc[question_id]["question"],
-    "essay": df_test.iloc[question_id]["essay"],
-    "wordCount": 265,
+    "question": df_test.iloc[question_id]["question_text"],
+    "essay": df_test.iloc[question_id]["complete_essay"],
+    "wordCount": len(row["complete_essay"].split()),
     "submissionGroup":6,
-    "taskType":"General Task 1"    
+    "taskType": row["taskType"]   
     }
 
 

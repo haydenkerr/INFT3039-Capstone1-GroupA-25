@@ -10,10 +10,23 @@ import re
 router = APIRouter()
 
 class PDFRequest(BaseModel):
+    """
+    Pydantic model for PDF extraction requests.
+    Expects a base64-encoded PDF file string.
+    """
     file: str  # Base64 encoded PDF string
 
 @router.post("/extract-pdf-text", summary="Extract clean text from a PDF file")
 def extract_pdf_text(request: PDFRequest):
+    """
+    Extracts and cleans text from a base64-encoded PDF file.
+
+    Args:
+        request (PDFRequest): The request containing the base64-encoded PDF.
+
+    Returns:
+        dict: A dictionary with the cleaned extracted text.
+    """
     try:
         file_bytes = base64.b64decode(request.file)
 
@@ -32,11 +45,17 @@ def extract_pdf_text(request: PDFRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-import re
-
-import re
-
 def clean_text(text):
+    """
+    Cleans extracted PDF text by joining hyphenated words, removing layout artifacts,
+    and ensuring bullet points are on their own lines.
+
+    Args:
+        text (str): The raw extracted text.
+
+    Returns:
+        str: The cleaned text.
+    """
     lines = text.splitlines()
     fixed_lines = []
     buffer = ""
@@ -44,7 +63,7 @@ def clean_text(text):
     for line in lines:
         line = line.strip()
 
-        # Skip empty layout lines
+        # Skip empty layout lines and flush buffer if needed
         if not line:
             if buffer:
                 fixed_lines.append(buffer.strip())
@@ -60,11 +79,10 @@ def clean_text(text):
     if buffer:
         fixed_lines.append(buffer.strip())
 
-    # Now fix dot points: force them onto their own lines
+    # Ensure bullet points are on their own lines
     fixed_with_bullets = []
     for line in fixed_lines:
         bullet_split = re.split(r"(?=\s*[•\-]\s)", line)
         fixed_with_bullets.extend([item.strip() for item in bullet_split if item.strip()])
 
     return "\n\n".join(fixed_with_bullets)
-
