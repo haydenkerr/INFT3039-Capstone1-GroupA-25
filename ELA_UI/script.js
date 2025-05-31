@@ -331,10 +331,10 @@ document.querySelector(".process-btn").addEventListener("click", function () {
   const wordCount = document.querySelector("#word-count").value || "0";
 
    const minWordCounts = {
-    "General Task 1": 150,
-    "General Task 2": 250,
-    "Academic Task 1": 150,
-    "Academic Task 2": 250
+    "General Task 1": 150, //1
+    "General Task 2": 250, //2
+    "Academic Task 1": 150, //3
+    "Academic Task 2": 250 //4
   }
 
   // Display confirm message if word count less than task minimum

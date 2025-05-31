@@ -11,14 +11,15 @@ host_port = "http://"+"127.0.0.1:8002" #docker local
 # Define the GitHub raw CSV URL
 # csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
-xls_url_test = ""
+xlsx_url_test =  "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/UI2SP-565-Resolve-overall-score-increase-on-same-submission/ela_rag_docker/test_scripts/Teacher%20Validation%20Report%203.5.25.xlsx"
 
 # Load the CSV data
-df_test = pd.read_csv(csv_url_test)
+df_test = pd.read_excel(xlsx_url_test, sheet_name='in')
 
-df_test = df_test[['prompt', 'essay', 'band', 'cleaned_evaluation','Task Achievement', 'Coherence', 'Lexical Resource', 'Grammar','Overall Band Score']]  
+print(df_test)
+df_test = df_test[['task_name', 'question_text', 'task_name', 'essay_response']]  
 
-df_test.rename(columns={'prompt':'question'}, inplace=True)
+# df_test.rename(columns={'prompt':'question'}, inplace=True)
 
 # Example test case
 question_id = 148
