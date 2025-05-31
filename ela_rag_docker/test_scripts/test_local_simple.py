@@ -11,41 +11,73 @@ host_port = "http://"+"127.0.0.1:8002" #docker local
 # Define the GitHub raw CSV URL
 # csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
-xlsx_url_test =  "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/UI2SP-565-Resolve-overall-score-increase-on-same-submission/ela_rag_docker/test_scripts/Teacher%20Validation%20Report%203.5.25.xlsx"
+xlsx_url_test =  "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/UI2SP-565-Resolve-overall-score-increase-on-same-submission/ela_rag_docker/test_scripts/question_list_with_all_essays.xlsx"
 
 # Load the CSV data
-df_test = pd.read_excel(xlsx_url_test, sheet_name='in')
+df_test = pd.read_excel(xlsx_url_test, sheet_name='Sheet1')
 
-print(df_test)
-df_test = df_test[['task_name', 'question_text', 'task_name', 'essay_response']]  
 
-# df_test.rename(columns={'prompt':'question'}, inplace=True)
+df_test = df_test[['task_id', 'question_text', 'complete_essay']]  
+
+# add a column to the dataframe with the task type description. 
+# 1 =     "General Task 1": with a minimum of 150 words
+# 2 =     "General Task 2": with a minimum of 250 words
+# 3 =     "Academic Task 1": with a minimum of 150 words 
+# 4 =     "Academic Task 2": with a minimum of 250 words
+df_test['taskType'] = df_test['task_id'].map({
+    1: "General Task 1",
+    2: "General Task 2",
+    3: "Academic Task 1",
+    4: "Academic Task 2"
+})
+
+df_test
+
+
+
 
 # Example test case
 question_id = 148
 # word wrap the text output below  
 
 API_KEY = "1234abcd"
-essayGrade = {
-    "email": "hayden.kerr@gmail.com",
-    "question": """Reporting of crimes and other kinds of violent news on television and in newspapers can have adverse consquences. This kind of information should be restricted from being shown in the media. 
-To what extent do you agree or disagree with this statement?
-Give reasons for your answer and include any relevant examples from your own knowledge or experience.""",
-    "essay": """
-In today's media-saturated world, crime and violence dominate headlines across television and print platforms. While it is argued that such content can cause harmful effects on public perception and mental health, I believe that completely restricting this information would be an overreach. Instead, the media should adopt a more responsible approach to reporting without fully censoring such news.
+# essayGrade = {
+#     "email": "hayden.kerr@gmail.com",
+#     "question": """Reporting of crimes and other kinds of violent news on television and in newspapers can have adverse consquences. This kind of information should be restricted from being shown in the media. 
+# To what extent do you agree or disagree with this statement?
+# Give reasons for your answer and include any relevant examples from your own knowledge or experience.""",
+#     "essay": """
+# In today's media-saturated world, crime and violence dominate headlines across television and print platforms. While it is argued that such content can cause harmful effects on public perception and mental health, I believe that completely restricting this information would be an overreach. Instead, the media should adopt a more responsible approach to reporting without fully censoring such news.
 
-On one hand, the continuous exposure to violent content can lead to desensitization, anxiety, and fear among the public. For instance, frequent reporting of crimes such as murder or terrorism may cause individuals to feel unsafe in their own communities, even when the actual risk is minimal. Moreover, young viewers who are repeatedly exposed to aggressive behaviour may develop a distorted understanding of acceptable social conduct. Studies in child psychology have shown correlations between exposure to violent media and increased aggression in youth.
+# On one hand, the continuous exposure to violent content can lead to desensitization, anxiety, and fear among the public. For instance, frequent reporting of crimes such as murder or terrorism may cause individuals to feel unsafe in their own communities, even when the actual risk is minimal. Moreover, young viewers who are repeatedly exposed to aggressive behaviour may develop a distorted understanding of acceptable social conduct. Studies in child psychology have shown correlations between exposure to violent media and increased aggression in youth.
 
-However, despite these concerns, restricting crime reporting altogether could suppress vital public awareness. News about criminal activities often serves a critical role in alerting citizens to potential dangers and holding authorities accountable. For example, media coverage of corruption or police misconduct has, in numerous cases, led to public pressure and subsequent institutional reform. Furthermore, in democratic societies, the freedom of the press is a fundamental right. Imposing broad restrictions on content could set a dangerous precedent for censorship and the erosion of transparency.
+# However, despite these concerns, restricting crime reporting altogether could suppress vital public awareness. News about criminal activities often serves a critical role in alerting citizens to potential dangers and holding authorities accountable. For example, media coverage of corruption or police misconduct has, in numerous cases, led to public pressure and subsequent institutional reform. Furthermore, in democratic societies, the freedom of the press is a fundamental right. Imposing broad restrictions on content could set a dangerous precedent for censorship and the erosion of transparency.
 
-Rather than enforcing outright bans, the emphasis should be placed on how crime and violence are portrayed. Media outlets should avoid sensationalism and instead focus on facts, context, and potential solutions. Educational framing—such as including expert commentary or highlighting community resilience—can mitigate negative psychological effects while still informing the public.
+# Rather than enforcing outright bans, the emphasis should be placed on how crime and violence are portrayed. Media outlets should avoid sensationalism and instead focus on facts, context, and potential solutions. Educational framing—such as including expert commentary or highlighting community resilience—can mitigate negative psychological effects while still informing the public.
 
-In conclusion, although violent news can indeed have adverse effects, I disagree with the idea of fully restricting such content in the media. A balanced and ethical approach to reporting, rather than censorship, is a more effective and democratic solution.""",
-    "wordCount": 265,
-    "submissionGroup":6,
-    "taskType":"Academic Task 2"    
+# In conclusion, although violent news can indeed have adverse effects, I disagree with the idea of fully restricting such content in the media. A balanced and ethical approach to reporting, rather than censorship, is a more effective and democratic solution.""",
+#     "wordCount": 265,
+#     "submissionGroup":6,
+#     "taskType":"Academic Task 2"    
     
+#     }
+
+# loop through the test data set and post each essay to the API
+for index, row in df_test.iterrows():
+    essayGrade = {
+        "email": "hayden.kerr@gmail.com",
+        "question": row["question_text"],
+        "essay": row["complete_essay"],
+        "wordCount": len(row["complete_essay"].split()),
+        "submissionGroup": 6,
+        "taskType": row["taskType"]
     }
+    response = requests.post(
+        host_port+"/grade",
+        headers={"x-api-key": API_KEY},
+        json=essayGrade
+    )
+    print(response.json())
 
 essayGrade = {
     "email": "hayden.kerr@gmail.com",
@@ -55,6 +87,8 @@ essayGrade = {
     "submissionGroup":6,
     "taskType":"General Task 1"    
     }
+
+
 response = requests.post(
     host_port+"/grade",
     headers={"x-api-key": API_KEY},
