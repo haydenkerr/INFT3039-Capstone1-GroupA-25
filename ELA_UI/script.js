@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
 
 
-  const host_port = "https://ielts-unisa-groupa.me"  
-  // const host_port = "http://127.0.0.1:8008"    
+  // const host_port = "https://ielts-unisa-groupa.me"  
+  const host_port = "http://127.0.0.1:8008"    
   // const host_port = "http://127.0.0.1:8002"      
 
       
@@ -44,6 +44,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     document.getElementById("fileInput").addEventListener("change", handleFile);
+    
+    document.getElementById("pdf-format-warning").style.display = "none";
+    /*function sanitizeMammothOutput(htmlString) {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = htmlString;
+
+      const paragraphs = tempDiv.querySelectorAll("p");
+      const lines = Array.from(paragraphs)
+        .map(p => p.textContent.trim())
+        .filter(text => text !== "");
+
+      return lines.join("\n\n"); // Double newlines to create clear paragraph breaks
+    }*/
+    function sanitizeMammothOutput(htmlString) {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = htmlString;
+
+      const textLines = [];
+
+      tempDiv.childNodes.forEach(node => {
+        if (node.nodeName === "P") {
+          const line = node.textContent.trim();
+          if (line !== "") textLines.push(line);
+        } else if (node.nodeName === "UL" || node.nodeName === "OL") {
+          const items = node.querySelectorAll("li");
+          items.forEach(li => {
+            const bullet = node.nodeName === "OL" ? `${textLines.length + 1}. ` : "• ";
+            textLines.push(bullet + li.textContent.trim());
+          });
+        }
+      });
+
+      return textLines.join("\n\n"); // Keep double spacing for readability
+    }
 
     function handleFile(e) {
       const file = e.target.files[0];
@@ -65,8 +99,8 @@ document.addEventListener("DOMContentLoaded", function () {
           updateWordCount(); // update word count now that essay may be filled
         };
         reader.readAsText(file);
-      }
-      else if (extension === "docx") {
+       }
+      /*else if (extension === "docx") {
         // parse docx using mammoth
         const reader = new FileReader();
         reader.onload = function() {
@@ -81,22 +115,64 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         };
         reader.readAsArrayBuffer(file);
-      }
-      else if (extension === "pdf") {
-        // parse pdf using pdf.js
+      }*/
+      else if (extension === "docx") {
+      // parse docx using mammoth and clean spacing
         const reader = new FileReader();
         reader.onload = function() {
-          const typedarray = new Uint8Array(reader.result);
-          extractTextFromPDF(typedarray)
-            .then(pdfText => {
-              parseQuestionEssay(pdfText);
+          mammoth.convertToHtml({ arrayBuffer: reader.result })
+            .then(result => {
+              const cleanedText = sanitizeMammothOutput(result.value);
+              parseQuestionEssay(cleanedText);
               updateWordCount();
             })
             .catch(err => {
-              console.error("Error processing PDF:", err);
+              console.error("Error processing DOCX:", err);
             });
         };
         reader.readAsArrayBuffer(file);
+      }
+      // else if (extension === "pdf") {
+
+      //   document.getElementById("pdf-format-warning").style.display = "block";
+      //   // parse pdf using pdf.js
+      //   const reader = new FileReader();
+      //   reader.onload = function() {
+      //     const typedarray = new Uint8Array(reader.result);
+      //     extractTextFromPDF(typedarray)
+      //       .then(pdfText => {
+      //       //const finalText = insertNewlinesBeforeBullets(pdfText);
+      //         parseQuestionEssay(pdfText);
+      //         updateWordCount();
+      //       })
+      //       .catch(err => {
+      //         console.error("Error processing PDF:", err);
+      //       });
+      //   };
+      //   reader.readAsArrayBuffer(file);
+      // }
+      else if (extension === "pdf") {
+        document.getElementById("pdf-format-warning").style.display = "block";
+
+        const reader = new FileReader();
+        reader.onload = function () {
+          const base64 = reader.result.split(',')[1]; // strip off data prefix
+          fetch(`${host_port}/extract-pdf-text`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ file: base64 })
+          })
+            .then(res => res.json())
+            .then(data => {
+              parseQuestionEssay(data.text);
+              updateWordCount();
+            })
+            .catch(err => {
+              console.error("PDF processing failed:", err);
+              alert("There was an error extracting text from the PDF.");
+            });
+        };
+        reader.readAsDataURL(file);
       }
       else {
         alert("Unsupported file format. Please upload a TXT, PDF, or DOCX file.");
@@ -104,23 +180,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // pdf.js extraction
-    function extractTextFromPDF(typedarray) {
-      return pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-        let text = "";
-        const promises = [];
-        for (let i = 1; i <= pdf.numPages; i++) {
-          promises.push(
-            pdf.getPage(i).then(page =>
-              page.getTextContent().then(tc => {
-                const pageText = tc.items.map(item => item.str).join(" ");
-                text += pageText + "\n";
-              })
-            )
-          );
-        }
-        return Promise.all(promises).then(() => text);
-      });
-    }
+    // function extractTextFromPDF(typedarray) {
+    //   return pdfjsLib.getDocument(typedarray).promise.then(pdf => {
+    //     let text = "";
+    //     const promises = [];
+    //     for (let i = 1; i <= pdf.numPages; i++) {
+    //       promises.push(
+    //         pdf.getPage(i).then(page =>
+    //           page.getTextContent().then(tc => {
+    //             const pageText = tc.items.map(item => item.str).join(" ");
+    //             text += pageText + "\n";
+    //           })
+    //         )
+    //       );
+    //     }
+    //     return Promise.all(promises).then(() => text);
+    //   });
+    // }
 
     //----------------------------------------
     // 3) INSERT TASK INSTRUCTIONS
@@ -255,10 +331,10 @@ document.querySelector(".process-btn").addEventListener("click", function () {
   const wordCount = document.querySelector("#word-count").value || "0";
 
    const minWordCounts = {
-    "General Task 1": 150,
-    "General Task 2": 250,
-    "Academic Task 1": 150,
-    "Academic Task 2": 250
+    "General Task 1": 150, //1
+    "General Task 2": 250, //2
+    "Academic Task 1": 150, //3
+    "Academic Task 2": 250 //4
   }
 
   // Display confirm message if word count less than task minimum

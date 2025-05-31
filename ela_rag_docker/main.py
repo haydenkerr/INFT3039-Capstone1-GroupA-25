@@ -34,10 +34,12 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import pdfkit
 
+from pdf_extract import router as pdf_router
+
 
 app = FastAPI(    title="ELA RAG API",
     description="This API allows question/essay pairing to query with RAG context system with Gemini LLM.",
-    version="1.0.0",
+    version="1.0.12",
     # docs_url= "/mydocs",  # Change the Swagger docs URL
     # redoc_url= "/myredoc"  # Change the Redoc docs URL
 )
@@ -57,7 +59,6 @@ app.add_middleware(
     )
 
 vector_db = VectorDatabase(embedding_dim=384)
-
 
 AMPLIFY_BASE_URL = os.getenv("AMPLIFY_BASE_URL", "https://main.d3f79dfa9zi46n.amplifyapp.com/")
 AMPLIFY_UNAME = os.getenv("AMPLIFY_UNAME")
@@ -218,14 +219,14 @@ def grade_essay(request: EssayRequest):
     # First try direct JSON parsing
     try:
         grading_result = json.loads(llm_response)
-        print(f"Grading Result: {grading_result}")
+
         try:
             results_data = prepare_results_from_grading_data(submission_id, grading_result)
             overall_score = insert_results(submission_id, results_data)
 
             create_log(tracking_id, "Post-Gemini Database Insertions", "Results successfully inserted into database", submission_id=submission_id)
 
-            # Send results email to user
+ # Send results email to user
             send_results_email(request.email, tracking_id)
         except Exception as db_error:
             create_log(tracking_id, "Error", f"Error inserting results into database {str(db_error)}", submission_id=submission_id)
@@ -237,7 +238,7 @@ def grade_essay(request: EssayRequest):
         import re
         try:
             formatted_json = parse_grading_response(llm_response)
-            print(f"Formatted JSON: {formatted_json}") # Debugging line to check the formatted JSON structure
+
             try:
                 results_data = prepare_results_from_grading_data(submission_id, formatted_json)
                 overall_score = insert_results(submission_id, results_data)
@@ -245,8 +246,7 @@ def grade_essay(request: EssayRequest):
                 create_log(tracking_id, "Post-Gemini Database Insertions", "Results successfully inserted into database", submission_id=submission_id)
                 # Send results email to user
                 send_results_email(request.email, tracking_id)
-                
-                
+
             except Exception as db_error:
                 create_log(tracking_id, "Error", f"Error inserting results into database {str(db_error)}", submission_id=submission_id)
                 raise HTTPException(status_code=500, detail="Error saving results to database.")
@@ -262,8 +262,6 @@ def grade_essay(request: EssayRequest):
                 "message": str(e),
                 "raw_response": llm_response
             }
-      
-           
 template_dir = os.path.dirname(__file__)
 template_env = Environment(loader=FileSystemLoader(template_dir))
 
@@ -271,7 +269,9 @@ template_env = Environment(loader=FileSystemLoader(template_dir))
          summary="Get results for a specific tracking ID",
          description="Returns the results of the essay grading process for a specific tracking ID.")
 def show_results(tracking_id: str):
+
     session = SessionLocal()
+
     try:
         submission = session.execute(
             select(submissions)
@@ -309,12 +309,20 @@ def show_results(tracking_id: str):
                 "feedback_summary": result.feedback_summary,
             } for result in results_data]
         }
-
           # Fetch template from Amplify
         template_str = fetch_template('result_template.html')
         template = Template(template_str)
         html_content = template.render(response_data)
+
+        create_log(
+            tracking_id=tracking_id, 
+            log_type="Results Accessed", 
+            log_message="Results returned to the API for the user", 
+            submission_id=submission_id
+        )
+
         return HTMLResponse(content=html_content, status_code=200)
+    
     except Exception as e:
 
         create_log(
@@ -359,7 +367,6 @@ def list_documents():
 #     prompt = f"Based on this context:\n{context}\nAnswer the query: {request.query_text}"
 #     gemini_response = query_gemini(prompt)
 #     return {"retrieved_context": formatted_results, "llm_response": gemini_response}
-
 
 def send_results_email(to_email, tracking_id, host_url="https://ielts-unisa-groupa.me"):
     subject = "Your ELA Results Are Ready"
@@ -411,6 +418,7 @@ def send_results_email(to_email, tracking_id, host_url="https://ielts-unisa-grou
         # Clean up the PDF file
         if pdf_filename and os.path.exists(pdf_filename):
             os.remove(pdf_filename)
+
 
 @app.get("/debug/test",
          summary="Test Endpoint",
@@ -470,19 +478,24 @@ def parse_grading_response(raw_response):
     # task_response_feedback = re.search(
     # r"\*\*\s*1\.\s*Task Response\s*\*\*\s*(.*?)(?=\n\*\*\s*2\.\s*Coherence and Cohesion\s*\*\*)",
     # raw_response, re.DOTALL)
+    # task_response_feedback = re.search( ###most recent working###
+    # r"\*\*\s*1\.\s*(?:Task Response|Task Achievement)\s*\*\*\s*(.*?)(?=\n\*\*\s*2\.\s*Coherence and Cohesion\s*\*\*)",
+    # raw_response, re.DOTALL | re.IGNORECASE)
     task_response_feedback = re.search(
-    r"\*\*\s*1\.\s*(?:Task Response|Task Achievement)\s*\*\*\s*(.*?)(?=\n\*\*\s*2\.\s*Coherence and Cohesion\s*\*\*)",
-    raw_response, re.DOTALL | re.IGNORECASE)
+    r"(?:^|\n)\s*(?:\*\*\s*)?(?:1\.\s*)?(?:\*\*)?\s*(Task Response|Task Achievement)\s*(?:\*\*)?\s*\n+(.*?)(?=\n\s*(?:\*\*\s*)?(?:2\.\s*)?(?:\*\*)?\s*Coherence and Cohesion)",
+    raw_response,
+    re.DOTALL | re.IGNORECASE
+)
 
     coherence_feedback = re.search(
-    r"\*\*\s*2\.\s*Coherence and Cohesion\s*\*\*\s*(.*?)(?=\n\*\*\s*3\.\s*Lexical Resource\s*\*\*)",
+    r"\*\*\s*(?:2\.\s*)?Coherence and Cohesion\s*\*\*\s*(.*?)(?=\n\*\*\s*(?:3\.\s*)?Lexical Resource\s*\*\*)",
     raw_response, re.DOTALL)
 
     # lexical_feedback = re.search(
     # r"\*\*\s*3\.\s*Lexical Resource\s*\*\*\s*(.*?)(?=\n\*\*\s*4\.\s*Grammatical Range\s*&\s*Accuracy\s*\*\*)",
     # raw_response, re.DOTALL)
     lexical_feedback = re.search(
-    r"\*\*\s*(?:3\.?)?\s*Lexical Resource\*\*\s*(.*?)(?=\n\*\*\s*(?:4\.?)?\s*Grammatical Range\s*(?:&|and)\s*Accuracy\*\*)",
+    r"\*\*\s*(?:3\.\s*)?Lexical Resource\s*\*\*\s*(.*?)(?=\n\*\*\s*(?:4\.\s*)?Grammatical Range\s*(?:&|and)\s*Accuracy\s*\*\*)",
     raw_response, re.DOTALL | re.IGNORECASE)
 
     # grammar_feedback = re.search(
@@ -493,19 +506,24 @@ def parse_grading_response(raw_response):
     raw_response, re.DOTALL | re.IGNORECASE)
 
     overall_summary_feedback = re.search(
-    r"\*\*\s*5\.\s*Overall Band Score Summary\s*\*\*\s*(.*?)(?=\n\*\*\s*6\.\s*Feedback\s*\*\*)",
+    r"\*\*\s*(?:5\.\s*)?Overall Band Score Summary\s*\*\*\s*(.*?)(?=\n\*\*\s*(?:6\.\s*)?Feedback\s*\*\*)",
     raw_response, re.DOTALL)
 
     general_feedback = re.search(
-    r"\*\*\s*6\.\s*Feedback\s*\*\*\s*(.*?)(?=\n\*\*\s*7\.\s*Scoring Table\s*\*\*)",
+    r"\*\*\s*(?:6\.\s*)?Feedback\s*\*\*\s*(.*?)(?=\n\*\*\s*(?:7\.\s*)?Scoring Table\s*\*\*)",
     raw_response, re.DOTALL)
 
-    def safe_extract(regex_match):
+    # def safe_extract(regex_match):
+    #     try:
+    #         return regex_match.group(1).strip()
+    #     except:
+    #         return ""
+    def safe_extract(regex_match, group_num=1):
         try:
-            return regex_match.group(1).strip()
+            return regex_match.group(group_num).strip()
         except:
             return ""
-
+    
     print("🧪 Raw regex matches:")
     print("  cohrence_feedback:", bool(coherence_feedback))
     print("  lexical_feedback:", bool(lexical_feedback))
@@ -513,10 +531,10 @@ def parse_grading_response(raw_response):
     print("  overall_summary_feedback:", bool(overall_summary_feedback))
     print("  general_feedback:", bool(general_feedback))
     print("📥 Matched Task Feedback:", task_response_feedback.group(1) if task_response_feedback else "❌ Not found")
-    print("📥 Matched Coherence Feedback:", coherence_feedback.group(1) if task_response_feedback else "❌ Not found")
-    print("📥 Matched Lexical Feedback:", lexical_feedback.group(1) if task_response_feedback else "❌ Not found")
-    print("📥 Matched Grammer Feedback:", grammar_feedback.group(1) if task_response_feedback else "❌ Not found")
-    print("📥 Matched Overall Feedback:", overall_summary_feedback.group(1) if task_response_feedback else "❌ Not found")
+    print("📥 Matched Coherence Feedback:", coherence_feedback.group(1) if coherence_feedback else "❌ Not found")
+    print("📥 Matched Lexical Feedback:", lexical_feedback.group(1) if lexical_feedback else "❌ Not found")
+    print("📥 Matched Grammer Feedback:", grammar_feedback.group(1) if grammar_feedback else "❌ Not found")
+    print("📥 Matched Overall Feedback:", overall_summary_feedback.group(1) if overall_summary_feedback else "❌ Not found")
     print("📥 Matched General Feedback:", general_feedback.group(1) if general_feedback else "❌ Not found")
 
 
@@ -538,7 +556,7 @@ def parse_grading_response(raw_response):
         #     "general_feedback": general_feedback.group(1).strip() if general_feedback else ""
         # },
         "feedback": {
-            "task_response": safe_extract(task_response_feedback),
+            "task_response": safe_extract(task_response_feedback,group_num=2),
             "coherence_cohesion": safe_extract(coherence_feedback),
             "lexical_resource": safe_extract(lexical_feedback),
             "grammatical_range": safe_extract(grammar_feedback),
@@ -660,3 +678,5 @@ def ingest_file_from_url(url: str = Query(..., description="Public GitHub or raw
         return {"message": f"Successfully ingested: {url}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ingestion error: {str(e)}")
+    
+app.include_router(pdf_router)
