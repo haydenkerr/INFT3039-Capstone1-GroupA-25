@@ -32,9 +32,9 @@
         <label for="email">Enter email</label>
         <input type="email" id="email" placeholder="firstName.lastName@email.com" />
       </div>
-      <div class="form-group">
+    <div class="form-group">
         <button id="view-submissions-btn" type="button">View My Previous Submissions</button>
-      </div>  
+      </div>
       <!-- Submission Group + Task Type (show on same row) -->
       <div class="form-row">
         <div class="form-group">
@@ -82,21 +82,56 @@
       <!-- File Upload -->
       <div class="form-group">
         <label>Upload a Question & Essay (TXT, PDF, or DOCX)</label>
-        <div class="file-upload">
+        <!-- <div class="file-upload">
           <input type="text" placeholder="No file chosen" readonly />
           <button>
             <img src="public/external/uploadi153-jmr8.svg" alt="Upload" />
             Choose File
           </button>
+        </div> -->
+        <div class="file-upload" style="display: flex; gap: 0.75rem; align-items: center;">
+          <input type="text" placeholder="No file chosen" readonly style="flex: 1;" />
+
+          <button type="button">
+            <img src="public/external/uploadi153-jmr8.svg" alt="Upload" style="margin-right: 0.5rem;" />
+            Choose File
+          <button id="clear-upload" class="clear-upload-btn">
+            ❌ Clear
+          </button>
+
         </div>
-        <!-- PDF formatting guidance -->
+        <!-- PDF formatting guidance --> 
         <div id="pdf-format-warning" style="display: none; margin-top: 1rem; color: #b91c1c; background-color: #fef2f2; padding: 1rem; border: 1px solid #fca5a5; border-radius: 6px;">
           <strong>PDF formatting tip:</strong>
           <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-            <li>We recomend uploading pdf files rather than copying and pasting from them</li>
-            <li>If you choose to copy and paste from a pdf you may like to check the formatting below</li>
+            <li>If you are uploading a file please ensure the <code>**Question** and **Essay**</code> headers are in your file</li>
+            <li>We recomend uploading pdf files rather than copying and pasting from them</li>            
+            <li>Please check you are happy with the formatting below before submitting, especially if you copy and paste from a pdf</li>           
           </ul>
         </div>
+        <!-- DOCX -->
+        <div id="docx-format-warning" style="display: none; margin-top: 1rem; color: #92400e; background-color: #fff7ed; padding: 1rem; border: 1px solid #fdba74; border-radius: 6px;">
+          <strong>Word document tip:</strong>
+          <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+            <li>If you are uploading a file please ensure the <code>**Question** and **Essay**</code> headers are in your file</li>
+            <li>Please check you are happy with the formatting below before submitting</li>
+          </ul>
+        </div>
+        <!-- TXT -->
+        <div id="txt-format-warning" style="display: none; margin-top: 1rem; color: #1e40af; background-color: #eff6ff; padding: 1rem; border: 1px solid #93c5fd; border-radius: 6px;">
+          <strong>Plain text (.txt) tip:</strong>
+          <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+            <li>If you are uploading a file please ensure the <code>**Question** and **Essay**</code> headers are in your file</li>
+            <li>Please check you are happy with the formatting below before submitting</li>
+          </ul>
+        </div>
+        <!-- Clear Upload Button -->
+        <!-- <div class="file-upload">
+          <button id="clear-upload" style="margin-top: 0.75rem;">
+            <img src="public/external/close-circle.svg" alt="Clear" style="margin-right: 0.5rem;" />
+            Clear Upload
+          </button>
+        </div> -->
       </div>
 
       <!-- Task Instructions -->
@@ -156,6 +191,7 @@
     <!-- <div id="feedback" style="margin-bottom: 2rem;"></div> -->
 
     <!-- Main script -->
+    <script src="config.js"></script> 
     <script src="script.js"></script>
 
 </body>

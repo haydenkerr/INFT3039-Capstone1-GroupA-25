@@ -56,10 +56,12 @@ app.add_middleware(
 
 vector_db = VectorDatabase(embedding_dim=384)
 
-# Amplify UI base URL and credentials for fetching templates
-AMPLIFY_BASE_URL = os.getenv("AMPLIFY_BASE_URL", "https://main.d3f79dfa9zi46n.amplifyapp.com/")
-AMPLIFY_UNAME = os.getenv("AMPLIFY_UNAME")
-AMPLIFY_PWORD = os.getenv("AMPLIFY_PWORD")
+
+# API_KEY and Amplify UI base URL and credentials for fetching templates
+API_KEY = dotenv.get_key(dotenv.find_dotenv(), "API_KEY")
+AMPLIFY_BASE_URL = dotenv.get_key(dotenv.find_dotenv(), "AMPLIFY_BASE_URL") or "https://main.d3f79dfa9zi46n.amplifyapp.com/"
+AMPLIFY_UNAME = dotenv.get_key(dotenv.find_dotenv(), "AMPLIFY_UNAME")
+AMPLIFY_PWORD = dotenv.get_key(dotenv.find_dotenv(), "AMPLIFY_PWORD")
 
 def fetch_template(template_name):
     """
@@ -80,8 +82,7 @@ def fetch_template(template_name):
     resp.raise_for_status()
     return resp.text
 
-# API Key for authentication
-API_KEY = "1234abcd"
+
 
 def verify_api_key(x_api_key: str = Header(None)):
     """
@@ -439,36 +440,7 @@ def parse_grading_response(raw_response):
     grammar_score = re.search(r"Grammatical Range & Accuracy\s*\|\s*(\d+)", raw_response)
     overall_score = re.search(r"\*\*Overall Band Score\*\*\s*\|\s*\*\*(\d+)\*\*", raw_response)
     
-    # task_response_feedback = re.search(
-    # r"(?:^|\n)[#\d.\s]*\**(?:Task Response|Task Achievement)\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Coherence and Cohesion\**[:\-]?)",
-    # raw_response, re.DOTALL)
-
-    # coherence_feedback = re.search(
-    # r"(?:^|\n)[#\d.\s]*\**Coherence and Cohesion\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Lexical Resource\**[:\-]?)",
-    # raw_response, re.DOTALL)
-
-    # lexical_feedback = re.search(
-    # r"(?:^|\n)[#\d.\s]*\**Lexical Resource\**[:\-]?\s*(.*?)(?=(?:^|\n)[#\d.\s]*\**(?:Grammatical Range & Accuracy|Grammatical Range and Accuracy)\**|$)",
-    # raw_response, re.DOTALL)
-
-    # grammar_feedback = re.search(
-    # r"(?:^|\n)[#\d.\s]*\**(?:Grammatical Range & Accuracy|Grammatical Range and Accuracy)\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Overall Band Score)",
-    # raw_response, re.DOTALL)
-
-    # overall_summary_feedback = re.search(
-    # r"(?:^|\n)[#\d.\s]*\**Overall Band Score Summary\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Feedback\**[:\-]?)",
-    # raw_response, re.DOTALL)
-
-    # general_feedback = re.search(
-    # r"(?:^|\n)[#\d.\s]*\**Feedback\**[:\-]?\s*(.*?)(?=\n[#\d.\s]*\**Scoring Table\**[:\-]?)",
-    # raw_response, re.DOTALL)
-
-    # task_response_feedback = re.search(
-    # r"\*\*\s*1\.\s*Task Response\s*\*\*\s*(.*?)(?=\n\*\*\s*2\.\s*Coherence and Cohesion\s*\*\*)",
-    # raw_response, re.DOTALL)
-    # task_response_feedback = re.search( ###most recent working###
-    # r"\*\*\s*1\.\s*(?:Task Response|Task Achievement)\s*\*\*\s*(.*?)(?=\n\*\*\s*2\.\s*Coherence and Cohesion\s*\*\*)",
-    # raw_response, re.DOTALL | re.IGNORECASE)
+   
     task_response_feedback = re.search(
     r"(?:^|\n)\s*(?:\*\*\s*)?(?:1\.\s*)?(?:\*\*)?\s*(Task Response|Task Achievement)\s*(?:\*\*)?\s*\n+(.*?)(?=\n\s*(?:\*\*\s*)?(?:2\.\s*)?(?:\*\*)?\s*Coherence and Cohesion)",
     raw_response,
@@ -501,11 +473,7 @@ def parse_grading_response(raw_response):
     r"\*\*\s*(?:6\.\s*)?Feedback\s*\*\*\s*(.*?)(?=\n\*\*\s*(?:7\.\s*)?Scoring Table\s*\*\*)",
     raw_response, re.DOTALL)
 
-    # def safe_extract(regex_match):
-    #     try:
-    #         return regex_match.group(1).strip()
-    #     except:
-    #         return ""
+
     def safe_extract(regex_match, group_num=1):
         try:
             return regex_match.group(group_num).strip()
@@ -535,14 +503,7 @@ def parse_grading_response(raw_response):
             "grammatical_range": int(grammar_score.group(1)) if grammar_score else None,
             "overall": int(overall_score.group(1)) if overall_score else None
         },
-        # "feedback": {
-        #     "task_response": task_response_feedback.group(1).strip() if task_response_feedback else "",
-        #     "coherence_cohesion": coherence_feedback.group(1).strip() if coherence_feedback else "",
-        #     "lexical_resource": lexical_feedback.group(1).strip() if lexical_feedback else "",
-        #     "grammatical_range": grammar_feedback.group(1).strip() if grammar_feedback else "",
-        #     "overall_summary": overall_summary_feedback.group(1).strip() if overall_summary_feedback else "",
-        #     "general_feedback": general_feedback.group(1).strip() if general_feedback else ""
-        # },
+  
         "feedback": {
             "task_response": safe_extract(task_response_feedback,group_num=2),
             "coherence_cohesion": safe_extract(coherence_feedback),

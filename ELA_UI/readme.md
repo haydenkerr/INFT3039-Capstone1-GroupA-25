@@ -6,7 +6,10 @@ This project provides a browser-based interface for uploading and submitting IEL
 
 ## 🔧 Prerequisites
 - A modern web browser (Chrome, Firefox, Edge)
-- Optional: A running API backend listening on the endpoint defined in `script.js` (default: `http://192.168.1.17:8001/grade`)
+- Optional: A running API backend listening on the endpoint defined based on `config.js` in `script.js`. It looks for local docker instance at port 8002 by default, otherwise, it runs on port 8008.
+- When loaded at AWS Amplify at either staging or main, it uses environment variables to control API access.
+
+
 
 ---
 
@@ -36,8 +39,8 @@ That's it! No additional build steps required. This is a fully client-side HTML/
 ---
 
 ## 🔒 Security Notes
-- The API key `1234abcd` is hardcoded in `script.js` for demo purposes.
-- For production, consider securing API access using environment variables or server-side authentication.
+- The API key is hardcoded in local `config.js` and referenced at in runtime `script.js` for demo purposes.
+- For production, AWS Amplify has had environtal variables updates to hold the API_KEY consider securing API access using environment variables or server-side authentication.
 
 ---
 

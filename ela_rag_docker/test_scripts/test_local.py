@@ -3,7 +3,22 @@ import json
 import os
 from dotenv import load_dotenv
 
+#  Change to the directory where the FastAPI app is located
+# check current working directory, and then change to the ela_rag_docker directory
+current_dir = os.getcwd()
+print(current_dir)
+if not current_dir.endswith('ela_rag_docker'):
+    print("Changing directory to ela_rag_docker")
+    # Change to the ela_rag_docker directory    
+if os.path.exists('ela_rag_docker'):
+    print("ela_rag_docker directory exists, changing to it.")    
+    os.chdir('ela_rag_docker')
+
+
 load_dotenv()
+
+API_KEY = load_dotenv().get("API_KEY")  # Default to a test key if not set
+
 
 def test_query_endpoint(query_text: str, api_key: str = None):
     """
@@ -18,13 +33,13 @@ def test_query_endpoint(query_text: str, api_key: str = None):
     """
     url = 'http://localhost:8001/query'  # Assuming the app is running locally on port 8000
     headers = {}
-    if api_key:
-        headers["x-api-key"] = api_key
+    if API_KEY:
+        headers["x-api-key"] = API_KEY
     else:
         # api_key = os.getenv("API_KEY")
-        api_key = "1234abcd"
-        if api_key:
-            headers["x-api-key"] = api_key
+        
+        if API_KEY:
+            headers["x-api-key"] = API_KEY
         else:
             print("Error: API_KEY not provided and not found in environment variables.")
             return None
