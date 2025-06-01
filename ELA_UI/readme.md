@@ -36,7 +36,7 @@ That's it! No additional build steps required. This is a fully client-side HTML/
 ---
 
 ## 🔒 Security Notes
-- The API key `1234abcd` is hardcoded in `script.js` for demo purposes.
+- 
 - For production, consider securing API access using environment variables or server-side authentication.
 
 ---
