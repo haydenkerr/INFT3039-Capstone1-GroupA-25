@@ -5,6 +5,8 @@ This repository contains the source code for the ELA (English Language Assessmen
 - **ela_ui**: The frontend web user interface (HTML/JS/CSS).
 - **ela_rag_docker**: The backend FastAPI application, vector database, document ingestion, and LLM integration.
 
+- **system markdown prompts**: Thes system markdown prompts are located in a seperate repo, https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25-System-Prompts.
+
 ---
 
 ## Table of Contents
