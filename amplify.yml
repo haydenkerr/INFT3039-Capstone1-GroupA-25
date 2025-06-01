@@ -1,0 +1,21 @@
+version: 1
+frontend:
+phases:
+  preBuild:
+    commands:
+      - |
+        echo "window.APP_CONFIG = {" > ELA_UI/config.js
+        echo "  API_KEY: '$(echo $API_KEY)'," >> ELA_UI/config.js
+        echo "  HOST_PORT: '$(echo $HOST_PORT)'" >> ELA_UI/config.js
+        echo "};" >> ELA_UI/config.js
+        echo "window.APP_CONFIG_READY = Promise.resolve();" >> ELA_UI/config.js
+
+    build:
+      commands:
+        - echo "No build needed"
+  artifacts:
+    baseDirectory: ELA_UI
+    files:
+      - '**/*'
+  cache:
+    paths: []
