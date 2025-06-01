@@ -4,49 +4,99 @@ import json
 
 # load test data set
 # host_port = "http://"+"3.106.58.24:8002"
-# host_port = "https://"+"ielts-unisa-groupa.me"
+host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
-# host_port = "http://"+"192.168.1.17:8001"
-host_port = "http://"+"127.0.0.1:8008"
+# host_port = "http://"+"127.0.0.1:8002" #docker local
+# host_port = "http://"+"127.0.0.1:8008" # fastapi local
 # Define the GitHub raw CSV URL
-csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
+# csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
+
+xlsx_url_test =  "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/UI2SP-565-Resolve-overall-score-increase-on-same-submission/ela_rag_docker/test_scripts/question_list_with_all_essays.xlsx"
 
 # Load the CSV data
-df_test = pd.read_csv(csv_url_test)
+df_test = pd.read_excel(xlsx_url_test, sheet_name='Sheet1')
 
-df_test = df_test[['prompt', 'essay', 'band', 'cleaned_evaluation','Task Achievement', 'Coherence', 'Lexical Resource', 'Grammar','Overall Band Score']]  
 
-df_test.rename(columns={'prompt':'question'}, inplace=True)
+df_test = df_test[['task_id', 'question_text', 'complete_essay']]  
+
+# add a column to the dataframe with the task type description. 
+# 1 =     "General Task 1": with a minimum of 150 words
+# 2 =     "General Task 2": with a minimum of 250 words
+# 3 =     "Academic Task 1": with a minimum of 150 words 
+# 4 =     "Academic Task 2": with a minimum of 250 words
+df_test['taskType'] = df_test['task_id'].map({
+    1: "General Task 1",
+    2: "General Task 2",
+    3: "Academic Task 1",
+    4: "Academic Task 2"
+})
+
+df_test
+
+
+
 
 # Example test case
-question_id = 191
+import random
+# Randomly select a question ID from the test set
+# For testing purposes, we can set a specific question_id
+
+# question_id = 148
 # word wrap the text output below  
 
 API_KEY = "1234abcd"
-# essayGrade = {
-#     "email": "hayden@google.com",
-#     "question": """You are experiencing financial problems and want to ask your landlord if you can pay your rent late. Write a letter to your landlord. In your letter explain:  
-# - Why you are writing to him.
-# - Why you cannot pay the rent.
-# - When you will pay the rent.""",
-#     "essay": """Dear Mr. Bloke, 
-# I hope this message finds you well. I am writing to inform you that I am facing some financial difficulties this month due to an unexpected family emergency. As a result, I will not be able to pay my rent on time. I will ensure the full rent is paid by the 20th of this month. I appreciate your understanding and patience.
-# Yours sincerely,
-# Jane Doe""",
-#     "wordCount": 265,
-#     "submissionGroup":6,
-#     "taskType":"General Task 1"    
-    
-#     }
-
 essayGrade = {
-    "email": "hayden@google.com",
-    "question": df_test.iloc[question_id]["question"],
-    "essay": df_test.iloc[question_id]["essay"],
-    "wordCount": 265,
-    "submissionGroup":6,
-    "taskType":"General Task 1"    
+    "email": "hayden.kerr@gmail.com",
+    "question": """"Some people think that it is better for children to grow up in the countryside, while others believe that living in a city is more beneficial for their development.
+
+Discuss both views and give your own opinion."
+""",
+    "essay": """
+"The environment in which children grow up can have a significant impact on their development. While some believe that a rural upbringing offers a healthier and more peaceful lifestyle, others argue that growing up in a city provides more opportunities for learning and personal growth. Both perspectives have merit, but I believe that urban environments offer more advantages overall.
+
+Supporters of countryside living often point to the cleaner air, closer connection to nature, and slower pace of life. Children in rural areas may enjoy more outdoor activities, experience less stress, and have stronger community ties. These factors can contribute to physical well-being and emotional security during early development.
+
+However, growing up in a city exposes children to a wide range of educational and cultural opportunities. Urban areas typically offer better schools, libraries, and extracurricular programs. Children also benefit from access to museums, theatres, and diverse communities, which can broaden their understanding of the world. While city life can be fast-paced and sometimes overwhelming, it also prepares young people for modern life in a globalized society.
+
+In my opinion, although the countryside provides a peaceful environment, the resources and exposure available in cities play a more critical role in a child’s intellectual and social development. With proper guidance and support, the challenges of urban living can be managed effectively.
+
+In conclusion, both the countryside and the city have unique benefits, but I believe the city better equips children for the future by offering more varied and stimulating experiences."
+""",
+    "wordCount": 247,
+    "submissionGroup":3,
+    "taskType":"General Task 2"    
+    
     }
+
+# loop through the test data set and post each essay to the API
+for index, row in df_test.iterrows():
+    essayGrade = {
+        "email": "hayden.kerr@gmail.com",
+        "question": row["question_text"],
+        "essay": row["complete_essay"],
+        "wordCount": len(row["complete_essay"].split()),
+        "submissionGroup": 6,
+        "taskType": row["taskType"]
+    }
+    response = requests.post(
+        host_port+"/grade",
+        headers={"x-api-key": API_KEY},
+        json=essayGrade
+    )
+    print(response.json())
+
+
+question_id = random.randint(0, len(df_test) - 1)
+essayGrade = {
+    "email": "hayden.kerr@gmail.com",
+    "question": df_test.iloc[question_id]["question_text"],
+    "essay": df_test.iloc[question_id]["complete_essay"],
+    "wordCount": len(row["complete_essay"].split()),
+    "submissionGroup":6,
+    "taskType": row["taskType"]    
+    }
+
+
 response = requests.post(
     host_port+"/grade",
     headers={"x-api-key": API_KEY},
@@ -55,16 +105,16 @@ response = requests.post(
 )
 print(response.json())
 
-query = {"query_text": "What is the main idea of the text?"}
-response = requests.post(
-    host_port+"/query",
-    headers={"x-api-key": API_KEY},
-    json=query
- 
-)
+# query = {"query_text": "What is the main idea of the text?"}
+# response = requests.post(
+#     host_port+"/query",
+#     headers={"x-api-key": API_KEY},
+#     json=query,
+#     verify=False
+# )
 
 
-print(response.json())
+# print(response.json())
 
 
 responseGet = requests.get(
@@ -87,7 +137,7 @@ print(responseGet.json())
 
 
 # test results return from database
-tracking_id = "3e19f672-76aa-4fc5-ace6-f25a836713cd"
+tracking_id = "7fda868d-8cb5-40e9-b02a-25d6fab89d33"
 responseGet = requests.get(
     host_port+"/results/"+tracking_id,
     headers={"x-api-key": API_KEY}
@@ -95,6 +145,16 @@ responseGet = requests.get(
 )
 print(responseGet.text)
 
+
+# test results return from submissions
+email = "hayden.kerr@gmail.com"
+ 
+responseGet = requests.get(
+    host_port+"/submissions/"+email,
+    headers={"x-api-key": API_KEY}
+    
+)
+print(responseGet.text)
 
 
 response = requests.get(

@@ -5,22 +5,34 @@ import hashlib
 from sentence_transformers import SentenceTransformer
 from vector_db import VectorDatabase
 
-
-# Initialize embedding model
+# Initialize the sentence transformer embedding model
 embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-# Define FAISS vector store
+# Initialize the FAISS vector database with the correct embedding dimension
 vector_db = VectorDatabase(embedding_dim=384)
 
-# GitHub CSV URL
+# Default GitHub CSV URL for data ingestion
 CSV_URL = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_train_data.csv"
 
 def compute_content_hash(content):
-    """Generate a hash for document content to check for duplicates"""
+    """
+    Generate a hash for document content to check for duplicates.
+
+    Args:
+        content (str): The document content.
+
+    Returns:
+        str: MD5 hash of the content.
+    """
     return hashlib.md5(content.encode('utf-8')).hexdigest()
 
 def load_document_hashes():
-    """Load existing document hashes from metadata"""
+    """
+    Load existing document hashes from the vector database metadata.
+
+    Returns:
+        dict: Mapping of content hash to document index.
+    """
     hashes = {}
     for idx, metadata in vector_db.metadata.items():
         if isinstance(metadata, str) and "hash:" in metadata:
@@ -31,21 +43,27 @@ def load_document_hashes():
     return hashes
 
 def ingest_csv_documents(max_rows=10000, csv_url=None):
-    """Batch processes and stores CSV data into FAISS with duplicate checking."""
+    """
+    Batch processes and stores CSV data into the FAISS vector database with duplicate checking.
+
+    Args:
+        max_rows (int): Maximum number of rows to process from the CSV.
+        csv_url (str, optional): URL to the CSV file. If None, uses the default CSV_URL.
+    """
     if csv_url is None:
         csv_url = CSV_URL
         
     print(f"📊 Loading CSV data from {csv_url}...")
     
     try:
-        # Load existing document hashes
+        # Load existing document hashes for duplicate detection
         existing_hashes = load_document_hashes()
         print(f"🔍 Found {len(existing_hashes)} existing documents")
         
-        # Load the CSV data
+        # Load the CSV data into a DataFrame
         df = pd.read_csv(csv_url)
         
-        # Select and rename columns
+        # Select and rename relevant columns
         df = df[['prompt', 'essay', 'band', 'cleaned_evaluation', 
                 'Task Achievement', 'Coherence', 'Lexical Resource', 
                 'Grammar', 'Overall Band Score']]
@@ -53,11 +71,12 @@ def ingest_csv_documents(max_rows=10000, csv_url=None):
         
         print(f"✅ Loaded CSV with {len(df)} rows")
         
-        # Process rows up to max_rows limit
+        # Initialize counters
         processed_rows = 0
         new_docs = 0
         skipped_docs = 0
         
+        # Iterate through DataFrame rows
         for idx, row in df.iterrows():
             if processed_rows >= max_rows:
                 break
@@ -75,15 +94,14 @@ def ingest_csv_documents(max_rows=10000, csv_url=None):
                 f"Overall Band Score: {row['Overall Band Score']}"
             )
             
-            # Check for duplicates
+            # Check for duplicates using content hash
             content_hash = compute_content_hash(content)
-            
             if content_hash in existing_hashes:
                 skipped_docs += 1
                 processed_rows += 1
                 continue
                 
-            # Generate embedding
+            # Generate embedding for the document
             embedding = embedding_model.encode(content, normalize_embeddings=True)
             
             # Use row index as document ID

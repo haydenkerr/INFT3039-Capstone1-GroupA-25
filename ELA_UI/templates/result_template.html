@@ -48,7 +48,22 @@
     </style>
 </head>
 <body>
-    <div class="container">
+            <!-- <div style="margin-bottom: 20px;">
+                <a id="back-to-main" style="font-weight:bold;">&#8592; Back to Main Page</a>
+            </div>
+            <script>
+            // Try to use the referrer if it matches your UI domains, otherwise fallback to a default
+            const ref = document.referrer;
+            let uiBase = "https://main.d3f79dfa9zi46n.amplifyapp.com"; // default
+            if (ref.includes("127.0.0.1")) {
+            uiBase = "http://127.0.0.1:8008";
+        } else if (ref.includes("staging.d3f79dfa9zi46n.amplifyapp.com")) {
+                uiBase = "https://staging.d3f79dfa9zi46n.amplifyapp.com";
+            } else if (ref.includes("main.d3f79dfa9zi46n.amplifyapp.com")) {
+                uiBase = "https://main.d3f79dfa9zi46n.amplifyapp.com";
+            }
+            document.getElementById("back-to-main").href = uiBase + "/index.html";
+            </script> -->
         <h1>View Results</h1>
 
         <h2>Question:</h2>
@@ -108,5 +123,6 @@
             </table>
         </div>
     </div>
+
 </body>
 </html>
