@@ -39,6 +39,7 @@ That's it! No additional build steps required. This is a fully client-side HTML/
 ---
 
 ## 🔒 Security Notes
+
 - The API key is hardcoded in local `config.js` and referenced at in runtime `script.js` for demo purposes.
 - For production, AWS Amplify has had environtal variables updates to hold the API_KEY consider securing API access using environment variables or server-side authentication.
 
