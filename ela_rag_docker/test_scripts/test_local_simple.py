@@ -1,37 +1,47 @@
 import requests
 import pandas as pd
 import json
+import os
+import dotenv
 
 # load test data set
 # host_port = "http://"+"3.106.58.24:8002"
-host_port = "https://"+"ielts-unisa-groupa.me"
+# host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
 # host_port = "http://"+"127.0.0.1:8002" #docker local
-# host_port = "http://"+"127.0.0.1:8008" # fastapi local
+host_port = "http://"+"127.0.0.1:8008" # fastapi local
+
+os.chdir('ela_rag_docker')
+dotenv.load_dotenv()
+API_KEY = dotenv.get_key(dotenv.find_dotenv(), "API_KEY")
+
+
+
+
 # Define the GitHub raw CSV URL
 # csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 
-xlsx_url_test =  "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/UI2SP-565-Resolve-overall-score-increase-on-same-submission/ela_rag_docker/test_scripts/question_list_with_all_essays.xlsx"
+xlsx_url_test =  "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/staging/ela_rag_docker/test_scripts/question_list_with_all_essays.xlsx"
 
 # Load the CSV data
-df_test = pd.read_excel(xlsx_url_test, sheet_name='Sheet1')
+xlsx_url_test = pd.read_excel(xlsx_url_test, sheet_name='Sheet1')
 
 
-df_test = df_test[['task_id', 'question_text', 'complete_essay']]  
+xlsx_url_test = xlsx_url_test[['task_id', 'question_text', 'complete_essay']]  
 
 # add a column to the dataframe with the task type description. 
 # 1 =     "General Task 1": with a minimum of 150 words
 # 2 =     "General Task 2": with a minimum of 250 words
 # 3 =     "Academic Task 1": with a minimum of 150 words 
 # 4 =     "Academic Task 2": with a minimum of 250 words
-df_test['taskType'] = df_test['task_id'].map({
+xlsx_url_test['taskType'] = xlsx_url_test['task_id'].map({
     1: "General Task 1",
     2: "General Task 2",
     3: "Academic Task 1",
     4: "Academic Task 2"
 })
 
-df_test
+xlsx_url_test
 
 
 
@@ -44,7 +54,7 @@ import random
 # question_id = 148
 # word wrap the text output below  
 
-API_KEY = "1234abcd"
+
 essayGrade = {
     "email": "hayden.kerr@gmail.com",
     "question": """"Some people think that it is better for children to grow up in the countryside, while others believe that living in a city is more beneficial for their development.
@@ -69,7 +79,7 @@ In conclusion, both the countryside and the city have unique benefits, but I bel
     }
 
 # loop through the test data set and post each essay to the API
-for index, row in df_test.iterrows():
+for index, row in xlsx_url_test.iterrows():
     essayGrade = {
         "email": "hayden.kerr@gmail.com",
         "question": row["question_text"],
@@ -86,11 +96,11 @@ for index, row in df_test.iterrows():
     print(response.json())
 
 
-question_id = random.randint(0, len(df_test) - 1)
+question_id = random.randint(0, len(xlsx_url_test) - 1)
 essayGrade = {
     "email": "hayden.kerr@gmail.com",
-    "question": df_test.iloc[question_id]["question_text"],
-    "essay": df_test.iloc[question_id]["complete_essay"],
+    "question": xlsx_url_test.iloc[question_id]["question_text"],
+    "essay": xlsx_url_test.iloc[question_id]["complete_essay"],
     "wordCount": len(row["complete_essay"].split()),
     "submissionGroup":6,
     "taskType": row["taskType"]    
@@ -159,7 +169,7 @@ print(responseGet.text)
 
 response = requests.get(
     "https://ielts-unisa-groupa.me/debug/test",
-    headers={"x-api-key": "1234abcd"},
+    headers={"x-api-key": API_KEY},
     timeout=10
 )
 

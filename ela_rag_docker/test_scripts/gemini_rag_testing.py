@@ -4,6 +4,13 @@ import re
 from sentence_transformers import SentenceTransformer, util
 import requests
 
+import dotenv
+import os
+# Load environment variables
+dotenv.load_dotenv()
+API_KEY = dotenv.get_key(dotenv.find_dotenv(), "API_KEY")
+# API_KEY = os.getenv("API_KEY")
+
 # Load the test dataset
 csv_url_test = "https://github.com/haydenkerr/INFT3039-Capstone1-GroupA-25/raw/refs/heads/main/datasets/processed_dataset2_test_data.csv"
 df_test = pd.read_csv(csv_url_test)
@@ -23,7 +30,7 @@ def compute_similarity(reference, candidate):
 
 def query_rag_model(question, essay):
     """Send a request to the RAG model API and return the graded response."""
-    API_KEY = "1234abcd"
+  
     url = "http://192.168.1.15:8001/grade"  # Adjust to match FastAPI endpoint
     payload = {"question": question, "essay": essay}
     headers = {"x-api-key": API_KEY, "Content-Type": "application/json"}
