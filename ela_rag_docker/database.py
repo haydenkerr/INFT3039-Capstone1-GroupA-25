@@ -392,9 +392,9 @@ def calculate_overall_score(results_data: list) -> float:
 
     # IELTS-specific rounding
     if average % 1 == 0.25:
-        overall_score = round(average + 0.25, 1)
+        overall_score = round(average - 0.25, 1)
     elif average % 1 == 0.75:
-        overall_score = round(average + 0.25, 1)
+        overall_score = round(average - 0.25, 1)
     else:
         overall_score = round(average * 2) / 2
 

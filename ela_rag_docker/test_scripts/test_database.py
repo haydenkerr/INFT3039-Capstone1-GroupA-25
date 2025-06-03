@@ -192,7 +192,7 @@ def test_get_or_create_user_existing():
 # TEST calculate_overall_score
 # ------------------------------------------------------------------------------------------
 
-def test_rounding_up_6_25():
+def test_rounding_down_6_25():
 
     results = [
         {"competency_name": "Task Response", "score": 6.0, "feedback_summary": "", "submission_id": 1},
@@ -201,9 +201,9 @@ def test_rounding_up_6_25():
         {"competency_name": "Grammatical Range and Accuracy", "score": 6.5, "feedback_summary": "", "submission_id": 1},
     ]
 
-    assert calculate_overall_score(results) == 6.5
+    assert calculate_overall_score(results) == 6.0
 
-def test_rounding_up_6_75():
+def test_rounding_down_6_75():
 
     results = [
         {"competency_name": "Task Response", "score": 7.0, "feedback_summary": "", "submission_id": 1},
@@ -212,7 +212,7 @@ def test_rounding_up_6_75():
         {"competency_name": "Grammatical Range and Accuracy", "score": 6.5, "feedback_summary": "", "submission_id": 1},
     ]
 
-    assert calculate_overall_score(results) == 7.0
+    assert calculate_overall_score(results) == 6.5
 
 def test_no_rounding_half_band():
 
