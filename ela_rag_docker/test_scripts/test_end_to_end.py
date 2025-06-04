@@ -26,8 +26,8 @@ dotenv.load_dotenv()
 
 # Configuration for the API endpoint and test data
 API_KEY = dotenv.get_key(dotenv.find_dotenv(), "API_KEY")
-# BASE_URL = "https://ielts-unisa-groupa.me"
-BASE_URL = "http://127.0.0.1:8008" # Local Fast API testing URL
+BASE_URL = "https://ielts-unisa-groupa.me"
+# BASE_URL = "http://127.0.0.1:8008" # Local Fast API testing URL
 # BASE_URL = "http://127.0.0.1:8002" # Local DOCKER IMAGE testing URL
 
 # Download and prepare test data
@@ -154,6 +154,7 @@ def test_results_and_submissions(test_data):
     assert response.status_code == 200
     data = response.json()
     tracking_id = data.get("tracking_id")
+    print(f"Tracking ID: {tracking_id}")
     assert tracking_id
 
     # Wait for results to be processed (if async)

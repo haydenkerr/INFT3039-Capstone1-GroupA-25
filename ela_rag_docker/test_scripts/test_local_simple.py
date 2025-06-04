@@ -3,13 +3,14 @@ import pandas as pd
 import json
 import os
 import dotenv
+import random
 
 # load test data set
 # host_port = "http://"+"3.106.58.24:8002"
 # host_port = "https://"+"ielts-unisa-groupa.me"
 # Docker
-# host_port = "http://"+"127.0.0.1:8002" #docker local
-host_port = "http://"+"127.0.0.1:8008" # fastapi local
+host_port = "http://"+"127.0.0.1:8002" #docker local
+# host_port = "http://"+"127.0.0.1:8008" # fastapi local
 
 os.chdir('ela_rag_docker')
 dotenv.load_dotenv()
@@ -47,7 +48,7 @@ xlsx_url_test
 
 
 # Example test case
-import random
+
 # Randomly select a question ID from the test set
 # For testing purposes, we can set a specific question_id
 
@@ -101,9 +102,9 @@ essayGrade = {
     "email": "hayden.kerr@gmail.com",
     "question": xlsx_url_test.iloc[question_id]["question_text"],
     "essay": xlsx_url_test.iloc[question_id]["complete_essay"],
-    "wordCount": len(row["complete_essay"].split()),
+    "wordCount": len(xlsx_url_test.iloc[question_id]["complete_essay"].split()),
     "submissionGroup":6,
-    "taskType": row["taskType"]    
+    "taskType": xlsx_url_test.iloc[question_id]["taskType"]    
     }
 
 
