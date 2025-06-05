@@ -37,7 +37,7 @@ body {
   text-align: left;
 }
 
-/* Form groups */
+/* Form groups (consistent styling for main form elements)*/
 .form-group {
   margin-bottom: 1.5rem;
   display: flex;
@@ -60,7 +60,7 @@ body {
   font-size: 1rem;
 }
 
-/* Form rows (two columns side by side) */
+/* Form rows (container to display form-group elements side by side horizontally) */
 .form-row {
   display: flex;
   gap: 1rem;
@@ -157,8 +157,6 @@ textarea {
   height: 22px;
 }
 
-
-
 /* Report Section */
 .report-section {
   background-color: #f1f5f9;
@@ -205,7 +203,7 @@ textarea {
   margin-right: 0.75rem; 
 }
 
-/* Style the Download Template and Submit Feedback links like the other buttons */
+/* Style the Download Template and Submit Feedback links to match the other buttons */
 .download-template a,
 .feedback-section a {
 display: inline-flex;
@@ -222,7 +220,7 @@ cursor: pointer;
 transition: background-color 0.3s;
 }
 
-/* View Results Box*/
+/* View Results Box */
 .results-text {
 text-align: left; 
 font-size: 1.75rem; 
@@ -253,7 +251,8 @@ color: #555;
 min-height: 60px;
 }
 
+/* Adjustments to align with other elements */
 p {
-  margin: 0 0 0.75em 0; /* Remove top margin, reduce bottom */
+  margin: 0 0 0.75em 0; 
   line-height: 1.5;
 }
